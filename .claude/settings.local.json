@@ -1,0 +1,42 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /home/dev-project/Documents/Work -type f -name README* -o -name package.json -o -name Makefile -o -name pyproject.toml -o -name Cargo.toml -o -name CLAUDE.md -o -name .cursorrules -o -name copilot-instructions.md)",
+      "Bash(mv atelier-analysis/SKILL.md atelier.md)",
+      "Bash(mv commerce-analysis/SKILL.md commerce.md)",
+      "Bash(mv master-analysis/SKILLS.md master.md)",
+      "Bash(mv monthly-recap/SKILL.md monthly.md)",
+      "Bash(mv weekly-analysis/SKILL.md weekly.md)",
+      "Skill(claude-api)",
+      "Skill(claude-api:*)",
+      "Bash(python \"c:/Users/mendo/Documents/Work/.agent/skills/scripts/data_router.py\")",
+      "Bash(python3 \"c:/Users/mendo/Documents/Work/.agent/skills/scripts/data_router.py\")",
+      "Bash(py \"c:/Users/mendo/Documents/Work/.agent/skills/scripts/data_router.py\")",
+      "Bash(where python3.exe)",
+      "Bash(where python.exe)",
+      "Read(//c/Users/mendo/AppData/Local/Programs/**)",
+      "Bash(ls /c/Python*)",
+      "Bash(\"/c/Users/mendo/AppData/Local/Microsoft/WindowsApps/python3.exe\" \"c:/Users/mendo/Documents/Work/.agent/skills/scripts/data_router.py\")",
+      "Bash(head -5 \"c:/Users/mendo/Documents/Work/resources/CA Main d''''oeuvre par TMS \\(1\\).csv\")",
+      "Bash(cat \"c:/Users/mendo/Documents/Work/resources/CA Main d''oeuvre par TMS \\(1\\).csv\")",
+      "Bash(cat 'c:/Users/mendo/Documents/Work/resources/Ratios Atelier de date à date \\(1\\).csv')",
+      "Bash(cat 'c:/Users/mendo/Documents/Work/resources/Suivi Individuel des ratios atelier \\(2\\).csv')",
+      "Bash(for f:*)",
+      "Bash(do echo:*)",
+      "Read(//c/Users/mendo/Documents/Work/**)",
+      "Bash(done)",
+      "Bash(cat \"c:/Users/mendo/Documents/Work/resources/comparatifCAv2_Famille \\(1\\).csv\")",
+      "Bash(ls -la \"c:\\\\Users\\\\mendo\\\\Documents\\\\Work\\\\.agent\\\\skills\\\\scripts\"\" 2>/dev/null || echo \"scripts directory does not exist \")",
+      "Bash(cat \"c:/Users/mendo/Documents/Work/resources/SUC/SUC - Objectifs Journaliers \\(7\\).csv\")",
+      "Bash(cat \"c:/Users/mendo/Documents/Work/resources/SUC/SUC - Situation de chiffre \\(2\\).csv\")",
+      "Bash(cat \"c:/Users/mendo/Documents/Work/resources/SUC/SUC - Situation de chiffre \\(3\\).csv\")",
+      "Bash(python3 -:*)",
+      "Bash(python -:*)",
+      "Bash(where py:*)",
+      "Bash(where python3:*)",
+      "Bash(where python:*)",
+      "Bash(py --version)",
+      "Bash(\"C:\\\\Users\\\\mendo\\\\AppData\\\\Local\\\\Microsoft\\\\WindowsApps\\\\python3.exe\" --version)"
+    ]
+  }
+}

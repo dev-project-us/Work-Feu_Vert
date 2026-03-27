@@ -1,0 +1,228 @@
+{
+  "main": {
+    "id": "516fd494c9a32caa",
+    "type": "split",
+    "children": [
+      {
+        "id": "80260335efab29a0",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "84e929bac6fa2186",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Rapport hebdomadaire/rapport hebdomadaire semaine 12.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "rapport hebdomadaire semaine 12"
+            }
+          },
+          {
+            "id": "5d896e1d16a9c542",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Untitled.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Untitled"
+            }
+          }
+        ],
+        "currentTab": 1
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "8ad164dc3ecad138",
+    "type": "split",
+    "children": [
+      {
+        "id": "49ccac5826a2e57e",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "589b7b8a8d419435",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "75a33ed6fac8a636",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "716c16cecaaf19bd",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "ec6cf4e9f42c07ef",
+    "type": "split",
+    "children": [
+      {
+        "id": "0ac8bf0c406d1a00",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "c4b1bc28db4b3653",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "01-Analyses-Hebdomadaires/Atelier/12 - Plan d'actions atelier semaine 12.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for 12 - Plan d'actions atelier semaine 12"
+            }
+          },
+          {
+            "id": "6b7518e889184ef2",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "01-Analyses-Hebdomadaires/Atelier/12 - Plan d'actions atelier semaine 12.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from 12 - Plan d'actions atelier semaine 12"
+            }
+          },
+          {
+            "id": "4b43e507d92a69e0",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "51386a081bc74748",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "0e76722e1d1b82e4",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "01-Analyses-Hebdomadaires/Atelier/12 - Plan d'actions atelier semaine 12.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of 12 - Plan d'actions atelier semaine 12"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false,
+      "obsidian-git:Open Git source control": false
+    }
+  },
+  "active": "5d896e1d16a9c542",
+  "lastOpenFiles": [
+    "Work-Feu_Vert",
+    "Work-Feu_vert",
+    "Rapport hebdomadaire/rapport hebdomadaire semaine 12.md",
+    "Untitled.md",
+    "resources/defectuosite/CA Main d'oeuvre par TMS.csv",
+    "resources/defectuosite",
+    "Rapport hebdomadaire/11 - Rapport semaine 11.md",
+    "Rapport hebdomadaire/12 - Rapport semaine 12.md",
+    "Master Dashboard.md",
+    "context_ca_mo.md",
+    "Rapport hebdomadaire/11 - Rapport semaine 11.md.tmp.22137.1774168316403",
+    "Rapport hebdomadaire/11 - Rapport semaine 11.md.tmp.19584.1774167770716",
+    "templates/rapport_hebdomadaire_template.md",
+    "templates/rapport_mensuel_template.md",
+    "Rapport hebdomadaire/12 - Plan d'actions semaine 12.md",
+    "Rapport hebdomadaire/11 - Plan d'actions semaine 11.md",
+    "Rapport hebdomadaire/12 - Plan d'actions semaine 12.md.tmp.11841.1774166154038",
+    "Rapport hebdomadaire/Atelier/11 - Plan d'actions atelier semaine 10.md",
+    "Rapport hebdomadaire/Atelier",
+    "Rapport hebdomadaire",
+    "CLAUDE.md.tmp.6746.1774163949472",
+    "Analyses-Hebdomadaires/Atelier/11 - Plan d'actions atelier semaine 10.md",
+    "01-Analyses-Hebdomadaires/Atelier/12 - Plan d'actions atelier semaine 12.md"
+  ]
+}
