@@ -20,8 +20,9 @@ Run these commands inside Claude Code to trigger report generation:
 | `/chiffre` | `.agent/skills/chiffre.md` | Fill Sections 2, 3, and 7 from SUC CSV exports |
 | `/ratios` | `.agent/skills/ratios_prioritaires.md` | Fill Section 4 (Priority KPIs) from ratios CSV |
 | `/defectuosite` | `.agent/skills/defectuosite.md` | Fill Section 5 Atelier (Taux de Défectuosité) from CA_Main_d_oeuvre CSV |
+| `/suivi_vendeur` | `.agent/skills/suivi_vendeur.md` | Fill Section 5 LS (Ratios de Vente par vendeur) from Suivi Individuel CSV |
 
-`/chiffre` also invokes `/ratios` at completion. **Section 5 LS** (Staff Libre Service ratios de vente) has no skill yet — must be filled manually.
+`/chiffre` also invokes `/ratios` at completion. **Section 5 LS** is fully automated via `/suivi_vendeur` — all columns (Garantie Pneu, Géométrie, VCR, VCF, Plaquette, Dépollution) are implemented.
 
 ## Architecture
 
@@ -50,6 +51,16 @@ CSV in resources/ → Agent Skill (slash command) → Markdown Report in Rapport
 3. Find matching rapport file by week number
 4. Extract 6 KPI values and update Section 4
 
+**`suivi_vendeur.md`** — fills Section 5 LS (Ratios de Vente par vendeur):
+1. Scan `resources/suivi vendeur/` for file containing column `textbox390` in its content
+2. Extract week end date from line 2 (format: `ANNECY 2,DD/MM/YYYY - DD/MM/YYYY`)
+3. Find matching rapport file by week number
+4. Parse **Bloc 1** (`textbox3,` header): Garantie Pneu (col 22) and Géométrie (col 28) per vendeur
+5. Parse **Bloc 2** (`textbox590,` header): VCR (col 19), Plaquette (col 21), VCF (col 23) per vendeur
+6. Parse **Bloc 4** (`textbox326,` header): Dépollution (col 17) per vendeur
+7. Write all ratios into Section 5 LS table
+8. Confirm to user, listing all values written per vendeur
+
 **`defectuosite.md`** — fills Section 5 Atelier:
 1. Scan `resources/defectuosite/` for file containing `technicien3` column
 2. Extract week end date from the line containing `ANNECY` with `/` date separators
@@ -73,8 +84,10 @@ resources/
 │   └── SUC - Situation de chiffre (...).csv    ← fichier_semaine (Du 16/...)
 ├── ratios prioritaires/
 │   └── Ratios Atelier de date à date .csv
-└── defectuosite/
-    └── CA_Main_d_oeuvre (...).csv              ← contains technicien3 column
+├── defectuosite/
+│   └── CA_Main_d_oeuvre (...).csv              ← contains technicien3 column
+└── suivi vendeur/
+    └── Suivi Individuel des ratios atelier (...).csv  ← contains textbox390 column
 ```
 
 ## Key CSV Mappings
@@ -114,6 +127,51 @@ SUC files are **not clean tables** — they contain multiple data blocks separat
 
 Extract columns: `objectif`, `ratioN` (realized), `ratioN_1` (N-1), `textbox130` (écart pts).
 
+### Suivi Vendeur — Section 5 LS Mapping
+
+File identified by presence of `textbox390` in content. Parsed raw with `open(..., encoding='utf-8-sig')`.
+
+**Vendor name map (CSV → Template):**
+
+| Nom Template | Nom CSV (`textbox390`, col 8) |
+|:-------------|:------------------------------|
+| **Sandrine** | `SANDRINE R.` |
+| **Paul** | `PAUL P.` |
+| **Kamilia** | `KAMILIA A.` |
+| **Chouaib** | `CHOUAIB G.` |
+| **Pauline** | `PAULINE R.` |
+| **Valentin** | `VALENTIN C.` |
+
+Vendeurs présents dans le CSV mais absents du template (Arnaud B., Elyne S., Isabelle P., Sofiane B.) sont ignorés.
+
+**Bloc 1 confirmed columns** (header starts with `textbox3,`):
+
+| Position | CSV Column | Report Field |
+|:---------|:-----------|:-------------|
+| 8 | `textbox390` | Nom du vendeur |
+| 21 | `textbox46` | Garantie Pneu — quantité (N) |
+| 22 | `textbox56` | Garantie Pneu — ratio % (N) ✅ |
+| 27 | `textbox158` | Géométrie / Pose Pneu — quantité (N) |
+| 28 | `textbox159` | Géométrie / Pose Pneu — ratio % (N) ✅ |
+
+**Bloc 2 confirmed columns** (header `textbox590,`, vendeur name at col 11 `textbox144`):
+
+| Position | CSV Column | Report Field |
+|:---------|:-----------|:-------------|
+| 19 | `textbox156` | VCR — ratio % ✅ |
+| 21 | `textbox146` | Plaquette — ratio % ✅ |
+| 23 | `textbox136` | VCF — ratio % ✅ |
+
+**Bloc 4 confirmed columns** (header `textbox326,`, vendeur name at col 9 `textbox14`):
+
+| Position | CSV Column | Report Field |
+|:---------|:-----------|:-------------|
+| 17 | `textbox201` | Dépollution — ratio % ✅ |
+
+**NCI**: column position not yet confirmed — not extracted.
+
+Ratios are already formatted as `"24,2 %"` in the CSV — preserve as-is. Output ratio % only; never output raw quantities.
+
 ### Défectuosité — Section 5 Atelier Mapping
 
 | CSV `technicien3` | Template name |
@@ -138,10 +196,11 @@ python -c "import datetime; now=datetime.datetime.now(); print(f'{now.month:02d}
 
 ## Known Issues
 
-- **Hardcoded paths in skills**: All skill files reference `C:\Users\utilisateur203\Documents\Personnal\Second Brain\` — this does not match the actual vault path `C:\Users\mendo\Documents\Work\`. Adjust paths when executing any file-system operations from the skills.
+- **Portable paths**: All skill files use a `find_dir()` helper that walks up the directory tree to locate `resources/`, `Rapport hebdomadaire/`, and `templates/` by name — no hardcoded absolute paths. This works on any machine provided the folder names remain unchanged.
 - **`rapport_mensuel_template.md`**: Title header incorrectly reads "Rapport d'Analyse Hebdomadaire" instead of monthly.
 - **Section 7 template mismatch**: The template shows `%` placeholders for the Marge row, but the actual output uses euros (`€`). Follow the format in `chiffre.md` and existing generated reports, not the template skeleton.
 - **`defectuosite.md` incomplete**: Skill steps 4–6 are stubs — implement the extraction and writing logic when first invoked.
+- **`suivi_vendeur.md` NCI column**: NCI is not extracted (no confirmed column position in any bloc). All other Section 5 LS columns are implemented.
 
 ## Content & Style Rules
 

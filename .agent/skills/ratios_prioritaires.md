@@ -15,7 +15,7 @@ Ce skill décrit comment lire le fichier CSV des ratios atelier et remplir
 la **Section 4 — Ratios Prioritaires (Performance Atelier)** du rapport hebdomadaire.
 
 Fichier source :
-`C:\Users\utilisateur203\Documents\Personnal\Second Brain\Resources\ratios prioritaires\`
+a folder named `resources/ratios prioritaires/`
 
 Le fichier commence toujours par `Ratios_Atelier` mais son nom exact peut varier.
 L'identifier par la présence de la colonne `libelleUnivers` dans son contenu.
@@ -29,9 +29,18 @@ Quand l'utilisateur tape `/ratios` ou `/chiffre`, exécuter :
 ### Étape 1 — Scanner le dossier ratios
 
 ```python
-import glob, os
+import pathlib, glob, os
 
-folder = r"C:\Users\utilisateur203\Documents\Personnal\Second Brain\Resources\ratios prioritaires"
+def find_dir(name):
+    """Locate a directory by name, searching up from the current working directory.
+    Works on any machine as long as a folder named `name` exists in the tree."""
+    for p in [pathlib.Path.cwd()] + list(pathlib.Path.cwd().parents):
+        candidate = p / name
+        if candidate.is_dir():
+            return candidate
+    raise FileNotFoundError(f"Cannot find directory '{name}' in any parent of {pathlib.Path.cwd()}")
+
+folder = str(find_dir("resources") / "ratios prioritaires")
 csv_files = glob.glob(os.path.join(folder, "*.csv"))
 
 fichier_ratios = None
@@ -58,7 +67,7 @@ semaine = date_fin.isocalendar()[1]
 ### Étape 3 — Trouver le bon fichier rapport
 
 ```python
-rapport_dir  = r"C:\Users\utilisateur203\Documents\Personnal\Second Brain\Rapport hebdomadaire"
+rapport_dir  = str(find_dir("Rapport hebdomadaire"))
 rapport_path = os.path.join(rapport_dir, f"rapport hebdomadaire semaine {semaine}.md")
 
 if not os.path.exists(rapport_path):

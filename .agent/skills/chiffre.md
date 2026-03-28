@@ -20,7 +20,7 @@ et en extraire les valeurs nécessaires pour remplir les sections 2, 3 et 7 du
 rapport hebdomadaire.
 
 Les 3 fichiers source sont stockés dans un dossier dédié :
-`C:\Users\utilisateur203\Documents\Personnal\Second Brain\Resources\SUC\`
+a folder named `resources/SUC/`
 
 > Ce dossier ne doit contenir **que ces 3 fichiers** — un par type de rapport.
 > À chaque nouvelle semaine, remplacer les anciens fichiers par les nouveaux exports.
@@ -51,8 +51,8 @@ annee = date_fin.year
 ```python
 import shutil, os
 
-template_path = r"C:\Users\utilisateur203\Documents\Personnal\Second Brain\Templates\rapport_hebdomadaire_template.md"
-output_dir    = r"C:\Users\utilisateur203\Documents\Personnal\Second Brain\Rapport hebdomadaire"
+template_path = str(find_dir("templates") / "rapport_hebdomadaire_template.md")
+output_dir    = str(find_dir("Rapport hebdomadaire"))
 output_name   = f"rapport hebdomadaire semaine {semaine}.md"
 output_path   = os.path.join(output_dir, output_name)
 
@@ -119,7 +119,7 @@ Le fichier objectifs se reconnaît à la présence de la colonne `libelleJour`.
 ```python
 import os, glob
 
-folder = r"C:\Users\utilisateur203\Documents\Personnal\Second Brain\Resources\SUC"
+folder = str(find_dir("resources") / "SUC")
 csv_files = glob.glob(os.path.join(folder, "SUC - *.csv"))
 
 fichier_semaine = None

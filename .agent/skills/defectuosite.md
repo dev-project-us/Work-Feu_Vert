@@ -15,7 +15,7 @@ Ce skill décrit comment lire le fichier CSV CA Main d'œuvre par TMS et remplir
 la **Section 5 — Staff Atelier : Taux de Défectuosité** du rapport hebdomadaire.
 
 Fichier source :
-`C:\Users\utilisateur203\Documents\Personnal\Second Brain\Resources\defectuosite\`
+a folder named `resources/defectuosite/`
 
 Le fichier commence toujours par `CA_Main_d_oeuvre` mais son nom exact peut varier.
 L'identifier par la présence de la colonne `technicien3` dans son contenu.
@@ -27,9 +27,18 @@ L'identifier par la présence de la colonne `technicien3` dans son contenu.
 ### Étape 1 — Scanner le dossier
 
 ```python
-import glob, os
+import pathlib, glob, os
 
-folder = r"C:\Users\utilisateur203\Documents\Personnal\Second Brain\Resources\defectuosite"
+def find_dir(name):
+    """Locate a directory by name, searching up from the current working directory.
+    Works on any machine as long as a folder named `name` exists in the tree."""
+    for p in [pathlib.Path.cwd()] + list(pathlib.Path.cwd().parents):
+        candidate = p / name
+        if candidate.is_dir():
+            return candidate
+    raise FileNotFoundError(f"Cannot find directory '{name}' in any parent of {pathlib.Path.cwd()}")
+
+folder = str(find_dir("resources") / "defectuosite")
 csv_files = glob.glob(os.path.join(folder, "*.csv"))
 
 fichier_def = None
@@ -60,7 +69,7 @@ for line in lines:
 ### Étape 3 — Trouver le bon fichier rapport
 
 ```python
-rapport_dir  = r"C:\Users\utilisateur203\Documents\Personnal\Second Brain\Rapport hebdomadaire"
+rapport_dir  = str(find_dir("Rapport hebdomadaire"))
 rapport_path = os.path.join(rapport_dir, f"rapport hebdomadaire semaine {semaine}.md")
 
 if not os.path.exists(rapport_path):

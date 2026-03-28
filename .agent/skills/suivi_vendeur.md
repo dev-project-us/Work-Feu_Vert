@@ -15,7 +15,7 @@ Ce skill décrit comment lire le fichier CSV "Suivi Individuel des ratios atelie
 la **Section 5 — Staff Libre Service : Ratios de Vente** du rapport hebdomadaire.
 
 Fichier source :
-`C:\Users\mendo\Documents\Work\resources\suivi vendeur\`
+a folder named `resources/suivi vendeur/`
 
 Le fichier commence toujours par `Suivi Individuel des ratios atelier` mais son nom exact peut varier.
 L'identifier par la présence de la colonne `textbox390` dans son contenu (colonne nom du bloc 1).
@@ -27,9 +27,18 @@ L'identifier par la présence de la colonne `textbox390` dans son contenu (colon
 ### Étape 1 — Scanner le dossier
 
 ```python
-import glob, os
+import pathlib, glob, os
 
-folder = r"C:\Users\mendo\Documents\Work\resources\suivi vendeur"
+def find_dir(name):
+    """Locate a directory by name, searching up from the current working directory.
+    Works on any machine as long as a folder named `name` exists in the tree."""
+    for p in [pathlib.Path.cwd()] + list(pathlib.Path.cwd().parents):
+        candidate = p / name
+        if candidate.is_dir():
+            return candidate
+    raise FileNotFoundError(f"Cannot find directory '{name}' in any parent of {pathlib.Path.cwd()}")
+
+folder = str(find_dir("resources") / "suivi vendeur")
 csv_files = glob.glob(os.path.join(folder, "*.csv"))
 
 fichier_suivi = None
@@ -59,7 +68,7 @@ semaine = date_fin.isocalendar()[1]
 ### Étape 3 — Trouver le bon fichier rapport
 
 ```python
-rapport_dir  = r"C:\Users\mendo\Documents\Work\Rapport hebdomadaire"
+rapport_dir  = str(find_dir("Rapport hebdomadaire"))
 rapport_path = os.path.join(rapport_dir, f"rapport hebdomadaire semaine {semaine}.md")
 
 if not os.path.exists(rapport_path):
