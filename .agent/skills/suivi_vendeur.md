@@ -47,7 +47,7 @@ for f in csv_files:
 from datetime import datetime
 
 # Ligne 2 du fichier : "ANNECY 2,16/03/2026 - 22/03/2026"
-lines = content.split('\r\n')
+lines = content.splitlines()
 date_line = lines[1]
 # Format : "ANNECY 2,DD/MM/YYYY - DD/MM/YYYY"
 date_part = date_line.split(',')[1]               # "16/03/2026 - 22/03/2026"
@@ -83,14 +83,23 @@ vendeurs = {nom_csv: {
 
 # ── BLOC 1 : Garantie Pneu & Géométrie ────────────────────────────────────────
 # Header commence par "textbox3,"
+# Note : pour certains vendeurs (peu de ventes pneu), le ratio GP est décalé d'une
+# position (pos 23 au lieu de 22) et le ratio Géom d'une position (pos 29 au lieu de 28).
+# → Toujours vérifier si la valeur extraite contient '%' ; sinon essayer la position suivante.
 bloc1_idx = next(i for i, l in enumerate(lines) if l.startswith('textbox3,'))
 i = bloc1_idx + 1
 while i < len(lines) and lines[i].strip():
     row = list(csv.reader([lines[i]]))[0]
     nom = row[8].strip() if len(row) > 8 else ''
     if nom in vendeurs:
-        vendeurs[nom]['gp_ratio']   = row[22].strip() if len(row) > 22 else ''  # textbox56
-        vendeurs[nom]['geom_ratio'] = row[28].strip() if len(row) > 28 else ''  # textbox159
+        gp   = row[22].strip() if len(row) > 22 else ''
+        geom = row[28].strip() if len(row) > 28 else ''
+        if '%' not in gp:
+            gp = row[23].strip() if len(row) > 23 else ''
+        if '%' not in geom:
+            geom = row[29].strip() if len(row) > 29 else ''
+        vendeurs[nom]['gp_ratio']   = gp    # textbox56 (ou pos 23)
+        vendeurs[nom]['geom_ratio'] = geom  # textbox159 (ou pos 29)
     i += 1
 
 # ── BLOC 2 : VCR, Plaquette, VCF ──────────────────────────────────────────────
@@ -139,7 +148,7 @@ for nom_template, nom_csv in NOM_MAP.items():
     if nom_csv not in vendeurs:
         continue
     data = vendeurs[nom_csv]
-    vals = [data.get(key) or 'N/A' for key, _ in COLS]
+    vals = [data.get(key) or '0 %' for key, _ in COLS]
     old = f"| **{nom_template}** |" + " % |" * len(COLS)
     new = f"| **{nom_template}** | " + " | ".join(vals) + " |"
     rapport = rapport.replace(old, new)
@@ -305,6 +314,6 @@ NOM_MAP = {
 
 - Les ratios sont déjà formatés `"24,2 %"` dans le CSV — conserver tel quel
 - Séparateur décimal : **virgule** (ex. `16,7 %`)
-- Si la valeur est absente dans le CSV pour un vendeur donné, afficher `N/A`
+- Si la valeur est absente dans le CSV pour un vendeur donné, afficher `0 %`
 - Ne jamais afficher les quantités brutes (numérateur) — uniquement le ratio %
 - Dépoll. = TRAIT. DEPOLLUTION / Nb OR (bloc 4, `textbox201`), objectif 35 %

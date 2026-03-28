@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "templates/rapport_hebdomadaire_template.md",
+                "file": "Rapport hebdomadaire/rapport hebdomadaire semaine 12.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "rapport_hebdomadaire_template"
+              "title": "rapport hebdomadaire semaine 12"
             }
           }
         ]
@@ -186,6 +186,7 @@
   },
   "active": "84e929bac6fa2186",
   "lastOpenFiles": [
+    "templates/rapport_hebdomadaire_template.md",
     "Rapport hebdomadaire/rapport hebdomadaire semaine 12.md",
     "templates/rapport_hebdomadaire_template.md.tmp.5.1774691385010",
     "resources/Untitled.md",
@@ -199,7 +200,6 @@
     "context_ca_mo.md",
     "Rapport hebdomadaire/11 - Rapport semaine 11.md.tmp.22137.1774168316403",
     "Rapport hebdomadaire/11 - Rapport semaine 11.md.tmp.19584.1774167770716",
-    "templates/rapport_hebdomadaire_template.md",
     "templates/rapport_mensuel_template.md",
     "Rapport hebdomadaire/12 - Plan d'actions semaine 12.md",
     "Rapport hebdomadaire/11 - Plan d'actions semaine 11.md",
