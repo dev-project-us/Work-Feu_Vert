@@ -1,0 +1,1 @@
+Exécuter le skill ratios_prioritaires : lire le fichier CSV dans resources/ratios prioritaires/ et remplir la section 4 (Ratios Prioritaires — Performance Atelier) du rapport hebdomadaire Feu Vert Annecy.
