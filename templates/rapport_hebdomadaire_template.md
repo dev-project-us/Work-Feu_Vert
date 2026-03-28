@@ -61,14 +61,14 @@
 
 _Objectif : Capacité des conseillers à transformer l'accueil en prestations prioritaires._
 
-|Collaborateur LS|Garantie Pneu|Géométrie|VCR|VCF|NCI|Plaquette|Dépoll.|
-|:--|:--|:--|:--|:--|:--|:--|:--|
-|**Sandrine**|%|%|%|%|%|%|%|
-|**Paul**|%|%|%|%|%|%|%|
-|**Kamilia**|%|%|%|%|%|%|%|
-|**Chouaib**|%|%|%|%|%|%|%|
-|**Pauline**|%|%|%|%|%|%|%|
-|**Valentin**|%|%|%|%|%|%|%|
+|Collaborateur LS|Garantie Pneu|Géométrie|VCR|VCF|Plaquette|Dépoll.|
+|:--|:--|:--|:--|:--|:--|:--|
+|**Sandrine**|%|%|%|%|%|%|
+|**Paul**|%|%|%|%|%|%|
+|**Kamilia**|%|%|%|%|%|%|
+|**Chouaib**|%|%|%|%|%|%|
+|**Pauline**|%|%|%|%|%|%|
+|**Valentin**|%|%|%|%|%|%|
 
 ### Staff Atelier : Taux de Défectuosité
 
