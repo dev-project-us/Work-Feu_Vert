@@ -88,21 +88,21 @@ _Objectif : Rigueur technique et capacité de détection des besoins de sécurit
 
 ### Plan d'Action Libre Service (LS)
 
-1. **[Action 1]**
-    - [Objectif]
-2. **[Action 2]**
-    - [Objectif]
-3. **[Action 3]**
-    - [Objectif]
+1. **Accompagnement ciblé de Pauline et Valentin**
+    - Objectif : Déclencher les premières ventes additionnelles en Garantie Pneu et Dépollution (actuellement à 0%).
+2. **Coaching sur la Garantie Pneu pour Sandrine (36,4%) et Paul (54,8%)**
+    - Objectif : S'inspirer des excellents résultats de Chouaib et Kamilia pour atteindre l'objectif global de 50%.
+3. **Standardisation du discours sur le freinage (VCF et Plaquettes)**
+    - Objectif : Augmenter les propositions au comptoir pour sécuriser l'atteinte des 11% de ratio global, en accompagnant particulièrement Sandrine et Chouaib (taux faibles ou nuls).
 
 ### Plan d'Action Atelier
 
-1. **[Action 1]**
-    - [Objectif]
-2. **[Action 2]**
-    - [Objectif]
-3. **[Action 3]**
-    - [Objectif]
+1. **Homogénéisation de la détection technique (Contrôles)**
+    - Objectif : Partager les méthodes de contrôle (ex: Mohammed Ali et Gael très forts sur VCR, mais Mohammed Ali à 0% sur la batterie). Rééquilibrer la défectuosité entre techniciens.
+2. **Sécurisation de la Garantie Pneu**
+    - Objectif : Gagner les 2,0 pts manquants pour atteindre l'objectif de 50% en systématisant la proposition et la validation par les techniciens.
+3. **Pérennisation des excellents résultats Dépollution et VCR/VCF**
+    - Objectif : Maintenir la forte dynamique (Dépollution à 82% pour un obj de 35% et VCR/VCF au-dessus des objectifs) en valorisant les techniciens performants.
 
 ---
 
