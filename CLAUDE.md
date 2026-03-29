@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is an **Obsidian vault** used for professional data analysis at **Feu Vert Annecy** (automotive service center). It converts CSV export data into structured French-language business analysis reports in Markdown format.
 
-- **Core logic:** `.agent/skills/` — Markdown skill definitions invoked via slash commands
+- **Core logic:** `.agent/skills/` — full Markdown skill definitions; `.claude/commands/` — one-liner prompts that trigger each skill via Claude Code slash commands (both must stay in sync)
 - **Incoming data:** `resources/` — CSV exports organized in subfolders
 - **Templates:** `templates/` — Markdown report templates in French
 - **Output:** `Rapport hebdomadaire/` — generated weekly reports
@@ -55,7 +55,7 @@ CSV in resources/ → Agent Skill (slash command) → Markdown Report in Rapport
 1. Scan `resources/suivi vendeur/` for file containing column `textbox390` in its content
 2. Extract week end date from line 2 (format: `ANNECY 2,DD/MM/YYYY - DD/MM/YYYY`)
 3. Find matching rapport file by week number
-4. Parse **Bloc 1** (`textbox3,` header): Garantie Pneu (col 22) and Géométrie (col 28) per vendeur
+4. Parse **Bloc 1** (`textbox3,` header): Garantie Pneu (col 22) and Géométrie (col 28) per vendeur — **if value at col 22/28 doesn't contain `%`, fall back to col 23/29** (position shifts for vendors with few tyre sales)
 5. Parse **Bloc 2** (`textbox590,` header): VCR (col 19), Plaquette (col 21), VCF (col 23) per vendeur
 6. Parse **Bloc 4** (`textbox326,` header): Dépollution (col 17) per vendeur
 7. Write all ratios into Section 5 LS table
@@ -63,11 +63,10 @@ CSV in resources/ → Agent Skill (slash command) → Markdown Report in Rapport
 
 **`defectuosite.md`** — fills Section 5 Atelier:
 1. Scan `resources/defectuosite/` for file containing `technicien3` column
-2. Extract week end date from the line containing `ANNECY` with `/` date separators
+2. Extract week end date from the line containing `ANNECY` with `/` date separators (format: `ANNECY SEYNOD,DD/MM/YYYY,DD/MM/YYYY`; split on `\r\n`)
 3. Find matching rapport file by week number
-4. Parse the last CSV block (starts with `technicien3`) for per-technician rates
-5. Write into Section 5 Atelier table; ignore excluded staff (see below)
-> **Note:** Steps 4–6 are stubs in the current skill file — implement when first needed.
+4. Split file on `\r\n\r\n` to find the block starting with `technicien3`; parse with `csv.DictReader`
+5. Write per-technician rates into Section 5 Atelier table; ignore excluded staff (see below)
 
 ### Templates
 
@@ -199,8 +198,8 @@ python -c "import datetime; now=datetime.datetime.now(); print(f'{now.month:02d}
 - **Portable paths**: All skill files use a `find_dir()` helper that walks up the directory tree to locate `resources/`, `Rapport hebdomadaire/`, and `templates/` by name — no hardcoded absolute paths. This works on any machine provided the folder names remain unchanged.
 - **`rapport_mensuel_template.md`**: Title header incorrectly reads "Rapport d'Analyse Hebdomadaire" instead of monthly.
 - **Section 7 template mismatch**: The template shows `%` placeholders for the Marge row, but the actual output uses euros (`€`). Follow the format in `chiffre.md` and existing generated reports, not the template skeleton.
-- **`defectuosite.md` incomplete**: Skill steps 4–6 are stubs — implement the extraction and writing logic when first invoked.
 - **`suivi_vendeur.md` NCI column**: NCI is not extracted (no confirmed column position in any bloc). All other Section 5 LS columns are implemented.
+- **`.skill` files at root** (`chiffre.skill`, `defectuosite.skill`, etc.) are binary ZIP archives — do not edit or read them.
 
 ## Content & Style Rules
 
