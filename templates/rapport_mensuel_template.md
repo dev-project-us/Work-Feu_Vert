@@ -1,110 +1,125 @@
-# Rapport d'Analyse Hebdomadaire - Feu Vert Annecy
-**Période :** [JJ/MM/AAAA] au [JJ/MM/AAAA]
-**Centre :** Annecy Seynod
+# Rapport d'Analyse Mensuel - Feu Vert Annecy
+
+**Mois :** [Mois AAAA] **Centre :** Annecy Seynod
 
 ---
 
-## 1. The Big Picture (Le Briefing du Directeur)
-**Vision Globale :** > *[Insérer ici votre analyse stratégique de la semaine : météo, événements locaux, dynamique d'équipe ou alertes sur la rentabilité].*
+## 1. Bilan du Directeur
+
+**Vision Globale :** > _[Synthèse mensuelle : tendances de fond, contexte marché local, dynamique d'équipe, faits marquants du mois, points de vigilance pour le mois suivant.]_
 
 ---
 
-## 2. Chiffres Globaux vs Objectifs & N-1
+## 2. Chiffres Globaux du Mois vs Objectifs & N-1
 
-| Indicateur        | Réalisé (N) | Objectif | Écart / Obj | N-1  | Évolution / N-1 |
-| :---------------- | :---------- | :------- | :---------- | :--- | :-------------- |
-| **CA HT Total**   | €           | €        | %           | €    | %               |
-| **Marge Brute**   | %           | %        | pts         | %    | pts             |
-| **Fréquentation** | clts        | -        | -           | clts | %               |
-| **Panier Moyen**  | €           | -        | -           | €    | %               |
+|Indicateur|Réalisé (N)|Objectif|Écart / Obj|N-1|Évolution / N-1|
+|:--|:--|:--|:--|:--|:--|
+|**CA HT Total**|€|€|%|€|%|
+|**Marge Brute**|%|%|pts|%|pts|
+|**Fréquentation**|clts|-|-|clts|%|
+|**Panier Moyen**|€|-|-|€|%|
 
 ---
 
 ## 3. Analyse Dissociée : Libre Service vs Atelier
 
-### Section Libre Service (LS) vs N-1
+### Libre Service (LS)
 
-| Métrique | Réalisé (N) | N-1 | Évolution | Statut |
-| :--- | :--- | :--- | :--- | :--- |
-| **CA HT Magasin** | € | € | % | |
-| **Marge Magasin** | % | % | pts | |
-| **Nb Clients LS** | | | % | |
-| **Panier Moyen LS**| € | € | % | |
+|Métrique|Réalisé (N)|Objectif|Écart / Obj|N-1|Évolution / N-1|Statut|
+|:--|:--|:--|:--|:--|:--|:--|
+|**CA HT Magasin**|€|€|%|€|%||
+|**Marge Magasin**|%|%|pts|%|pts||
+|**Panier Moyen LS**|€|-|-|€|%||
 
-### Section Atelier vs N-1
+### Atelier
 
-| Métrique | Réalisé (N) | N-1 | Évolution | Statut |
-| :--- | :--- | :--- | :--- | :--- |
-| **CA HT Atelier** | € | € | % | |
-| **Marge Atelier** | % | % | pts | |
-| **Nombre d'OR** | | | % | |
-| **Panier Moyen Atel.**| € | € | % | |
-
----
-
-## 4. Ratios Prioritaires (Performance Atelier)
-
-| KPI Prioritaire | Volume (Nb/Total) | Réalisé (N) | Objectif | Écart | Statut |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **Garantie Pneu** | | % | 50 % | % | |
-| **Géométrie** | | % | 19 % | % | |
-| **Dépollution** | | % | 35 % | % | |
-| **VCF (Frein)** | | % | 11 % | % | |
-| **VCR (Refroid)** | | % | 7 % | % | |
-| **Plaquette** | | % | 11 % | % | |
+|Métrique|Réalisé (N)|Objectif|Écart / Obj|N-1|Évolution / N-1|Statut|
+|:--|:--|:--|:--|:--|:--|:--|
+|**CA HT Atelier**|€|€|%|€|%||
+|**Marge Atelier**|%|%|pts|%|pts||
+|**Nombre d'OR**|||-||%||
+|**Panier Moyen Atel.**|€|-|-|€|%||
 
 ---
 
-## 5. Staff Performance (Analyse Individuelle)
+## 4. Ratios Prioritaires du Mois (Performance Atelier)
 
-### Staff Libre Service : Ratios de Vente
-*Objectif : Capacité des conseillers à transformer l'accueil en prestations prioritaires.*
-
-| Collaborateur LS | Nb Diags | Garantie Pneu | Géométrie | VCR | Dépoll. | Plaquette |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Sandrine** | | % | % | % | % | % |
-| **Paul** | | % | % | % | % | % |
-| **Isabelle** | | % | % | % | % | % |
-| **Kamilia** | | % | % | % | % | % |
-| **Pauline** | | % | % | % | % | % |
-| **Valentin** | | % | % | % | % | % |
-
-### Staff Atelier : Taux de Défectuosité
-*Objectif : Rigueur technique et capacité de détection des besoins de sécurité.*
-
-| Technicien | Nb Diags | Déf. Batterie | Disq AV | Disq AR | Plaq Av | Plaq Ar | Def BEG | Déf. VCF (Frein) | Déf. VCR | Déf. Amort | Déf. Pare-brise |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Chandrack K.** | | % | % | % | % | % | % | % | % | % | % |
-| **Mohammed Ali M.** | | % | % | % | % | % | % | % | % | % | % |
-| **Alishan A.** | | % | % | % | % | % | % | % | % | % | % |
-| **Gael R.** | | % | % | % | % | % | % | % | % | % | % |
-| **Denis D.** | | % | % | % | % | % | % | % | % | % | % |
+|KPI Prioritaire|Réalisé (N)|Objectif|Écart / Obj|N-1|Évolution / N-1|Statut|
+|:--|:--|:--|:--|:--|:--|:--|
+|**Garantie Pneu**|%|50 %|pts|%|pts||
+|**Géométrie**|%|19 %|pts|%|pts||
+|**VCR (Refroid)**|%|7 %|pts|%|pts||
+|**VCF (Frein)**|%|11 %|pts|%|pts||
+|**Plaquette**|%|11 %|pts|%|pts||
+|**Dépollution**|%|35 %|pts|%|pts||
 
 ---
 
-## 6. Plans d'Action Opérationnels
+## 5. Staff Performance Mensuelle (Analyse Individuelle)
 
-### Plan d'Action Libre Service (LS)
+### Staff Libre Service : Ratios de Vente (cumul mois)
+
+_Objectif : Régularité mensuelle de la transformation en prestations prioritaires._
+
+|Collaborateur LS|Garantie Pneu|Géométrie|VCR|VCF|Plaquette|Dépoll.|
+|:--|:--|:--|:--|:--|:--|:--|
+|**Sandrine**|%|%|%|%|%|%|
+|**Paul**|%|%|%|%|%|%|
+|**Kamilia**|%|%|%|%|%|%|
+|**Chouaib**|%|%|%|%|%|%|
+|**Pauline**|%|%|%|%|%|%|
+|**Valentin**|%|%|%|%|%|%|
+
+### Staff Atelier : Taux de Défectuosité (cumul mois)
+
+_Objectif : Rigueur technique sur la durée — détecter les écarts structurels vs ponctuels._
+
+|Technicien|Nb OR|Déf. Batterie|Disq AV|Disq AR|Plaq Av|Plaq Ar|Def BEG|Déf. VCF (Frein)|Déf. VCR|Déf. Amort|Déf. Pare-brise|
+|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|
+|**Chandrack K.**||%|%|%|%|%|%|%|%|%|%|
+|**Mohammed Ali M.**||%|%|%|%|%|%|%|%|%|%|
+|**Alishan A.**||%|%|%|%|%|%|%|%|%|%|
+|**Gael R.**||%|%|%|%|%|%|%|%|%|%|
+|**Denis D.**||%|%|%|%|%|%|%|%|%|%|
+
+---
+
+## 6. Bilan & Plans d'Action
+
+### Bilan des Actions du Mois Écoulé
+
+> _[Évaluer chaque action engagée le mois précédent : résultat obtenu, action close ou reconduite.]_
+
+1. **[Action 1]** → [Résultat]
+2. **[Action 2]** → [Résultat]
+3. **[Action 3]** → [Résultat]
+
+### Plan d'Action Libre Service — Mois Suivant
+
 1. **[Action 1]**
-	-  [Objectif]
+    - [Objectif mesurable]
 2. **[Action 2]**
-	- [Objectif]
+    - [Objectif mesurable]
 3. **[Action 3]**
-	- [Objectif]
+    - [Objectif mesurable]
 
-### Plan d'Action Atelier
+### Plan d'Action Atelier — Mois Suivant
+
 1. **[Action 1]**
-	- [Objectif]
+    - [Objectif mesurable]
 2. **[Action 2]**
-	- [Objectif]
+    - [Objectif mesurable]
 3. **[Action 3]**
-	- [Objectif]
+    - [Objectif mesurable]
 
 ---
 
-## 7. Reste à Faire (RAF) du Mois
+## 7. RH
 
-- **CAHT:**
-* **Objectif Marge :**
-* **Plan de Formation / Qualité :**
-* **Logistique / Stock :**
+### 7.1 Alerte RH
+
+> _[Toute situation sensible ou urgente : conflit, comportement, avertissement, procédure disciplinaire.]_
+
+### 7.2 Absence / Congé
+
+### 7.3 Recrutement / Départ
