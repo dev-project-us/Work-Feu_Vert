@@ -107,7 +107,7 @@ shutil.copy(template_path, output_path)
 
 Appliquer les mêmes mappings que le skill hebdomadaire (`chiffre.md`) :
 
-- **Bloc Global** → Section 2 (CA, Marge, Fréquentation, Panier) depuis `fichier_mtd`
+- **Bloc Global** → Section 2 (CA, Marge %, Marge €, Panier) depuis `fichier_mtd` et `fichier_objectifs`
 - **Bloc LS** → Section 3 LS depuis `fichier_mtd`
 - **Bloc Atelier** → Section 3 Atelier depuis `fichier_mtd`
 - **Objectifs** (`textbox8`, `textbox50`, `textbox42`) → depuis `fichier_objectifs`
@@ -124,7 +124,7 @@ with open(output_path, 'r', encoding='utf-8') as fh:
 # En-tête : remplacer [Mois AAAA]
 rapport = rapport.replace('[Mois AAAA]', f'{mois_str.capitalize()} {annee}')
 
-# Section 2 : CA, Marge, Fréquentation, Panier
+# Section 2 : CA, Marge %, Marge €, Panier
 # Section 3 LS : CA, Marge, Panier
 # Section 3 Atelier : CA, Marge, Nb OR, Panier
 # → Même logique de remplacement de placeholders que chiffre.md
@@ -132,6 +132,54 @@ rapport = rapport.replace('[Mois AAAA]', f'{mois_str.capitalize()} {annee}')
 
 with open(output_path, 'w', encoding='utf-8') as fh:
     fh.write(rapport)
+```
+
+**Marge Brute (€) — Section 2 :**
+
+Calculer la marge en euros à partir des valeurs déjà extraites :
+
+```python
+# Réalisé N
+marge_eur_n   = round(caht_n * marge_n / 100)
+
+# Objectif € → textbox42 (dernière colonne de fichier_objectifs, identique au skill hebdo)
+marge_obj_eur = int(textbox42.replace(' ', ''))
+
+# Écart vs objectif (%)
+marge_eur_ecart = round((marge_eur_n / marge_obj_eur - 1) * 100, 1)
+
+# N-1 : dériver depuis caht_n1 et marge_n1 (déjà calculés)
+marge_eur_n1  = round(caht_n1 * marge_n1 / 100)
+
+# Évolution N-1 (%)
+marge_eur_evo = round((marge_eur_n / marge_eur_n1 - 1) * 100, 1)
+```
+
+Format attendu dans le rapport :
+```markdown
+| **Marge Brute (€)** | {marge_eur_n} € | {marge_obj_eur} € | {marge_eur_ecart:+} % | {marge_eur_n1} € | {marge_eur_evo:+} % |
+```
+
+> **Note** : `textbox42` est la **dernière colonne** du fichier objectifs — voir `chiffre.md` pour le détail de l'extraction.
+
+**Colonne Statut — Section 3 (CA uniquement) :**
+
+Calculer le Statut pour chaque ligne disposant d'un objectif (CA LS et CA Atelier).
+Les lignes sans objectif (Marge, Panier, Nb OR) laissent la cellule Statut vide.
+
+```python
+def statut_ca(ecart_pct):
+    """ecart_pct : float, ex. -16.7 ou +1.9"""
+    if ecart_pct < 0:
+        return 'En retard'
+    elif ecart_pct == 0:
+        return 'Atteint'
+    else:
+        return 'Dépassé'
+
+# Exemples d'usage lors du remplacement des lignes CA :
+# statut_ls  = statut_ca(ls_ecart)   # ls_ecart = round((ls_ca / ls_obj - 1) * 100, 1)
+# statut_at  = statut_ca(at_ecart)   # at_ecart = round((at_ca / at_obj - 1) * 100, 1)
 ```
 
 **Note sur le template mensuel** : les tableaux des Sections 3 et 4 ont une colonne
@@ -146,7 +194,7 @@ pour remplir la Section 4.
 ### Étape 7 — Confirmer à l'utilisateur
 
 Indiquer le nom du fichier créé, le mois/année détectés, et un résumé des
-valeurs clés (CA mensuel, marge, nb clients).
+valeurs clés (CA mensuel, marge %, marge €, panier moyen).
 
 ---
 

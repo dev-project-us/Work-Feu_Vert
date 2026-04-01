@@ -16,7 +16,7 @@
 |:--|:--|:--|:--|:--|:--|
 |**CA HT Total**|€|€|%|€|%|
 |**Marge Brute**|%|%|pts|%|pts|
-|**Fréquentation**|clts|-|-|clts|%|
+|**Marge Brute (€)**|€|€|%|€|%|
 |**Panier Moyen**|€|-|-|€|%|
 
 ---

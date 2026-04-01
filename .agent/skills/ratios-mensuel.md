@@ -84,7 +84,8 @@ if not os.path.exists(rapport_path):
 
 Parsing identique au skill hebdomadaire (`ratios_prioritaires.md`) :
 - Localiser le bloc `libelleUnivers`
-- Extraire `objectif`, `ratioN` (réalisé), `ratioN_1` (N-1), `textbox130` (écart N vs N-1)
+- Extraire `objectif`, `ratioN` (réalisé), `ratioN_1` (N-1)
+- Évolution / N-1 = `ratioN - ratioN_1` (calculé, non lu depuis le CSV)
 
 ```python
 import csv
@@ -98,7 +99,7 @@ KPI_MAP = {
     'Traitements dépollution moteurs / Nb Vidange': 'Dépollution',
 }
 
-lines = content.split('\r\n')
+lines = content.split('\n')
 in_ratios_block = False
 ratios = {}
 
@@ -110,14 +111,14 @@ for line in lines:
         break
     if in_ratios_block:
         parts = next(csv.reader([line]))
-        libelle = parts[1]
-        if libelle in KPI_MAP:
-            ratios[KPI_MAP[libelle]] = {
-                'objectif': parts[2],
-                'realise':  parts[5],  # ratioN
-                'n1':       parts[8],  # ratioN_1
-                'ecart_n1': parts[9],  # textbox130 — écart N vs N-1 en pts
-            }
+        if len(parts) > 8:
+            libelle = parts[1]
+            if libelle in KPI_MAP:
+                ratios[KPI_MAP[libelle]] = {
+                    'objectif': parts[2],
+                    'realise':  parts[5],  # ratioN
+                    'n1':       parts[8],  # ratioN_1
+                }
 ```
 
 ### Étape 5 — Écrire dans le rapport
@@ -125,22 +126,45 @@ for line in lines:
 Le template mensuel Section 4 a 6 colonnes : Réalisé, Objectif, Écart/Obj, N-1, Évolution/N-1, Statut.
 
 ```python
-def calc_ecart(realise_str, objectif_str):
-    try:
-        r = float(realise_str.replace(' %','').replace(',','.'))
-        o = float(objectif_str.replace(' %','').replace(',','.'))
-        return f"{round(r - o, 1):+.1f} pts"
-    except:
-        return '-'
+def parse_pct(s):
+    return float(s.replace(' %','').replace(',','.'))
+
+def fmt_pts(val):
+    sign = '+' if val >= 0 else ''
+    return f"{sign}{val:.1f} pts".replace('.', ',')
+
+def statut(ecart_val):
+    if ecart_val is None:
+        return ''
+    if ecart_val < 0:
+        return 'En retard'
+    elif ecart_val == 0:
+        return 'Atteint'
+    else:
+        return 'Dépassé'
+
+OBJECTIFS = {
+    'Garantie Pneu': '50 %',
+    'Géométrie':     '19 %',
+    'VCR (Refroid)': '7 %',
+    'VCF (Frein)':   '11 %',
+    'Plaquette':     '11 %',
+    'Dépollution':   '35 %',
+}
 
 with open(rapport_path, 'r', encoding='utf-8') as fh:
     rapport = fh.read()
 
 for kpi_name, vals in ratios.items():
-    ecart_obj = calc_ecart(vals['realise'], vals['objectif'])
-    old = f"| **{kpi_name}** | % | "
-    new = (f"| **{kpi_name}** | {vals['realise']} | {vals['objectif']} | "
-           f"{ecart_obj} | {vals['n1']} | {vals['ecart_n1']} | ")
+    obj = OBJECTIFS.get(kpi_name, vals['objectif'])
+    r   = parse_pct(vals['realise'])
+    o   = parse_pct(obj)
+    n1  = parse_pct(vals['n1'])
+    ecart_obj = round(r - o, 1)
+    ecart_n1  = round(r - n1, 1)  # delta Réalisé - N-1
+    old = f"|**{kpi_name}**|%|{obj}|pts|%|pts||"
+    new = (f"|**{kpi_name}**|{vals['realise']}|{obj}|"
+           f"{fmt_pts(ecart_obj)}|{vals['n1']}|{fmt_pts(ecart_n1)}|{statut(ecart_obj)}|")
     rapport = rapport.replace(old, new)
 
 with open(rapport_path, 'w', encoding='utf-8') as fh:
