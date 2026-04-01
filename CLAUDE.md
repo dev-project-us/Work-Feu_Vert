@@ -6,10 +6,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is an **Obsidian vault** used for professional data analysis at **Feu Vert Annecy** (automotive service center). It converts CSV export data into structured French-language business analysis reports in Markdown format.
 
-- **Core logic:** `.agent/skills/` — full Markdown skill definitions; `.claude/commands/` — one-liner prompts that trigger each skill via Claude Code slash commands (both must stay in sync)
-- **Incoming data:** `resources/` — CSV exports organized in subfolders
+- **Core logic:** `.agent/skills/` — full Markdown skill definitions; `.claude/commands/` — one-liner prompts that trigger each skill via Claude Code slash commands (both must stay in sync for weekly skills)
+- **Incoming data:** `resources/` — CSV exports organized in subfolders; `resources/monthly_recap/` — parallel structure for monthly data
 - **Templates:** `templates/` — Markdown report templates in French
-- **Output:** `Rapport hebdomadaire/` — generated weekly reports
+- **Output:** `Rapport hebdomadaire/` — generated weekly reports; `Rapport mensuel/` — generated monthly reports
 
 ## Slash Commands (Agent Skills)
 
@@ -23,6 +23,17 @@ Run these commands inside Claude Code to trigger report generation:
 | `/suivi_vendeur` | `.agent/skills/suivi_vendeur.md` | Fill Section 5 LS (Ratios de Vente par vendeur) from Suivi Individuel CSV |
 
 `/chiffre` also invokes `/ratios` at completion. **Section 5 LS** is fully automated via `/suivi_vendeur` — all columns (Garantie Pneu, Géométrie, VCR, VCF, Plaquette, Dépollution) are implemented.
+
+### Monthly Commands (no registered slash command — invoke by description or keyword)
+
+| Trigger keyword | Skill File | Purpose |
+|----------------|-----------|---------|
+| `/chiffre-mensuel` | `.agent/skills/chiffre-mensuel.md` | Fill Sections 2 and 3 from `resources/monthly_recap/SUC/` (MTD file only, no weekly file) |
+| `/ratios-mensuel` | `.agent/skills/ratios-mensuel.md` | Fill Section 4 KPIs from `resources/monthly_recap/ratios prioritaires/` |
+| `/defectuosite-mensuel` | `.agent/skills/defectuosite-mensuel.md` | Fill Section 5 Atelier from `resources/monthly_recap/defectuosite/` |
+| `/suivi-vendeur-mensuel` | `.agent/skills/suivi-vendeur-mensuel.md` | Fill Section 5 LS from `resources/monthly_recap/suivi vendeur/` |
+
+Monthly skills are **not registered in `.claude/commands/`** — Claude Code reads the skill file directly from `.agent/skills/` when the trigger keyword is used.
 
 ## Architecture
 
