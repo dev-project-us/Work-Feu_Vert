@@ -18,9 +18,10 @@ Other triggers: "remplis le rapport mensuel", "mets à jour les chiffres du mois
 Ce skill lit les fichiers CSV exportés depuis le système SUC stockés dans
 `resources/monthly_recap/SUC/` et remplit les sections 2 et 3 du rapport mensuel.
 
-**Différence clé vs le skill hebdomadaire** : seul le fichier MTD (période `Du 01/`)
-est utilisé pour les chiffres réalisés. Le fichier semaine n'existe pas ou est ignoré.
-Le fichier objectifs reste nécessaire pour les objectifs mensuels.
+**Différence clé vs le skill hebdomadaire** : deux fichiers MTD (période `Du 01/`) sont
+présents — un pour l'année N, un pour l'année N-1. Ils sont distingués par l'année dans
+la date de période. Le fichier objectifs reste nécessaire pour l'objectif CA global TTC.
+Les valeurs N-1 sont lues **directement** depuis le fichier N-1, sans dérivation.
 
 ---
 
@@ -29,7 +30,8 @@ Le fichier objectifs reste nécessaire pour les objectifs mensuels.
 ### Étape 1 — Identifier les fichiers CSV
 
 ```python
-import os, glob, pathlib
+import os, glob, pathlib, re
+from datetime import datetime
 
 def find_dir(name):
     for p in [pathlib.Path.cwd()] + list(pathlib.Path.cwd().parents):
@@ -41,8 +43,11 @@ def find_dir(name):
 folder = str(find_dir("monthly_recap") / "SUC")
 csv_files = glob.glob(os.path.join(folder, "SUC - *.csv"))
 
-fichier_mtd = None
+fichier_mtd      = None   # Année N (ex. 2026)
+fichier_n1       = None   # Année N-1 (ex. 2025)
 fichier_objectifs = None
+
+annee_courante = datetime.today().year
 
 for f in csv_files:
     with open(f, 'r', encoding='utf-8-sig') as fh:
@@ -50,8 +55,14 @@ for f in csv_files:
     if 'libelleJour' in content:
         fichier_objectifs = f
     elif 'Du 01/' in content:
-        fichier_mtd = f
-    # Fichier semaine ignoré volontairement pour le rapport mensuel
+        # Distinguer N vs N-1 par l'année dans la ligne de période
+        m = re.search(r'Du 01/\d{2}/(\d{4})', content)
+        if m:
+            annee_fichier = int(m.group(1))
+            if annee_fichier == annee_courante:
+                fichier_mtd = f
+            else:
+                fichier_n1 = f
 ```
 
 ### Étape 2 — Déterminer le mois et l'année
@@ -103,17 +114,73 @@ shutil.copy(template_path, output_path)
 
 > Si le dossier `Rapport mensuel` n'existe pas, le créer avec `os.makedirs`.
 
-### Étape 4 — Extraire les valeurs
+### Étape 4 — Extraire les valeurs (colonnes TTC directes)
 
-Appliquer les mêmes mappings que le skill hebdomadaire (`chiffre.md`) :
+Lire `fichier_mtd` et `fichier_n1` en brut (`open(..., encoding='utf-8-sig')`).
+Séparer les blocs sur les lignes vides (`\n\n` ou `\r\n\r\n`).
 
-- **Bloc Global** → Section 2 (CA, Marge %, Marge €, Panier) depuis `fichier_mtd` et `fichier_objectifs`
-- **Bloc LS** → Section 3 LS depuis `fichier_mtd`
-- **Bloc Atelier** → Section 3 Atelier depuis `fichier_mtd`
-- **Objectifs** (`textbox8`, `textbox50`, `textbox42`) → depuis `fichier_objectifs`
+#### Bloc Global (Section 2)
 
-Les colonnes CSV, les calculs HT (÷ 1.2), et les formules N-1 sont **identiques**
-au skill hebdomadaire. Se référer à `chiffre.md` pour le détail complet des mappings.
+Header : `caht_n, textbox4, textbox74, textbox84, cattc_n, textbox16, marge_n, textbox24, ...`
+
+| Champ CSV       | Signification                          | Source       |
+|:----------------|:---------------------------------------|:-------------|
+| `cattc_n`       | CA TTC réalisé (N)                     | fichier_mtd  |
+| `textbox4`      | Évolution CA vs N-1 (%)               | fichier_mtd  |
+| `marge_n`       | Taux de marge global (%)              | fichier_mtd  |
+| `textbox24`     | Évolution marge vs N-1 (pts)          | fichier_mtd  |
+| `cattc_n_2`     | Panier moyen TTC                      | fichier_mtd  |
+| `textbox17`     | Évolution panier vs N-1 (%)           | fichier_mtd  |
+| `cattc_n`       | CA TTC N-1                            | fichier_n1   |
+| `marge_n`       | Taux de marge N-1 (%)                 | fichier_n1   |
+| `cattc_n_2`     | Panier moyen TTC N-1                  | fichier_n1   |
+
+**Objectif CA TTC global** : `textbox8` depuis `fichier_objectifs` — valeur déjà TTC, **ne pas diviser par 1.2**.
+
+#### Bloc LS (Section 3)
+
+Header : `textbox22, textbox25, textbox27, textbox29, textbox31, textbox33, ..., textbox39, textbox41`
+
+| Champ CSV   | Signification                  | Source      |
+|:------------|:-------------------------------|:------------|
+| `textbox27` | CA TTC LS réalisé (N)          | fichier_mtd |
+| `textbox25` | Évolution CA LS vs N-1 (%)    | fichier_mtd |
+| `textbox31` | Taux de marge LS (%)           | fichier_mtd |
+| `textbox33` | Évolution marge LS (pts)       | fichier_mtd |
+| `textbox39` | Panier moyen TTC LS            | fichier_mtd |
+| `textbox41` | Évolution panier LS (%)        | fichier_mtd |
+| `textbox27` | CA TTC LS N-1                  | fichier_n1  |
+| `textbox31` | Taux de marge LS N-1 (%)      | fichier_n1  |
+| `textbox39` | Panier moyen TTC LS N-1        | fichier_n1  |
+
+> **Note** : `textbox22` = CA HT LS. `textbox27` = CA TTC LS réalisé. `textbox25` = progression CA TTC LS vs objectif (%).
+> **Objectif CA TTC LS** : `objectif_ls_ttc = round(textbox27 × (1 - textbox25/100))`
+> Ex : 76 100 × (1 - 0,11) = **67 729 €**
+> **Écart / Obj** : utiliser `textbox25` directement (ex: `+11,0 %`)
+
+#### Bloc Atelier (Section 3)
+
+Header : `textbox43, textbox45, textbox47, textbox49, textbox51, textbox53, ..., textbox62, textbox64`
+
+| Champ CSV   | Signification                    | Source      |
+|:------------|:---------------------------------|:------------|
+| `textbox47` | CA TTC Atelier réalisé (N)       | fichier_mtd |
+| `textbox45` | Évolution CA Atelier vs N-1 (%) | fichier_mtd |
+| `textbox51` | Taux de marge Atelier (%)        | fichier_mtd |
+| `textbox53` | Évolution marge Atelier (pts)    | fichier_mtd |
+| `textbox55` | Nombre d'OR                      | fichier_mtd |
+| `textbox57` | Évolution Nb OR (%)              | fichier_mtd |
+| `textbox62` | Panier moyen TTC Atelier         | fichier_mtd |
+| `textbox64` | Évolution panier Atelier (%)     | fichier_mtd |
+| `textbox47` | CA TTC Atelier N-1               | fichier_n1  |
+| `textbox51` | Taux de marge Atelier N-1 (%)   | fichier_n1  |
+| `textbox55` | Nb OR N-1                        | fichier_n1  |
+| `textbox62` | Panier moyen TTC Atelier N-1     | fichier_n1  |
+
+> **Note** : `textbox43` = CA HT Atelier. `textbox47` = CA TTC Atelier réalisé. `textbox45` = progression CA TTC Atelier vs objectif (%).
+> **Objectif CA TTC Atelier** : `objectif_at_ttc = round(textbox47 × (1 - textbox45/100))`
+> Ex : 147 592 × (1 - 0,102) = **132 538 €**
+> **Écart / Obj** : utiliser `textbox45` directement (ex: `+10,2 %`)
 
 ### Étape 5 — Mettre à jour l'en-tête et remplir les sections
 
@@ -136,55 +203,70 @@ with open(output_path, 'w', encoding='utf-8') as fh:
 
 **Marge Brute (€) — Section 2 :**
 
-Calculer la marge en euros à partir des valeurs déjà extraites :
+La marge en euros est dans le bloc `libelle,marge_n_2,marge_n_1_1,textbox92`
+de chaque fichier MTD (dernière section avant la fin du fichier).
 
 ```python
-# Réalisé N
-marge_eur_n   = round(caht_n * marge_n / 100)
+import csv, io
 
-# Objectif € → textbox42 (dernière colonne de fichier_objectifs, identique au skill hebdo)
-marge_obj_eur = int(textbox42.replace(' ', ''))
+def extraire_marge_eur(content):
+    """Extrait marge_n_2 (Marge Produit) depuis le fichier MTD."""
+    # Chercher le bloc libelle/marge_n_2
+    lines = content.replace('\r\n', '\n').split('\n')
+    for i, line in enumerate(lines):
+        if line.startswith('libelle,marge_n_2'):
+            # Ligne suivante : "Marge Produit,46 985,39 275,20 %"
+            data_line = lines[i + 1]
+            parts = data_line.split(',')
+            valeur_raw = parts[1].replace('\xa0', '').replace(' ', '').strip()
+            return int(valeur_raw)
+    return None
+
+# Réalisé N et N-1 : lire directement depuis fichier_mtd et fichier_n1
+marge_eur_n   = extraire_marge_eur(mtd_content)    # ex. 46 985
+marge_eur_n1  = extraire_marge_eur(n1_content)     # ex. 40 181
+
+# Objectif € → textbox42 (dernière colonne du fichier_objectifs)
+# Attention : la valeur peut être répartie sur deux colonnes CSV à cause de la virgule
+# dans "49,0 %" — lire la ligne brute et reconstruire
+marge_obj_eur = int(textbox42_eur.replace('\xa0', '').replace(' ', ''))
 
 # Écart vs objectif (%)
 marge_eur_ecart = round((marge_eur_n / marge_obj_eur - 1) * 100, 1)
 
-# N-1 : dériver depuis caht_n1 et marge_n1 (déjà calculés)
-marge_eur_n1  = round(caht_n1 * marge_n1 / 100)
-
 # Évolution N-1 (%)
 marge_eur_evo = round((marge_eur_n / marge_eur_n1 - 1) * 100, 1)
 ```
+
+> **Extraction de textbox42** (objectif Marge €) : c'est la **dernière colonne numérique** du
+> fichier objectifs. La ligne type ressemble à `...,textbox50,textbox42` avec valeur
+> `...,\"49,0 %\",107 850`. Lire la dernière valeur non-vide de chaque ligne de données.
 
 Format attendu dans le rapport :
 ```markdown
 | **Marge Brute (€)** | {marge_eur_n} € | {marge_obj_eur} € | {marge_eur_ecart:+} % | {marge_eur_n1} € | {marge_eur_evo:+} % |
 ```
 
-> **Note** : `textbox42` est la **dernière colonne** du fichier objectifs — voir `chiffre.md` pour le détail de l'extraction.
+**Colonne Statut — Section 3 :**
 
-**Colonne Statut — Section 3 (CA uniquement) :**
+Les objectifs CA TTC LS et Atelier ne sont pas disponibles → cellule Statut laissée vide
+pour toutes les lignes de Section 3.
 
-Calculer le Statut pour chaque ligne disposant d'un objectif (CA LS et CA Atelier).
-Les lignes sans objectif (Marge, Panier, Nb OR) laissent la cellule Statut vide.
+**N-1 — Section 3 :**
 
-```python
-def statut_ca(ecart_pct):
-    """ecart_pct : float, ex. -16.7 ou +1.9"""
-    if ecart_pct < 0:
-        return 'En retard'
-    elif ecart_pct == 0:
-        return 'Atteint'
-    else:
-        return 'Dépassé'
+Les valeurs N-1 sont lues directement depuis `fichier_n1` (mêmes colonnes que `fichier_mtd`) :
 
-# Exemples d'usage lors du remplacement des lignes CA :
-# statut_ls  = statut_ca(ls_ecart)   # ls_ecart = round((ls_ca / ls_obj - 1) * 100, 1)
-# statut_at  = statut_ca(at_ecart)   # at_ecart = round((at_ca / at_obj - 1) * 100, 1)
-```
+| Ligne Section 3       | N-1 depuis fichier_n1     |
+|:----------------------|:--------------------------|
+| CA TTC LS N-1         | `textbox27`               |
+| Marge LS N-1 (%)      | `textbox31`               |
+| Panier LS N-1         | `textbox39`               |
+| CA TTC Atelier N-1    | `textbox47`               |
+| Marge Atelier N-1 (%) | `textbox51`               |
+| Nb OR N-1             | `textbox55`               |
+| Panier Atelier N-1    | `textbox62`               |
 
-**Note sur le template mensuel** : les tableaux des Sections 3 et 4 ont une colonne
-N-1 et Évolution/N-1 supplémentaires vs le template hebdo. Les renseigner depuis
-les champs d'évolution du CSV (`textbox4`, `textbox25`, `textbox45`, etc.).
+Évolution (%) = `round((val_n / val_n1 - 1) * 100, 1)` sauf marge (en pts).
 
 ### Étape 6 — Chaîner `/ratios-mensuel`
 
@@ -212,15 +294,18 @@ valeurs clés (CA mensuel, marge %, marge €, panier moyen).
 
 | Fichier | Identification | Utilisé pour |
 |:--|:--|:--|
-| `SUC - Situation de chiffre*.csv` | Contient `Du 01/` | Réalisé mensuel (S2, S3) |
-| `SUC - Objectifs Journaliers*.csv` | Contient `libelleJour` | Objectifs mensuels (S2) |
+| `SUC - Situation de chiffre*.csv` | `Du 01/` + **année courante** (ex. 2026) | `fichier_mtd` — Réalisé N (S2, S3) |
+| `SUC - Situation de chiffre*.csv` | `Du 01/` + **année N-1** (ex. 2025) | `fichier_n1` — Valeurs N-1 (S2, S3) |
+| `SUC - Objectifs Journaliers*.csv` | Contient `libelleJour` | `fichier_objectifs` — Objectif CA global, Marge € obj (S2) |
 
 ---
 
 ## Règles de formatage
 
-- CA en € HT (diviser TTC par 1.2)
+- CA en **€ TTC** — utiliser les colonnes TTC directement, **ne pas diviser par 1.2**
+- Panier moyen en **€ TTC** — utiliser `cattc_n_2`, `textbox39`, `textbox62` directement
 - Séparateur décimal : **virgule**
 - Espacement milliers : **espace** (ex. `125 430 €`)
 - Évolutions : toujours afficher le signe (`+3,2 %`, `-1,5 pts`)
-- Valeur absente : `N/A`
+- Valeur absente ou non disponible : `N/A`
+- Objectif CA LS / Atelier : calculé via `textbox27/47 × (1 - textbox25/45 / 100)` — voir formules Section 3

@@ -12,12 +12,12 @@
 
 ## 2. Chiffres Globaux du Mois vs Objectifs & N-1
 
-|Indicateur|Réalisé (N)|Objectif|Écart / Obj|N-1|Évolution / N-1|
-|:--|:--|:--|:--|:--|:--|
-|**CA HT Total**|€|€|%|€|%|
-|**Marge Brute**|%|%|pts|%|pts|
-|**Marge Brute (€)**|€|€|%|€|%|
-|**Panier Moyen**|€|-|-|€|%|
+| Indicateur          | Réalisé (N) | Objectif | Écart / Obj | N-1 | Évolution / N-1 |
+| :------------------ | :---------- | :------- | :---------- | :-- | :-------------- |
+| **CA TTC Total**    | €           | €        | %           | €   | %               |
+| **Marge Brute**     | %           | %        | pts         | %   | pts             |
+| **Marge Brute (€)** | €           | €        | %           | €   | %               |
+| **Panier Moyen**    | €           | -        | -           | €   | %               |
 
 ---
 
@@ -27,16 +27,16 @@
 
 |Métrique|Réalisé (N)|Objectif|Écart / Obj|N-1|Évolution / N-1|Statut|
 |:--|:--|:--|:--|:--|:--|:--|
-|**CA HT Magasin**|€|€|%|€|%||
-|**Marge Magasin**|%|%|pts|%|pts||
+|**CA TTC Magasin**|€|-|-|€|%||
+|**Marge Magasin**|%|-|-|%|pts||
 |**Panier Moyen LS**|€|-|-|€|%||
 
 ### Atelier
 
 |Métrique|Réalisé (N)|Objectif|Écart / Obj|N-1|Évolution / N-1|Statut|
 |:--|:--|:--|:--|:--|:--|:--|
-|**CA HT Atelier**|€|€|%|€|%||
-|**Marge Atelier**|%|%|pts|%|pts||
+|**CA TTC Atelier**|€|-|-|€|%||
+|**Marge Atelier**|%|-|-|%|pts||
 |**Nombre d'OR**|||-||%||
 |**Panier Moyen Atel.**|€|-|-|€|%||
 

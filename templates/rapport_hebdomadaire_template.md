@@ -45,7 +45,7 @@
 ## 4. Ratios Prioritaires (Performance Atelier)
 
 |KPI Prioritaire|Réalisé (N)|Objectif|Écart|Statut|
-|:--|:--|:--|:--|:--|
+|:--|:--|:--|:--|:--|:--|
 |**Garantie Pneu**|%|50 %|%||
 |**Géométrie**|%|19 %|%||
 |**VCR (Refroid)**|%|7 %|%||
@@ -75,7 +75,7 @@ _Objectif : Capacité des conseillers à transformer l'accueil en prestations pr
 _Objectif : Rigueur technique et capacité de détection des besoins de sécurité._
 
 |Technicien|Nb OR|Déf. Batterie|Disq AV|Disq AR|Plaq Av|Plaq Ar|Def BEG|Déf. VCF (Frein)|Déf. VCR|Déf. Amort|Déf. Pare-brise|
-|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|
+|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|
 |**Chandrack K.**||%|%|%|%|%|%|%|%|%|%|
 |**Mohammed Ali M.**||%|%|%|%|%|%|%|%|%|%|
 |**Alishan A.**||%|%|%|%|%|%|%|%|%|%|
@@ -109,7 +109,7 @@ _Objectif : Rigueur technique et capacité de détection des besoins de sécurit
 ## 7. Reste à Faire (RAF) du Mois
 
 |Indicateur|Objectif|Réalisé (N)|% Réalisé|RAF|
-|:--|:--|:--|:--|:--|
+|:--|:--|:--|:--|:--|:--|
 |**CA**|€|€|%|€|
 |**Marge**|%|%|%||
 |**Contrat**|||%||
