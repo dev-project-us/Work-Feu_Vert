@@ -4,7 +4,7 @@
 
 ---
 
-## 1. Bilan du Directeur
+## 1. Bilan global
 
 **Vision Globale :** > _[Synthèse mensuelle : tendances de fond, contexte marché local, dynamique d'équipe, faits marquants du mois, points de vigilance pour le mois suivant.]_
 
@@ -84,33 +84,47 @@ _Objectif : Rigueur technique sur la durée — détecter les écarts structurel
 
 ---
 
-## 6. Bilan & Plans d'Action
+## 6. Bilan & Plans d'Action impact
 
 ### Bilan des Actions du Mois Écoulé
 
-> _[Évaluer chaque action engagée le mois précédent : résultat obtenu, action close ou reconduite.]_
+1. **Formation et cohésion (capital humain)** → 
+	1. Accélération de la montée en compétence : 
+		- 
+			- *Plan d'action* : 
+				- 
+			- *Objectif* : 
+				- 
+	2. Fidélisation face à la concurrence : 
+		- 
+			- *Plan d'action* :
+				- 
+			- *Objectif* : 
+				- 
 
-1. **[Action 1]** → [Résultat]
-2. **[Action 2]** → [Résultat]
-3. **[Action 3]** → [Résultat]
+2. **Excellence opérationnel et contrôle** → 
+	1. Standardisation des process :
+		- 
+			- *Plans d'actions* : 
+				- 
+			- *Objectif*s :
+				- 
+	2. Rigueur sur les réceptions :
+		- 
+			- *Plans d'actions* :
+				- 
+			- *Objectifs* :
+				- 
 
-### Plan d'Action Libre Service — Mois Suivant
-
-1. **[Action 1]**
-    - [Objectif mesurable]
-2. **[Action 2]**
-    - [Objectif mesurable]
-3. **[Action 3]**
-    - [Objectif mesurable]
-
-### Plan d'Action Atelier — Mois Suivant
-
-1. **[Action 1]**
-    - [Objectif mesurable]
-2. **[Action 2]**
-    - [Objectif mesurable]
-3. **[Action 3]**
-    - [Objectif mesurable]
+3. **Dynamisation et image commerciale** → 
+	1. Prise en charge : 
+		- 
+	2. Modernisation du libre service :
+		- 
+			- *Plan d'action* :
+				- 
+			- *Objectif* :
+				- 
 
 ---
 

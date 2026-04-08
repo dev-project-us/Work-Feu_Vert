@@ -4,7 +4,7 @@
 
 ---
 
-## 1. The Big Picture (Le Briefing du Directeur)
+## 1. Brief global
 
 **Vision Globale :** > _[Insérer ici votre analyse stratégique de la semaine : météo, événements locaux, dynamique d'équipe ou alertes sur la rentabilité]._
 
