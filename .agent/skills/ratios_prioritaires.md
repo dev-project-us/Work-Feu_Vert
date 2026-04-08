@@ -88,10 +88,19 @@ with open(rapport_path, 'r', encoding='utf-8') as fh:
     rapport = fh.read()
 
 # Remplacer chaque ligne de la Section 4
+def statut(ecart_str):
+    try:
+        val = float(ecart_str.replace(' pts','').replace(',','.').replace('+',''))
+        if val < 0:   return '🔴'
+        elif val == 0: return '🟡'
+        else:          return '🟢'
+    except:
+        return ''
+
 for kpi_name, vals in ratios.items():
     ecart = calc_ecart(vals['realise'], vals['objectif'])
     old = f"| **{kpi_name}** | % | "
-    new = f"| **{kpi_name}** | {vals['realise']} | {vals['objectif']} | {ecart} | "
+    new = f"| **{kpi_name}** | {vals['realise']} | {vals['objectif']} | {ecart} | {statut(ecart)} |"
     rapport = rapport.replace(old, new)
 
 with open(rapport_path, 'w', encoding='utf-8') as fh:
@@ -226,7 +235,7 @@ def calc_ecart(realise_str, objectif_str):
 | **Dépollution**   | {ratioN} | {objectif} | {ecart_obj} | |
 ```
 
-La colonne **Statut** n'est pas dans le CSV — laisser vide.
+La colonne **Statut** est calculée depuis l'écart vs objectif : 🔴 (< 0), 🟡 (= 0), 🟢 (> 0).
 
 ---
 

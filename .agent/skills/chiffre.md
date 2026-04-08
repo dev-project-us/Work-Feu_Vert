@@ -22,7 +22,7 @@ rapport hebdomadaire.
 Les 3 fichiers source sont stockés dans un dossier dédié :
 a folder named `resources/SUC/`
 
-> Ce dossier ne doit contenir **que ces 3 fichiers** — un par type de rapport.
+> Ce dossier contient désormais **4 fichiers** — un par type de rapport.
 > À chaque nouvelle semaine, remplacer les anciens fichiers par les nouveaux exports.
 
 ---
@@ -100,31 +100,37 @@ Lire la ligne de période dans chaque fichier `SUC - Situation de chiffre*.csv` 
 
 ```
 textbox1,textbox72
-Du 16/03/2026,22/03/2026   ← période courte = fichier SEMAINE
+Du 16/03/2026,22/03/2026   ← semaine N (année courante)
+Du 16/03/2025,22/03/2025   ← semaine N-1 (année précédente)
 Du 01/03/2026,22/03/2026   ← période depuis le 1er = fichier MOIS (MTD)
 ```
 
 Le fichier objectifs se reconnaît à la présence de la colonne `libelleJour`.
+Les fichiers semaine N et N-1 se distinguent par **l'année dans la date de période**.
 
-### Résumé des 3 fichiers
+### Résumé des 4 fichiers
 
-| Fichier                              | Identification                          | Utilisé pour       |
-| :----------------------------------- | :-------------------------------------- | :----------------- |
-| `SUC - Situation de chiffre*.csv`    | Période commence le **1er du mois**     | S7 (réalisé MTD)   |
-| `SUC - Situation de chiffre*.csv`    | Période commence **en milieu de mois**  | S2 et S3 (semaine) |
-| `SUC - Objectifs Journaliers*.csv`   | Contient la colonne `libelleJour`       | S7 (objectifs)     |
+| Fichier                              | Identification                                      | Utilisé pour            |
+| :----------------------------------- | :-------------------------------------------------- | :---------------------- |
+| `SUC - Situation de chiffre*.csv`    | Période commence le **1er du mois**, année N        | S7 (réalisé MTD)        |
+| `SUC - Situation de chiffre*.csv`    | Période en milieu de mois, **année courante**       | S2 et S3 (semaine N)    |
+| `SUC - Situation de chiffre*.csv`    | Période en milieu de mois, **année N-1**            | S3 (valeurs N-1 LS/At.) |
+| `SUC - Objectifs Journaliers*.csv`   | Contient la colonne `libelleJour`                   | S7 (objectifs)          |
 
 ### Protocole de scan du dossier
 
 ```python
-import os, glob
+import os, glob, re
+from datetime import datetime
 
 folder = str(find_dir("resources") / "SUC")
 csv_files = glob.glob(os.path.join(folder, "SUC - *.csv"))
 
-fichier_semaine = None
-fichier_mtd = None
+annee_courante    = datetime.today().year
+fichier_semaine   = None
+fichier_mtd       = None
 fichier_objectifs = None
+fichier_n1        = None   # même semaine, année N-1 (optionnel)
 
 for f in csv_files:
     with open(f, 'r', encoding='utf-8-sig') as fh:
@@ -134,7 +140,11 @@ for f in csv_files:
     elif 'Du 01/' in content:
         fichier_mtd = f
     else:
-        fichier_semaine = f
+        m = re.search(r'Du \d{2}/\d{2}/(\d{4})', content)
+        if m and int(m.group(1)) == annee_courante:
+            fichier_semaine = f
+        else:
+            fichier_n1 = f  # semaine N-1 (année précédente)
 ```
 
 ---
@@ -179,8 +189,27 @@ Ligne valeur  : [valeurs correspondantes]
 | `cattc_n_2`      | Panier moyen TTC (€)       | S2               |
 
 > **Note** : Le panier moyen dans le CSV est TTC. Pour l'affichage HT, diviser par 1.2.
-> Les valeurs N-1 ne sont pas toujours directes — les calculer depuis le réalisé et l'évolution :
-> `N-1 = réalisé_N / (1 + evo/100)`
+> **Section 2** : les valeurs N-1 sont dérivées depuis le réalisé et l'évolution : `N-1 = réalisé_N / (1 + evo/100)`.
+> **Section 3 LS et Atelier** : si `fichier_n1` est présent, lire les valeurs N-1 directement (mêmes colonnes que `fichier_semaine`). Si absent, dériver depuis l'évolution.
+
+### Bloc LS N-1 (fichier_n1 — Section 3 LS)
+
+Mêmes colonnes que dans `fichier_semaine` :
+
+| Champ CSV     | Valeur N-1 extraite         |
+| :------------ | :--------------------------- |
+| `textbox22`   | CA HT LS N-1                |
+| `textbox31`   | Taux de marge LS N-1 (%)    |
+| `textbox39`   | Panier moyen LS N-1 (€ TTC → ÷1.2 pour HT) |
+
+### Bloc Atelier N-1 (fichier_n1 — Section 3 Atelier)
+
+| Champ CSV     | Valeur N-1 extraite              |
+| :------------ | :-------------------------------- |
+| `textbox43`   | CA HT Atelier N-1                |
+| `textbox51`   | Taux de marge Atelier N-1 (%)    |
+| `textbox55`   | Nombre d'OR N-1                  |
+| `textbox62`   | Panier moyen Atelier N-1 (€ TTC → ÷1.2 pour HT) |
 
 ### Bloc Libre Service (Section 3 LS)
 ```
@@ -314,16 +343,32 @@ contrat_mtd   = int(nbContratEntretien_DECI) + int(nbCE_G6K)
 | **Panier Moyen**  | {panier_n} € | -               | -              | {panier_n1} € | {panier_evo:+} % |
 ```
 
+### Colonne Statut — Section 3
+
+Appliquer une icône sur **toutes les lignes** de Section 3, basée sur le signe de l'Évolution / N-1 :
+
+```python
+def statut_n1(evo_str):
+    """evo_str ex: '+17,3 %' ou '-5,5 %' ou '+7,0 pts'"""
+    val = float(evo_str.replace(' %', '').replace(' pts', '').replace(',', '.').replace('+', ''))
+    if val > 0:    return '🟢'
+    elif val == 0: return '🟡'
+    else:          return '🔴'
+```
+
 ### Section 3 LS — Format attendu
 
 ```markdown
-| **CA HT Magasin**  | {ls_ca} €  | {ls_obj} € | {ls_n1} €  | {ls_evo:+} % | |
-| **Marge Magasin**  | {ls_marge} % | -        | {ls_marge_n1} % | {ls_marge_evo:+} pts | |
-| **Panier Moyen LS**| {ls_panier} € | -       | {ls_panier_n1} € | {ls_panier_evo:+} % | |
+| **CA HT Magasin**  | {ls_ca} €     | {ls_obj} € | {ls_n1} €        | {ls_evo:+} %        | {statut_n1(ls_evo)} |
+| **Marge Magasin**  | {ls_marge} %  | -          | {ls_marge_n1} %  | {ls_marge_evo:+} pts | {statut_n1(ls_marge_evo)} |
+| **Panier Moyen LS**| {ls_panier} € | -          | {ls_panier_n1} € | {ls_panier_evo:+} % | {statut_n1(ls_panier_evo)} |
 ```
 
 ### Section 3 Atelier — Format attendu
 
 ```markdown
-| **CA HT Atelier**     | {at_ca} €   | {at_obj} €  | {at_n1} €   | {at_evo:+} % | |
-| **Marge Atelier**     | {at_marge} % | -         
+| **CA HT Atelier**     | {at_ca} €    | {at_obj} €  | {at_n1} €         | {at_evo:+} %         | {statut_n1(at_evo)} |
+| **Marge Atelier**     | {at_marge} % | -           | {at_marge_n1} %   | {at_marge_evo:+} pts | {statut_n1(at_marge_evo)} |
+| **Nombre d'OR**       | {at_nb_or}   | -           | {at_nb_or_n1}     | {at_nb_or_evo:+} %  | {statut_n1(at_nb_or_evo)} |
+| **Panier Moyen Atel.**| {at_panier} €| -           | {at_panier_n1} €  | {at_panier_evo:+} % | {statut_n1(at_panier_evo)} |
+```         

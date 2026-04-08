@@ -32,18 +32,18 @@
 
 |Métrique|Réalisé (N)|Objectif|Écart / Obj|N-1|Évolution / N-1|Statut|
 |:--|:--|:--|:--|:--|:--|:--|
-|**CA TTC Magasin**|76 100 €|67 729 €|+11,0 %|70 569 €|+7,8 %||
-|**Marge Magasin**|40,5 %|-|-|38,2 %|+2,3 pts||
-|**Panier Moyen LS**|32,1 €|-|-|30,1 €|+6,6 %||
+|**CA TTC Magasin**|76 100 €|67 729 €|+11,0 %|70 569 €|+7,8 %|🟢|
+|**Marge Magasin**|40,5 %|-|-|38,2 %|+2,3 pts|🟢|
+|**Panier Moyen LS**|32,1 €|-|-|30,1 €|+6,6 %|🟢|
 
 ### Atelier
 
 |Métrique|Réalisé (N)|Objectif|Écart / Obj|N-1|Évolution / N-1|Statut|
 |:--|:--|:--|:--|:--|:--|:--|
-|**CA TTC Atelier**|147 592 €|132 538 €|+10,2 %|134 226 €|+10,0 %||
-|**Marge Atelier**|61,3 %|-|-|61,2 %|+0,1 pts||
-|**Nombre d'OR**|692|-|-|669|+3,4 %||
-|**Panier Moyen Atel.**|213,3 €|-|-|200,6 €|+6,3 %||
+|**CA TTC Atelier**|147 592 €|132 538 €|+10,2 %|134 226 €|+10,0 %|🟢|
+|**Marge Atelier**|61,3 %|-|-|61,2 %|+0,1 pts|🟢|
+|**Nombre d'OR**|692|-|-|669|+3,4 %|🟢|
+|**Panier Moyen Atel.**|213,3 €|-|-|200,6 €|+6,3 %|🟢|
 
 ---
 
@@ -51,12 +51,12 @@
 
 | KPI Prioritaire   | Réalisé (N) | Objectif | Écart / Obj | N-1  | Évolution / N-1 | Statut    |
 | :---------------- | :---------- | :------- | :---------- | :--- | --------------- | --------- |
-| **Garantie Pneu** | 49 %        | 50 %     | -1,0 pts    | 52 % | -3,0 pts        | En retard |
-| **Géométrie**     | 25 %        | 19 %     | +6,0 pts    | 21 % | +4,0 pts        | Dépassé   |
-| **VCR (Refroid)** | 9 %         | 7 %      | +2,0 pts    | 11 % | -2,0 pts        | Dépassé   |
-| **VCF (Frein)**   | 13 %        | 11 %     | +2,0 pts    | 13 % | +0,0 pts        | Dépassé   |
-| **Plaquette**     | 11 %        | 11 %     | +0,0 pts    | 12 % | -1,0 pts        | Atteint   |
-| **Dépollution**   | 60 %        | 35 %     | +25,0 pts   | 47 % | +13,0 pts       | Dépassé   |
+| **Garantie Pneu** | 49 %        | 50 %     | -1,0 pts    | 52 % | -3,0 pts        | 🔴 |
+| **Géométrie**     | 25 %        | 19 %     | +6,0 pts    | 21 % | +4,0 pts        | 🟢 |
+| **VCR (Refroid)** | 9 %         | 7 %      | +2,0 pts    | 11 % | -2,0 pts        | 🟢 |
+| **VCF (Frein)**   | 13 %        | 11 %     | +2,0 pts    | 13 % | +0,0 pts        | 🟢 |
+| **Plaquette**     | 11 %        | 11 %     | +0,0 pts    | 12 % | -1,0 pts        | 🟡 |
+| **Dépollution**   | 60 %        | 35 %     | +25,0 pts   | 47 % | +13,0 pts       | 🟢 |
 > *Retard de certains rations, notammenet Garantie. Beaucoup de rendez vous centrale qui n'ont pas été correctement anticipé de notre part. Un rappel et suivi minute est prévu afin de ne plus perdre ce ratio de base. 
 > Le ratio plaquette est en recul par rapport à l'année dernière, pour cause de quelques déboirs staff atelier, et des travaux qui n'ont pas pu être réalisés.*
 

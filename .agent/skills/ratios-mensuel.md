@@ -137,11 +137,11 @@ def statut(ecart_val):
     if ecart_val is None:
         return ''
     if ecart_val < 0:
-        return 'En retard'
+        return '🔴'
     elif ecart_val == 0:
-        return 'Atteint'
+        return '🟡'
     else:
-        return 'Dépassé'
+        return '🟢'
 
 OBJECTIFS = {
     'Garantie Pneu': '50 %',

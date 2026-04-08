@@ -32,18 +32,18 @@
 
 |Métrique|Réalisé (N)|Objectif|N-1|Évolution|Statut|
 |:--|:--|:--|:--|:--|:--|
-|**CA HT Magasin**|15 553 €|18 661 €|13 259 €|+17,3 %||
-|**Marge Magasin**|36,8 %|N/A|29,8 %|+7,0 pts||
-|**Panier Moyen LS**|31,3 €|-|30,1 €|+4,1 %||
+|**CA HT Magasin**|15 553 €|18 661 €|13 259 €|+17,3 %|🟢|
+|**Marge Magasin**|36,8 %|N/A|29,8 %|+7,0 pts|🟢|
+|**Panier Moyen LS**|31,3 €|-|30,1 €|+4,1 %|🟢|
 
 ### Section Atelier vs N-1
 
 |Métrique|Réalisé (N)|Objectif|N-1|Évolution|Statut|
 |:--|:--|:--|:--|:--|:--|
-|**CA HT Atelier**|28 500 €|34 200 €|23 909 €|+19,2 %||
-|**Marge Atelier**|62,8 %|N/A|36,8 %|+26,0 pts||
-|**Nombre d'OR**|137|-|145|-5,5 %||
-|**Panier Moyen Atel.**|249,6 €|-|197,8 €|+26,2 %||
+|**CA HT Atelier**|28 500 €|34 200 €|23 909 €|+19,2 %|🟢|
+|**Marge Atelier**|62,8 %|N/A|36,8 %|+26,0 pts|🟢|
+|**Nombre d'OR**|137|-|145|-5,5 %|🔴|
+|**Panier Moyen Atel.**|249,6 €|-|197,8 €|+26,2 %|🟢|
 
 ---
 
@@ -51,12 +51,12 @@
 
 |KPI Prioritaire|Réalisé (N)|Objectif|Écart|Statut|
 |:--|:--|:--|:--|:--|
-|**Garantie Pneu**|38 %|50 %|-12,0 pts||
-|**Géométrie**|24 %|19 %|+5,0 pts||
-|**VCR (Refroid)**|7 %|7 %|0,0 pts||
-|**VCF (Frein)**|13 %|11 %|+2,0 pts||
-|**Plaquette**|15 %|11 %|+4,0 pts||
-|**Dépollution**|71 %|35 %|+36,0 pts||
+|**Garantie Pneu**|38 %|50 %|-12,0 pts|🔴|
+|**Géométrie**|24 %|19 %|+5,0 pts|🟢|
+|**VCR (Refroid)**|7 %|7 %|0,0 pts|🟡|
+|**VCF (Frein)**|13 %|11 %|+2,0 pts|🟢|
+|**Plaquette**|15 %|11 %|+4,0 pts|🟢|
+|**Dépollution**|71 %|35 %|+36,0 pts|🟢|
 
 ---
 

@@ -249,8 +249,20 @@ Format attendu dans le rapport :
 
 **Colonne Statut — Section 3 :**
 
-Les objectifs CA TTC LS et Atelier ne sont pas disponibles → cellule Statut laissée vide
-pour toutes les lignes de Section 3.
+Appliquer une icône sur **toutes les lignes** de Section 3, basée sur le signe de l'Évolution / N-1 :
+
+```python
+def statut_n1(evo_str):
+    """evo_str ex: '+7,8 %' ou '-1,2 pts'"""
+    val = float(evo_str.replace(' %', '').replace(' pts', '').replace(',', '.').replace('+', ''))
+    if val > 0:    return '🟢'
+    elif val == 0: return '🟡'
+    else:          return '🔴'
+
+# Appliquer sur chaque ligne de S3 LS et Atelier :
+# statut_n1(evo_ca_ls), statut_n1(evo_marge_ls), statut_n1(evo_panier_ls)
+# statut_n1(evo_ca_at), statut_n1(evo_marge_at), statut_n1(evo_nb_or), statut_n1(evo_panier_at)
+```
 
 **N-1 — Section 3 :**
 
