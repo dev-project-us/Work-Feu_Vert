@@ -4,7 +4,7 @@
 
 ---
 
-## 1. Bilan du Directeur
+## 1. Bilan mensuel
 
 **Vision Globale :** 
 > Evolution du chiffre sur objectif et sur N-1
@@ -30,11 +30,11 @@
 
 ### Libre Service (LS)
 
-|Métrique|Réalisé (N)|Objectif|Écart / Obj|N-1|Évolution / N-1|Statut|
-|:--|:--|:--|:--|:--|:--|:--|
-|**CA TTC Magasin**|76 100 €|67 729 €|+11,0 %|70 569 €|+7,8 %|🟢|
-|**Marge Magasin**|40,5 %|-|-|38,2 %|+2,3 pts|🟢|
-|**Panier Moyen LS**|32,1 €|-|-|30,1 €|+6,6 %|🟢|
+| Métrique            | Réalisé (N) | Objectif | Écart / Obj | N-1      | Évolution / N-1 | Statut |
+| :------------------ | :---------- | :------- | :---------- | :------- | :-------------- | :----- |
+| **CA TTC Magasin**  | 76 100 €    | 67 729 € | +11,0 %     | 70 569 € | +7,8 %          | 🟢     |
+| **Marge Magasin**   | 40,5 %      | -        | -           | 38,2 %   | +2,3 pts        | 🟢     |
+| **Panier Moyen LS** | 32,1 €      | -        | -           | 30,1 €   | +6,6 %          | 🟢     |
 
 ### Atelier
 
@@ -57,8 +57,8 @@
 | **VCF (Frein)**   | 13 %        | 11 %     | +2,0 pts    | 13 % | +0,0 pts        | 🟢 |
 | **Plaquette**     | 11 %        | 11 %     | +0,0 pts    | 12 % | -1,0 pts        | 🟡 |
 | **Dépollution**   | 60 %        | 35 %     | +25,0 pts   | 47 % | +13,0 pts       | 🟢 |
-> *Retard de certains rations, notammenet Garantie. Beaucoup de rendez vous centrale qui n'ont pas été correctement anticipé de notre part. Un rappel et suivi minute est prévu afin de ne plus perdre ce ratio de base. 
-> Le ratio plaquette est en recul par rapport à l'année dernière, pour cause de quelques déboirs staff atelier, et des travaux qui n'ont pas pu être réalisés.*
+> *Retard de certains ratios, notamment Garantie. Beaucoup de rendez vous centrale qui n'ont pas été correctement anticipé de notre part. Un rappel et suivi minute est prévu afin de ne plus perdre ce ratio de base. 
+> Le ratio plaquette est en recul par rapport à l'année dernière, pour cause de quelques déboires staff atelier, et des travaux qui n'ont pas pu être réalisés.*
 
 ---
 
@@ -66,7 +66,7 @@
 
 ### Staff Libre Service : Ratios de Vente (cumul mois)
 
-_Objectif : Régularité mensuelle de la transformation en prestations prioritaires._
+_Objectif : Régularité mensuelle de la transformation en prestations.
 
 | Collaborateur LS | Garantie Pneu | Géométrie | VCR    | VCF    | Plaquette | Dépoll. |
 | :--------------- | :------------ | :-------- | :----- | :----- | --------- | ------- |
@@ -76,10 +76,11 @@ _Objectif : Régularité mensuelle de la transformation en prestations prioritai
 | **Chouaib**      | 96,3 %        | 23,1 %    | 11,7 % | 11,7 % | 8,3 %     | 100,0 % |
 | **Pauline**      | 100,0 %       | 0 %       | 0 %    | 0 %    | 0 %       | 0 %     |
 | **Valentin**     | 350,0 %       | 25,0 %    | 18,6 % | 11,6 % | 2,3 %     | 340,0 % |
+> *Pauline en formation : dernière arrivée, formation fastidieuse
 
 ### Staff Atelier : Taux de Défectuosité (cumul mois)
 
-_Objectif : Rigueur technique sur la durée — détecter les écarts structurels vs ponctuels._
+_Objectif : Rigueur technique sur la durée 
 
 | Technicien          | Nb OR | Déf. Batterie | Disq AV | Disq AR | Plaq Av | Plaq Ar | Def BEG | Déf. VCF (Frein) | Déf. VCR | Déf. Amort | Déf. Pare-brise |
 | :------------------ | :---- | :------------ | :------ | :------ | :------ | :------ | :------ | :--------------- | :------- | ---------- | --------------- |
@@ -96,38 +97,69 @@ _Objectif : Rigueur technique sur la durée — détecter les écarts structurel
 
 ### Bilan des Actions du Mois Écoulé
 
-> _[Évaluer chaque action engagée le mois précédent : résultat obtenu, action close ou reconduite.]_
+1. **Formation et cohésion (capital humain)** → 
+	1. Accélération de la montée en compétence : 
+		- Equipe en montée de compétence, e-learning à jour, équipe plus à l'aise sur le LS +11% sur le LS vs objectif
+		- 2 montée en compétences distinctes sur des items non atteints auparavant (contrat entretien: Chouaib et Paul). Très bon potentiel d'évolution et très bonne mentalité
+			- *Plan d'action* : 
+				- Continuer l'accompagnement de l'équipe. Focaliser l'accompagnement sur les "plus gros potentiels de montée en compétence" (Kamilia, Elyne, Chouaib). Missionner Paul sur l'accompagnement de l'équipe de vente (1 vendeurs par semaine)
+			- *Objectif* : 
+				- Ne plus avoir de vendeurs en dessous des objectifs ratios au mois de Avril
+	2. Fidélisation face à la concurrence : 
+		- Pas de départs sans contraintes personnelles (1 départ pour raison familiale). Les équipes ne montrent pas de signes de départ
+			- *Plan d'action* :
+				- Suivi accrue de Pauline Rollin (dernière arrivée / formation compliqué et fastidieuse). 
+			- *Objectif* : 
+				- Consolider l'équipe au mois d'Avril et autonomie de TOUS les vendeurs sur les devis de bases et techniques. 
 
-1. **[Action 1]** → [Résultat]
-2. **[Action 2]** → [Résultat]
-3. **[Action 3]** → [Résultat]
+2. **Excellence opérationnel et contrôle** → 
+	1. Standardisation des process :
+		- Les taux de défectuosités se lissent entre techs et deviennent plus contrôlé. 
+		- Les diags et travaux ateliers sensibles sont contrôlés par la cheffe atelier et le maintien des pratiques obligatoires (diag et protections) est maintenu scrupuleusement. 
+			- *Plans d'actions* : 
+				- Recrutement en cours pour consolider l'équipe et libérer Ihsan à l'accompagnement des TMS (2 arrêts maladie + 1 licenciement)
+			- *Objectif*s :
+				- Consolider l'équipe TMS par un recrutement et continuer la vérification et montée en compétence de l'équipe
+				- Accompagner Mohamed sur sa montée en compétence en vu de passer technicien expert
+				- Accompagner Gael et Chandrack sur les temps de travaux (plus rapide)
+	2. Rigueur sur les réceptions :
+		- Contrôle systématique des réceptions (plus de temps pour traitement de plateforme). D'autre part, nous maintenons l'alerte si nous voyons des écarts de stocks réceptions en dessous de 300€. 
+		- Inventaires tournants à jour, taux de démarques en baisse.
+		- Broches vides faites systématiquement le lundi pour optimiser les réceptions marchandises et éviter le manque de marchandise. 
+			- *Plans d'actions* :
+				- Maintien des contrôles de réceptions et personnels tournants (pas toujours les même pour la formation inventaire des moins anciens)
+				- Maintien des inventaires tournant. Le taux est faussé car les corrections sur MSI faussent les taux d'inventaires
+				- Maintien des contrôles de broches vides en doublons avec un personnel de vente pour les sensibiliser sur le stock et le maintien de marge LS
+			- *Objectifs* :
+				- Aucuns manque de stock pour répondre à la demande permanente et continuer de pousser le LS (encore gros potentiel évolutif)
+				- Baisse significative de la démarque et maintien 
 
-### Plan d'Action Libre Service — Mois Suivant
 
-1. **[Action 1]**
-    - [Objectif mesurable]
-2. **[Action 2]**
-    - [Objectif mesurable]
-3. **[Action 3]**
-    - [Objectif mesurable]
+3. **Dynamisation et image commerciale** → 
+	1. Prise en charge : 
+		- Suivi scrupuleusement. Rappel aux briefs de manière QUOTIDIENNE et management minute
+	2. Modernisation du libre service :
+		- Plan d'implantation validé, l'implantation marchandise et le changement des gondoles a été fait en amont avant la date d'implantation par l'équipe
+		- Le rayon "autobest" a été implanté en grande partie avant l'arrivée de Julien Manuguerra et son équipe et peaufiné le jour de leur venue. 
+			- *Plan d'action* :
+				- Affiliation d'un planning de présence LS (installation de la CAM au niveau du LS durant l'implantation) 
+				- Faire venir le commerciale autobest afin qu'il brief l'équipe sur les spécificités du rayon (technique de vente particulière et argumentaire)
+			- *Objectif* :
+				- Montée du taux NPS, expérience client (cible à 60 à fin Avril)
+				- Montée du chiffre LS  et notament de l'outillage (cible à 6000€ à fin Avril)
 
-### Plan d'Action Atelier — Mois Suivant
-
-1. **[Action 1]**
-    - [Objectif mesurable]
-2. **[Action 2]**
-    - [Objectif mesurable]
-3. **[Action 3]**
-    - [Objectif mesurable]
 
 ---
 
 ## 7. RH
 
 ### 7.1 Alerte RH
-
-> _[Toute situation sensible ou urgente : conflit, comportement, avertissement, procédure disciplinaire.]_
+> Formation de Pauline Rollin fastidieuse. Renouvellement de période d'essai. 
 
 ### 7.2 Absence / Congé
+> Arrêt maladie de Denis (du 16.03 au 16.05)
+> Arrêt maladie de Chandrack (du 31.03 au 18.04)
 
 ### 7.3 Recrutement / Départ
+> Départ de Isabelle (camiste) le 27 Mars
+> Licenciement de Alishan (TMS) le 30 Mars
