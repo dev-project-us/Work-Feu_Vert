@@ -1,1 +1,1 @@
-Exécuter le skill ratios_prioritaires-mensuel : lire le fichier CSV dans resources/ratios prioritaires/ et remplir la section 4 (Ratios Prioritaires — Performance Atelier) du rapport mensuel Feu Vert Annecy.
+Exécuter le skill ratios-mensuel : lire le fichier CSV dans resources/ratios prioritaires/ et remplir la section 4 (Ratios Prioritaires — Performance Atelier) du rapport mensuel Feu Vert Annecy.
