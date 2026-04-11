@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "notebooklm": {
+      "type": "stdio",
+      "command": "/home/dev-project/.local/bin/notebooklm-mcp",
+      "args": []
+    }
+  }
+}
