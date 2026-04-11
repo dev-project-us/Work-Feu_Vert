@@ -1,1 +1,1 @@
-Exécuter le skill chiffre : lire les 3 fichiers CSV SUC dans resources/SUC/ et remplir les sections 2, 3 et 7 du rapport hebdomadaire Feu Vert Annecy. Puis enchaîner automatiquement avec le skill ratios_prioritaires pour remplir la section 4.
+Exécuter le skill chiffre : lire les 3 fichiers CSV SUC dans resources/SUC/ et remplir les sections 2, 3 et 7 du rapport hebdomadaire Feu Vert Annecy. 
