@@ -44,14 +44,14 @@
 
 ## 4. Ratios Prioritaires (Performance Atelier)
 
-|KPI Prioritaire|Réalisé (N)|Objectif|Écart|Statut|
-|:--|:--|:--|:--|:--|:--|
-|**Garantie Pneu**|48 %|50 %|-2,0 pts|🔴|
-|**Géométrie**|29 %|19 %|+10,0 pts|🟢|
-|**VCR (Refroid)**|10 %|7 %|+3,0 pts|🟢|
-|**VCF (Frein)**|11 %|11 %|0,0 pts|🟡|
-|**Plaquette**|8 %|11 %|-3,0 pts|🔴|
-|**Dépollution**|57 %|35 %|+22,0 pts|🟢|
+| KPI Prioritaire   | Réalisé (N) | Objectif | Écart     | Statut |     |
+| :---------------- | :---------- | :------- | :-------- | :----- | :-- |
+| **Garantie Pneu** | 48 %        | 50 %     | -2,0 pts  | 🔴     |     |
+| **Géométrie**     | 29 %        | 19 %     | +10,0 pts | 🟢     |     |
+| **VCR (Refroid)** | 10 %        | 7 %      | +3,0 pts  | 🟢     |     |
+| **VCF (Frein)**   | 11 %        | 11 %     | 0,0 pts   | 🟡     |     |
+| **Plaquette**     | 8 %         | 11 %     | -3,0 pts  | 🔴     |     |
+| **Dépollution**   | 57 %        | 35 %     | +22,0 pts | 🟢     |     |
 
 ---
 
