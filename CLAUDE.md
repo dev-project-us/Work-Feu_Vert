@@ -230,7 +230,7 @@ python -c "import datetime; now=datetime.datetime.now(); print(f'{now.month:02d}
 ## Content & Style Rules
 
 - All reports are written in French, in the voice of a **Senior Business Analyst / Workshop Manager**
-- No emojis, no AI branding, no decorative formatting — clean standard Markdown only
+- No AI branding.
 - Missing data must be written as `N/A` — never guess or hallucinate values
 - **Strict Percentages**: In Staff tables (LS or Atelier), output ONLY the final percentage (e.g. `71,4 %`). Never append raw fractions or context strings like `(10/14 PP)`.
 - **Clean Tables**: In Section 2, output only the exact rows defined in the template — do not add extra rows.
