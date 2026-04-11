@@ -1,1 +1,1 @@
-Exécuter le skill defectuosite-mensuel : lire le fichier CSV dans resources/defectuosite/ et remplir la section 5 Atelier (Taux de Défectuosité par technicien) du rapport mensuel Feu Vert Annecy.
+Exécuter le skill defectuosite-mensuel : lire le fichier CSV dans resources/Resources mensuelles/defectuosite/ et remplir la section 5 Atelier (Taux de Défectuosité par technicien) du rapport mensuel Feu Vert Annecy.
