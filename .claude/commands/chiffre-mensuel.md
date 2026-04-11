@@ -1,1 +1,1 @@
-Exécuter le skill chiffre : lire les 3 fichiers CSV SUC dans resources/SUC/ et remplir les sections 2, 3 et 7 du rapport mensuel Feu Vert Annecy. 
+Exécuter le skill chiffre-mensuel : lire les 3 fichiers CSV SUC dans resources/SUC/ et remplir les sections 2, 3 et 7 du rapport mensuel Feu Vert Annecy. 
