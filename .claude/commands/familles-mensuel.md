@@ -1,0 +1,1 @@
+Exécuter le skill famille-mensuel : lire lefichier CSV ComparatifCAv2_Famille  dans resources/Resources mensuelles/familles/ et remplir les sections 3 du rapport mensuel Feu Vert Annecy. 
