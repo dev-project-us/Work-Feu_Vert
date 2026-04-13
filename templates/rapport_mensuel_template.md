@@ -42,6 +42,27 @@
 
 ---
 
+
+## Analyse spécifique / Familles
+
+| Famille | CA n (€) | CA n-1 (€) | Evol. CA (%) | Marge n (%) | Marge +/- (pts) | Qté n |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **A-ENTRETIEN** | | | | | | |
+| **B-ELECTRICITE** | | | | | | |
+| **C-PIECES TECHNIQUES** | | | | | | |
+| **D-OUTILLAGE** | | | | | | |
+| **E-EQUIPEMENT EXTERIEUR** | | | | | | |
+| **F-EQUIPEMENT INTERIEUR** | | | | | | |
+| **G-AUTO SON** | | | | | | |
+| **H-LUBRIFIANTS** | | | | | | |
+| **I-PNEUMATIQUES** | | | | | | |
+| **J-2 ROUES** | | | | | | |
+| **U-SERVICES** | | | | | | |
+| **W-DIVERS** | | | | | | |
+| **X-TARIF MAIN D'OEUVRE** | | | | | | |
+
+### Points clés de l'analyse par famille
+* 
 ## 4. Ratios Prioritaires du Mois (Performance Atelier)
 
 |KPI Prioritaire|Réalisé (N)|Objectif|Écart / Obj|N-1|Évolution / N-1|Statut|
@@ -78,7 +99,7 @@ _Objectif : Rigueur technique sur la durée — détecter les écarts structurel
 |:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|
 |**Chandrack K.**||%|%|%|%|%|%|%|%|%|%|
 |**Mohammed Ali M.**||%|%|%|%|%|%|%|%|%|%|
-|**Alishan A.**||%|%|%|%|%|%|%|%|%|%|
+|**Viktor B. A.**||%|%|%|%|%|%|%|%|%|%|
 |**Gael R.**||%|%|%|%|%|%|%|%|%|%|
 |**Denis D.**||%|%|%|%|%|%|%|%|%|%|
 
