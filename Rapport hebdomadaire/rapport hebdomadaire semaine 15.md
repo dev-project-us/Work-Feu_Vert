@@ -102,6 +102,8 @@ _Objectif : Rigueur technique et capacité de détection des besoins de sécurit
 	- Rappel des clients pour les travaux pneus (garantie pneu)
 	- Rappel de sortir au parking pour vente géo dans la foulée
 	- Devis et faire le point avec Ihsan pour transformation directe (ATTENTION A BIEN FAIRE LE POINT AVEC IHSAN)
+5. **Suivi PLVs et Calicots**
+	- Faire le tour des abords du centre pour remise en état des affiches et Calicots (Arnaud)
 
 ### Plan d'Action Atelier
 
@@ -111,6 +113,8 @@ _Objectif : Rigueur technique et capacité de détection des besoins de sécurit
     - Semaine de formation de Jordan
 3. **Intégration Viktor Mercredi**
     - Le contacter pour lui donner ses horaires. Contrat imprimer dans mon bureau, le faire signer et laisser sur mon bureau. 
+4. **Vigilance communication avec la CAM**
+	- Attention à la communication avec la CAM (travaux complémentaires, communication problème sur véhicules etc...)
 
 ---
 
@@ -120,7 +124,7 @@ _Objectif : Rigueur technique et capacité de détection des besoins de sécurit
 | :------------ | :-------- | :------------ | :-------- | :-------- |
 | **CA**        | 219 988 € | 86 105 €      | 39,1 %    | 133 883 € |
 | **Marge**     | 107 078 € | 39 703 €      | 37,1 %    | 67 375 €  |
-| **Entretien** | 12        | 13            | 108 %     | 0         |
+| **Entretien** | 12        | 13            | 108 %     | -1        |
 | **Cofidis**   | 38        | 15            | 39        | 23        |
 
 ---
@@ -128,7 +132,7 @@ _Objectif : Rigueur technique et capacité de détection des besoins de sécurit
 ## 8. RH
 
 ### 8.1 Alerte RH
->
+> --
 
 ### 8.2 Absence / Congé
 > Arrêt maladie de Denis (du 16.03 au 16.05)
