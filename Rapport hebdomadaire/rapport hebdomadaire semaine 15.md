@@ -68,12 +68,12 @@ _Objectif : Capacité des conseillers à transformer l'accueil en prestations pr
 
 |Collaborateur LS|Garantie Pneu|Géométrie|VCR|VCF|Plaquette|Dépoll.|
 |:--|:--|:--|:--|:--|:--|:--|
-|**Sandrine**|%|%|%|%|%|%|
-|**Paul**|%|%|%|%|%|%|
-|**Kamilia**|%|%|%|%|%|%|
-|**Chouaib**|%|%|%|%|%|%|
-|**Pauline**|%|%|%|%|%|%|
-|**Valentin**|%|%|%|%|%|%|
+|**Sandrine**|28,6 %|25,0 %|0 %|14,3 %|14,3 %|9,1 %|
+|**Paul**|42,9 %|8,3 %|13,3 %|13,3 %|10,0 %|80,0 %|
+|**Kamilia**|100,0 %|30,0 %|8,0 %|8,0 %|8,0 %|200,0 %|
+|**Chouaib**|116,7 %|21,4 %|12,5 %|12,5 %|0 %|40,0 %|
+|**Pauline**|0 %|0 %|0 %|16,7 %|0 %|0 %|
+|**Valentin**|25,0 %|0 %|8,0 %|8,0 %|12,0 %|166,7 %|
 
 ### Staff Atelier : Taux de Défectuosité
 

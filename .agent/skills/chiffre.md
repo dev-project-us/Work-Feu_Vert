@@ -177,9 +177,9 @@ Ligne valeur  : [valeurs correspondantes]
 
 | Champ CSV        | Signification              | Section utilisée |
 | :--------------- | :------------------------- | :--------------- |
-| `caht_n`         | CA HT réalisé (N)          | S2, S7 MTD       |
+| `cattc_n`        | CA TTC réalisé (N)         | S2, S7 MTD       |
 | `textbox4`       | Évolution CA vs N-1 (%)    | S2               |
-| `textbox74`      | CA HT N-1                  | S2               |
+| `textbox74`      | CA TTC N-1                 | S2               |
 | `textbox84`      | % réalisation vs objectif  | S2               |
 | `marge_n`        | Taux de marge (%)          | S2               |
 | `textbox24`      | Évolution marge vs N-1 (pts)| S2              |
@@ -188,7 +188,7 @@ Ligne valeur  : [valeurs correspondantes]
 | `textbox17`      | Évolution fréquentation    | S2               |
 | `cattc_n_2`      | Panier moyen TTC (€)       | S2               |
 
-> **Note** : Le panier moyen dans le CSV est TTC. Pour l'affichage HT, diviser par 1.2.
+> **Note** : Le panier moyen dans le CSV est TTC — utiliser directement, ne pas diviser par 1.2.
 > **Section 2** : les valeurs N-1 sont dérivées depuis le réalisé et l'évolution : `N-1 = réalisé_N / (1 + evo/100)`.
 > **Section 3 LS et Atelier** : si `fichier_n1` est présent, lire les valeurs N-1 directement (mêmes colonnes que `fichier_semaine`). Si absent, dériver depuis l'évolution.
 
@@ -198,18 +198,18 @@ Mêmes colonnes que dans `fichier_semaine` :
 
 | Champ CSV     | Valeur N-1 extraite         |
 | :------------ | :--------------------------- |
-| `textbox22`   | CA HT LS N-1                |
+| `textbox27`   | CA TTC LS N-1               |
 | `textbox31`   | Taux de marge LS N-1 (%)    |
-| `textbox39`   | Panier moyen LS N-1 (€ TTC → ÷1.2 pour HT) |
+| `textbox39`   | Panier moyen LS N-1 (€ TTC) |
 
 ### Bloc Atelier N-1 (fichier_n1 — Section 3 Atelier)
 
 | Champ CSV     | Valeur N-1 extraite              |
 | :------------ | :-------------------------------- |
-| `textbox43`   | CA HT Atelier N-1                |
+| `textbox47`   | CA TTC Atelier N-1               |
 | `textbox51`   | Taux de marge Atelier N-1 (%)    |
 | `textbox55`   | Nombre d'OR N-1                  |
-| `textbox62`   | Panier moyen Atelier N-1 (€ TTC → ÷1.2 pour HT) |
+| `textbox62`   | Panier moyen Atelier N-1 (€ TTC) |
 
 ### Bloc Libre Service (Section 3 LS)
 ```
@@ -219,15 +219,16 @@ Ligne header : textbox22, textbox25, textbox27, textbox29, textbox31,
 
 | Champ CSV     | Signification              |
 | :------------ | :------------------------- |
-| `textbox22`   | CA HT LS réalisé (N)       |
+| `textbox27`   | CA TTC LS réalisé (N)      |
 | `textbox25`   | Évolution CA LS vs N-1 (%) |
-| `textbox27`   | CA HT LS objectif          |
 | `textbox31`   | Taux de marge LS (%)       |
 | `textbox33`   | Évolution marge LS (pts)   |
 | `textbox35`   | Nb clients LS              |
 | `textbox37`   | Évolution fréq LS (%)      |
-| `textbox39`   | Panier moyen LS (€)        |
+| `textbox39`   | Panier moyen LS (€ TTC)    |
 | `textbox41`   | Évolution panier LS (%)    |
+
+> **Note** : `textbox22` = CA HT LS (ignoré). `textbox27` = CA TTC LS réalisé. Objectif CA TTC LS : `round(textbox27 × (1 - textbox25/100))`.
 
 ### Bloc Atelier (Section 3 Atelier)
 ```
@@ -237,15 +238,16 @@ Ligne header : textbox43, textbox45, textbox47, textbox49, textbox51,
 
 | Champ CSV     | Signification                |
 | :------------ | :--------------------------- |
-| `textbox43`   | CA HT Atelier réalisé (N)    |
+| `textbox47`   | CA TTC Atelier réalisé (N)   |
 | `textbox45`   | Évolution CA Atelier vs N-1  |
-| `textbox47`   | CA HT Atelier objectif       |
 | `textbox51`   | Taux de marge Atelier (%)    |
 | `textbox53`   | Évolution marge Atelier (pts)|
 | `textbox55`   | Nb OR (nombre d'ordres)      |
 | `textbox57`   | Évolution Nb OR (%)          |
-| `textbox62`   | Panier moyen Atelier (€)     |
+| `textbox62`   | Panier moyen Atelier (€ TTC) |
 | `textbox64`   | Évolution panier Atelier (%) |
+
+> **Note** : `textbox43` = CA HT Atelier (ignoré). `textbox47` = CA TTC Atelier réalisé. Objectif CA TTC Atelier : `round(textbox47 × (1 - textbox45/100))`.
 
 ### Contrats entretien (Section 7)
 ```
@@ -270,7 +272,7 @@ dateDatetime, libelleJour, CATTC, ..., marge, marge_1, textbox8, textbox22,
 
 | Champ CSV     | Signification                          |
 | :------------ | :------------------------------------- |
-| `textbox8`    | Objectif CA TTC mensuel (÷ 1.2 → HT)  |
+| `textbox8`    | Objectif CA TTC mensuel                |
 | `textbox50`   | Objectif Taux de Marge % mensuel       |
 | `textbox42`   | **Objectif Marge € mensuel** — **dernière colonne** du fichier |
 
@@ -287,12 +289,11 @@ Ces valeurs sont **identiques sur toutes les lignes** — lire depuis n'importe 
 
 ```python
 # CA
-caht_n        = int(caht_n_raw.replace(' ', ''))
-caht_obj_ttc  = int(textbox8.replace(' ', ''))
-caht_obj_ht   = round(caht_obj_ttc / 1.2)
+cattc_n       = int(cattc_n_raw.replace(' ', ''))
+ca_obj_ttc    = int(textbox8.replace(' ', ''))
 caht_evo      = float(textbox4.replace(' %', '').replace(',', '.'))
-caht_n1       = round(caht_n / (1 + caht_evo / 100))
-caht_ecart    = round((caht_n / caht_obj_ht - 1) * 100, 1)
+ca_n1         = round(cattc_n / (1 + caht_evo / 100))
+ca_ecart      = round((cattc_n / ca_obj_ttc - 1) * 100, 1)
 
 # Marge
 marge_n       = float(marge_n_raw.replace(' %', '').replace(',', '.'))
@@ -306,9 +307,8 @@ freq_n        = int(textbox14_value)
 freq_evo      = float(textbox17.replace(' %', '').replace(',', '.'))
 freq_n1       = round(freq_n / (1 + freq_evo / 100))
 
-# Panier moyen (TTC → HT)
-panier_ttc    = float(cattc_n_2.replace(' €', '').replace(',', '.'))
-panier_n      = round(panier_ttc / 1.2, 1)
+# Panier moyen TTC — utiliser cattc_n_2 directement, ne pas diviser par 1.2
+panier_n      = float(cattc_n_2.replace(' €', '').replace(',', '.'))
 panier_evo    = float(textbox17_panier.replace(' %', '').replace(',', '.'))
 panier_n1     = round(panier_n / (1 + panier_evo / 100), 1)
 ```
@@ -316,10 +316,10 @@ panier_n1     = round(panier_n / (1 + panier_evo / 100), 1)
 ### Section 7 (RAF)
 
 ```python
-ca_obj_ht     = round(obj_ttc_mensuel / 1.2)
-ca_mtd        = int(caht_n_from_file3.replace(' ', ''))
-ca_pct        = round(ca_mtd / ca_obj_ht * 100, 1)
-ca_raf        = ca_obj_ht - ca_mtd
+ca_obj_ttc    = int(textbox8.replace(' ', ''))
+ca_mtd        = int(cattc_n_from_mtd.replace(' ', ''))
+ca_pct        = round(ca_mtd / ca_obj_ttc * 100, 1)
+ca_raf        = ca_obj_ttc - ca_mtd
 
 marge_obj_eur = int(textbox42.replace(' ', ''))
 marge_mtd_eur_raw = # ligne "Marge Produit" dans le bloc libelle/marge_n_2 du fichier 3
@@ -337,7 +337,7 @@ contrat_mtd   = int(nbContratEntretien_DECI) + int(nbCE_G6K)
 ### Section 2 — Format attendu
 
 ```markdown
-| **CA HT Total**   | {caht_n} €   | {caht_obj_ht} € | {caht_ecart} % | {caht_n1} € | {caht_evo:+} % |
+| **CA TTC Total**  | {cattc_n} €  | {ca_obj_ttc} €  | {ca_ecart} %   | {ca_n1} €   | {caht_evo:+} % |
 | **Marge Brute**   | {marge_n} %  | {marge_obj} %   | {marge_ecart:+} pts | {marge_n1} % | {marge_evo:+} pts |
 | **Fréquentation** | {freq_n} clts | -              | -              | {freq_n1} clts | {freq_evo:+} % |
 | **Panier Moyen**  | {panier_n} € | -               | -              | {panier_n1} € | {panier_evo:+} % |
@@ -359,7 +359,7 @@ def statut_n1(evo_str):
 ### Section 3 LS — Format attendu
 
 ```markdown
-| **CA HT Magasin**  | {ls_ca} €     | {ls_obj} € | {ls_n1} €        | {ls_evo:+} %        | {statut_n1(ls_evo)} |
+| **CA TTC Magasin** | {ls_ca} €     | {ls_obj} € | {ls_n1} €        | {ls_evo:+} %        | {statut_n1(ls_evo)} |
 | **Marge Magasin**  | {ls_marge} %  | -          | {ls_marge_n1} %  | {ls_marge_evo:+} pts | {statut_n1(ls_marge_evo)} |
 | **Panier Moyen LS**| {ls_panier} € | -          | {ls_panier_n1} € | {ls_panier_evo:+} % | {statut_n1(ls_panier_evo)} |
 ```
@@ -367,7 +367,7 @@ def statut_n1(evo_str):
 ### Section 3 Atelier — Format attendu
 
 ```markdown
-| **CA HT Atelier**     | {at_ca} €    | {at_obj} €  | {at_n1} €         | {at_evo:+} %         | {statut_n1(at_evo)} |
+| **CA TTC Atelier**    | {at_ca} €    | {at_obj} €  | {at_n1} €         | {at_evo:+} %         | {statut_n1(at_evo)} |
 | **Marge Atelier**     | {at_marge} % | -           | {at_marge_n1} %   | {at_marge_evo:+} pts | {statut_n1(at_marge_evo)} |
 | **Nombre d'OR**       | {at_nb_or}   | -           | {at_nb_or_n1}     | {at_nb_or_evo:+} %  | {statut_n1(at_nb_or_evo)} |
 | **Panier Moyen Atel.**| {at_panier} €| -           | {at_panier_n1} €  | {at_panier_evo:+} % | {statut_n1(at_panier_evo)} |

@@ -22,7 +22,7 @@ Run these commands inside Claude Code to trigger report generation:
 | `/defectuosite` | `.agent/skills/defectuosite.md` | Fill Section 5 Atelier (Taux de Défectuosité) from CA_Main_d_oeuvre CSV |
 | `/suivi_vendeur` | `.agent/skills/suivi_vendeur.md` | Fill Section 5 LS (Ratios de Vente par vendeur) from Suivi Individuel CSV |
 
-`/chiffre` also invokes `/ratios` at completion. **Section 5 LS** is fully automated via `/suivi_vendeur` — all columns (Garantie Pneu, Géométrie, VCR, VCF, Plaquette, Dépollution) are implemented.
+**Section 5 LS** is fully automated via `/suivi_vendeur` — all columns (Garantie Pneu, Géométrie, VCR, VCF, Plaquette, Dépollution) are implemented.
 
 ### Monthly Commands (no registered slash command — invoke by description or keyword)
 
