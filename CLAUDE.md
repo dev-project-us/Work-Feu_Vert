@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 This is an **Obsidian vault** used for professional data analysis at **Feu Vert Annecy** (automotive service center). It converts CSV export data into structured French-language business analysis reports in Markdown format.
 
 - **Core logic:** `.agent/skills/` — full Markdown skill definitions; `.claude/commands/` — one-liner prompts that trigger each skill via Claude Code slash commands (both must stay in sync for weekly skills)
-- **Incoming data:** `resources/` — CSV exports organized in subfolders; `resources/Resources mensuelles/` — parallel structure for monthly data (note: skill files reference this as `monthly_recap` via `find_dir()`, but the actual folder name on disk is `Resources mensuelles`)
+- **Incoming data:** `resources/` — CSV exports organized in subfolders; `resources/monthly_recap/` — parallel structure for monthly data (skill files locate it via `find_dir("monthly_recap")`)
 - **Templates:** `templates/` — Markdown report templates in French
 - **Output:** `Rapport hebdomadaire/` — generated weekly reports; `Rapport mensuel/` — generated monthly reports
 
@@ -28,12 +28,12 @@ Run these commands inside Claude Code to trigger report generation:
 
 | Trigger keyword | Skill File | Purpose |
 |----------------|-----------|---------|
-| `/chiffre-mensuel` | `.agent/skills/chiffre-mensuel.md` | Fill Sections 2 and 3 from `resources/Resources mensuelles/SUC/` — expects **two** `SUC - Situation de chiffre*.csv` files (one for year N, one for N-1) + one Objectifs file |
-| `/ratios-mensuel` | `.agent/skills/ratios-mensuel.md` | Fill Section 4 KPIs from `resources/Resources mensuelles/ratios prioritaires/` |
-| `/defectuosite-mensuel` | `.agent/skills/defectuosite-mensuel.md` | Fill Section 5 Atelier from `resources/Resources mensuelles/defectuosite/` |
-| `/suivi-vendeur-mensuel` | `.agent/skills/suivi-vendeur-mensuel.md` | Fill Section 5 LS from `resources/Resources mensuelles/suivi vendeur/` |
+| `/chiffre-mensuel` | `.agent/skills/chiffre-mensuel.md` | Fill Sections 2 and 3 from `resources/monthly_recap/SUC/` — expects **two** `SUC - Situation de chiffre*.csv` files (one for year N, one for N-1) + one Objectifs file |
+| `/ratios-mensuel` | `.agent/skills/ratios-mensuel.md` | Fill Section 4 KPIs from `resources/monthly_recap/ratios prioritaires/` |
+| `/defectuosite-mensuel` | `.agent/skills/defectuosite-mensuel.md` | Fill Section 5 Atelier from `resources/monthly_recap/defectuosite/` |
+| `/suivi-vendeur-mensuel` | `.agent/skills/suivi-vendeur-mensuel.md` | Fill Section 5 LS from `resources/monthly_recap/suivi vendeur/` |
 
-Monthly skills are **not registered in `.claude/commands/`** — Claude Code reads the skill file directly from `.agent/skills/` when the trigger keyword is used.
+Monthly commands are registered in both `.claude/commands/` and `.agent/skills/` — both stay in sync, same as weekly commands.
 
 ## Architecture
 
@@ -48,10 +48,11 @@ CSV in resources/ → Agent Skill (slash command) → Markdown Report in Rapport
 **`chiffre.md`** — 6-step workflow:
 1. Extract week number N from CSV date fields (ISO calendar)
 2. Create output file from template: `Rapport hebdomadaire/rapport hebdomadaire semaine {N}.md`
-3. Identify the 3 SUC files in `resources/SUC/` **by content, not filename**:
+3. Identify the 4 SUC files in `resources/SUC/` **by content, not filename**:
    - `fichier_objectifs`: contains column `libelleJour`
    - `fichier_mtd`: period string starts with `Du 01/`
-   - `fichier_semaine`: everything else (mid-month period, e.g. `Du 16/03/2026`)
+   - `fichier_semaine`: mid-month period, current year (e.g. `Du 16/03/2026`)
+   - `fichier_n1`: mid-month period, prior year — used for N-1 values in Section 3
 4. Extract values using block/column mappings defined in the skill
 5. Fill placeholders in Sections 2, 3, and 7
 6. Confirm to user
@@ -83,6 +84,7 @@ CSV in resources/ → Agent Skill (slash command) → Markdown Report in Rapport
 
 - `templates/rapport_hebdomadaire_template.md` — 8-section weekly report (Sections 1–8)
 - `templates/rapport_mensuel_template.md` — monthly recap (same structure; **known issue**: title header incorrectly reads "Hebdomadaire")
+- `templates/rapport_trimestriel_template.md.md` — quarterly report template (note: double `.md` extension in filename is a typo; no skill currently uses this template)
 
 ### Resources Structure
 
@@ -91,14 +93,15 @@ resources/
 ├── SUC/
 │   ├── SUC - Objectifs Journaliers (...).csv   ← contains libelleJour column
 │   ├── SUC - Situation de chiffre (...).csv    ← fichier_mtd (Du 01/...)
-│   └── SUC - Situation de chiffre (...).csv    ← fichier_semaine (Du 16/...)
+│   ├── SUC - Situation de chiffre (...).csv    ← fichier_semaine (Du 16/..., current year)
+│   └── SUC - Situation de chiffre (...).csv    ← fichier_n1 (Du 16/..., prior year)
 ├── ratios prioritaires/
 │   └── Ratios Atelier de date à date .csv
 ├── defectuosite/
 │   └── CA_Main_d_oeuvre (...).csv              ← contains technicien3 column
 └── suivi vendeur/
     └── Suivi Individuel des ratios atelier (...).csv  ← contains textbox390 column
-resources/Resources mensuelles/           ← monthly data (skill files call this "monthly_recap")
+resources/monthly_recap/
 ├── SUC/
 │   ├── SUC - Objectifs Journaliers (...).csv    ← contains libelleJour column
 │   ├── SUC - Situation de chiffre (...).csv     ← fichier_mtd (Du 01/ + current year)
@@ -220,7 +223,7 @@ python -c "import datetime; now=datetime.datetime.now(); print(f'{now.month:02d}
 ## Known Issues
 
 - **Portable paths**: All skill files use a `find_dir()` helper that walks up the directory tree to locate `resources/`, `Rapport hebdomadaire/`, and `templates/` by name — no hardcoded absolute paths. This works on any machine provided the folder names remain unchanged.
-- **Monthly folder name mismatch**: Skill files call `find_dir("monthly_recap")` but the actual folder on disk is `resources/Resources mensuelles/`. The `find_dir()` search will fail unless the folder is renamed to `monthly_recap` or the skill files are updated.
+- **`run_def.py` at root**: Legacy debug script with hardcoded Windows paths (`C:/Users/mendo/...`). Not invoked by any skill — ignore it.
 - **Marge Brute € (mensuel)**: `chiffre-mensuel.md` instructs reading `marge_n_2` from the `libelle,marge_n_2,...` block — but this value is "Marge Produit" only (e.g. 46 985), not total marge. The correct total Marge € is `round(caht_n * marge_pct / 100)` (e.g. 186 418 × 54,2 % = 101 039 €). Always use the computed formula, not `marge_n_2`, for the Marge Brute (€) row.
 - **Monthly N-1 file**: `/chiffre-mensuel` requires two `SUC - Situation de chiffre*.csv` files — one dated with the current year, one with the prior year. If only one file is present, N-1 values cannot be read and must be preserved from a prior run or marked `N/A`.
 - **Section 7 template mismatch**: The template shows `%` placeholders for the Marge row, but the actual output uses euros (`€`). Follow the format in `chiffre.md` and existing generated reports, not the template skeleton.
