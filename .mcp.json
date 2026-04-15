@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "notebooklm": {
+      "type": "stdio",
+      "command": "C:\\Users\\mendo\\.local\\bin\\notebooklm-mcp.exe",
+      "args": []
+    }
+  }
+}
