@@ -37,6 +37,32 @@ Période : [T1/T2/T3/T4] [AAAA] | Centre : Annecy Seynod
 | **Nombre d'OR** | | | % | |
 | **Panier Moyen Atel.** | € | € | % | |
 
+## Analyse spécifique / Familles
+
+| Famille | CA n (€) | CA n-1 (€) | Evol. CA (%) | Marge n (%) | Marge +/- (pts) | Qté n | Statut |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **A-ENTRETIEN** | N/A | N/A | N/A | N/A | N/A | N/A | ⚪ |
+| **B-ELECTRICITE** | N/A | N/A | N/A | N/A | N/A | N/A | ⚪ |
+| **C-PIECES TECHNIQUES** | N/A | N/A | N/A | N/A | N/A | N/A | ⚪ |
+| **D-OUTILLAGE** | N/A | N/A | N/A | N/A | N/A | N/A | ⚪ |
+| **E-EQUIPEMENT EXTERIEUR** | N/A | N/A | N/A | N/A | N/A | N/A | ⚪ |
+| **F-EQUIPEMENT INTERIEUR** | N/A | N/A | N/A | N/A | N/A | N/A | ⚪ |
+| **G-AUTO SON** | N/A | N/A | N/A | N/A | N/A | N/A | ⚪ |
+| **H-LUBRIFIANTS** | N/A | N/A | N/A | N/A | N/A | N/A | ⚪ |
+| **I-PNEUMATIQUES** | N/A | N/A | N/A | N/A | N/A | N/A | ⚪ |
+| **J-2 ROUES** | N/A | N/A | N/A | N/A | N/A | N/A | ⚪ |
+| **U-SERVICES** | N/A | N/A | N/A | N/A | N/A | N/A | ⚪ |
+| **W-DIVERS** | N/A | N/A | N/A | N/A | N/A | N/A | ⚪ |
+| **X-TARIF MAIN D'OEUVRE** | N/A | N/A | N/A | N/A | N/A | N/A | ⚪ |
+
+### Points clés de l'analyse par famille
+
+* [Point clé 1 — famille moteur du trimestre]
+* [Point clé 2 — famille en déclin]
+* [Point clé 3 — alerte marge]
+* [Point clé 4 — anomalie ou fait notable]
+* [Synthèse trimestrielle globale]
+
 ---
 
 ## 4. Ratios Prioritaires (Moyenne Trimestrielle)
@@ -87,4 +113,4 @@ Période : [T1/T2/T3/T4] [AAAA] | Centre : Annecy Seynod
 * **Alerte RH :** [Texte]
 * **Recrutement :** [Texte]
 * **Investissements :** [Texte]
-* 
+

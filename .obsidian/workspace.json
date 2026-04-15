@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "templates/rapport_mensuel_template.md",
+                "file": "templates/rapport_trimestriel_template.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "rapport_mensuel_template"
+              "title": "rapport_trimestriel_template"
             }
           }
         ]
@@ -186,8 +186,9 @@
   },
   "active": "3c9e9ca7c6264b37",
   "lastOpenFiles": [
-    "templates/rapport_trimestriel_template.md.md",
+    "templates/rapport_mensuel_template.md",
     "templates/rapport_trimestriel_template.md",
+    "templates/rapport_trimestriel_template.md.md",
     "Rapport hebdomadaire/rapport hebdomadaire semaine 15.md",
     "CLAUDE.md.tmp.6411.1776107202409",
     "Rapport hebdomadaire/rapport hebdomadaire semaine 14.md",
@@ -195,7 +196,6 @@
     "Rapport hebdomadaire/rapport hebdomadaire semaine 15.md.tmp.10826.1776092556846",
     "Rapport hebdomadaire/rapport hebdomadaire semaine 13.md",
     "run_def.py",
-    "templates/rapport_mensuel_template.md",
     "Rapport hebdomadaire/rapport hebdomadaire semaine 14.md.tmp.12676.1775665509483",
     "CLAUDE.md.tmp.8400.1775664136404",
     "resources/suivi vendeur/Suivi Individuel des ratios atelier (7).csv",

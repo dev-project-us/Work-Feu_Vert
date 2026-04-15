@@ -1,0 +1,1 @@
+Exécuter le skill familles-trimestriel : lire le fichier CSV ComparatifCAv2_Famille dans resources/Resources trimestrielles/Familles/ et remplir la section 8 (Analyse spécifique / Familles) du rapport trimestriel Feu Vert Annecy.

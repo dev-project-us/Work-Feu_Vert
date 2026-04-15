@@ -40,10 +40,7 @@
 |**Nombre d'OR**|||-||%||
 |**Panier Moyen Atel.**|€|-|-|€|%||
 
----
-
-
-## Analyse spécifique / Familles
+# Analyse spécifique / Familles
 
 | Famille | CA n (€) | CA n-1 (€) | Evol. CA (%) | Marge n (%) | Marge +/- (pts) | Qté n | Statut |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -62,7 +59,15 @@
 | **X-TARIF MAIN D'OEUVRE** | | | | | | | |
 
 ### Points clés de l'analyse par famille
-* 
+
+* [Point clé 1 — famille moteur du trimestre]
+* [Point clé 2 — famille en déclin]
+* [Point clé 3 — alerte marge]
+* [Point clé 4 — anomalie ou fait notable]
+* [Synthèse trimestrielle globale]
+
+---
+
 ## 4. Ratios Prioritaires du Mois (Performance Atelier)
 
 |KPI Prioritaire|Réalisé (N)|Objectif|Écart / Obj|N-1|Évolution / N-1|Statut|
