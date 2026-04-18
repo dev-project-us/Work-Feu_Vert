@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Rapport trimestriel/rapport trimestriel T1 2026.md",
+                "file": "templates/rapport_trimestriel_template.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "rapport trimestriel T1 2026"
+              "title": "rapport_trimestriel_template"
             }
           }
         ]
@@ -184,10 +184,8 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "589b7b8a8d419435",
+  "active": "3c9e9ca7c6264b37",
   "lastOpenFiles": [
-    "Rapport trimestriel",
-    "templates/rapport_hebdomadaire_template.md",
     "templates/rapport_mensuel_template.md",
     "templates/rapport_trimestriel_template.md",
     "templates/rapport_trimestriel_template.md.md",
@@ -206,6 +204,7 @@
     "resources/SUC/SUC - Situation de chiffre (8).csv",
     "resources/SUC/SUC - Objectifs Journaliers (9).csv",
     "Rapport hebdomadaire/rapport hebdomadaire semaine 12.md",
+    "templates/rapport_hebdomadaire_template.md",
     "resources/Untitled.md",
     "Rapport hebdomadaire/11 - Rapport semaine 11.md",
     "Rapport hebdomadaire/12 - Rapport semaine 12.md",

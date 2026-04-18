@@ -1,0 +1,1 @@
+Exécuter le skill ratios-trimestriel : lire le fichier CSV dans resources/trimestres/ratios/ et remplir la section 4 (Ratios Prioritaires — Performance Atelier) du rapport trimestriel Feu Vert Annecy.

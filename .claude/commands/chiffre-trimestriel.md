@@ -1,0 +1,1 @@
+Exécuter le skill chiffre-trimestriel : lire les 3 fichiers CSV SUC dans resources/Resources trimestres/SUC/ et remplir les sections 2, 3 et 7 du rapport trimestriel Feu Vert Annecy. 
