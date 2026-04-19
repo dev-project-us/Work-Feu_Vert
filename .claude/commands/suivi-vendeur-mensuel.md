@@ -1,0 +1,1 @@
+Exécuter le skill suivi-vendeur-mensuel : lire le fichier CSV dans resources/Resources mendurl/suivi vendeur/ et remplir la section 5 LS (Ratios de Vente par vendeur : Garantie Pneu, Géométrie, VCR, VCF, Plaquette, Dépollution) du rapport mensuel Feu Vert Annecy.

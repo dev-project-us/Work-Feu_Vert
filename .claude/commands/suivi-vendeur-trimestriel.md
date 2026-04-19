@@ -1,0 +1,1 @@
+Exécuter le skill suivi-vendeur-trimestriel : lire le fichier CSV dans resources/trimestres/suivi vendeur/ et remplir la section 5 LS (Ratios de Vente par vendeur : Garantie Pneu, Géométrie, VCR, VCF, Plaquette, Dépollution) du rapport trimestriel Feu Vert Annecy.
