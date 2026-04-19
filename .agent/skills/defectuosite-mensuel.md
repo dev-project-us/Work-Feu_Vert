@@ -2,43 +2,56 @@
 description: defectuosite mensuel
 ---
 
-ALWAYS use this skill when the user types "/defectuosite-mensuel". Fills Section 5
-Atelier (Taux de Défectuosité) of the monthly report from the CA_Main_d_oeuvre CSV
-in resources/monthly_recap/defectuosite/.
+ALWAYS use this skill when the user types "/defectuosite-mensuel". Execute the
+Python script below in full. It scans the monthly CA_Main_d_oeuvre CSV and fills
+Section 5 Atelier of the monthly report. Do NOT interpret or read the CSV yourself.
 
 ---
 
 # Skill : Taux de Défectuosité — Section 5 Atelier Rapport Mensuel Feu Vert Annecy
 
-## Vue d'ensemble
+## ⚠️ Note importante — NOM_MAP à vérifier
 
-Ce skill lit le fichier CSV CA Main d'œuvre depuis `resources/monthly_recap/defectuosite/`
-et remplit la **Section 5 — Staff Atelier : Taux de Défectuosité** du rapport mensuel.
+Le template mensuel contient **`Viktor B. A.`** en lieu de `Alishan A.` (présent dans le
+template hebdomadaire). Le script utilise `VIKTOR B. A.` comme clé CSV par défaut.
+**Vérifier que ce nom correspond bien à l'entrée réelle dans le CSV mensuel.**
+Si le CSV contient toujours `ALISHAN A.`, remplacer `'VIKTOR B. A.'` par `'ALISHAN A.'`
+dans le NOM_MAP ci-dessous.
 
-**Différence vs le skill hebdomadaire** :
-- Dossier source : `monthly_recap/defectuosite/` au lieu de `resources/defectuosite/`
-- Fichier rapport cible : `Rapport mensuel/rapport mensuel {mois} {année}.md`
+## Instruction d'exécution
 
-Le parsing CSV, le mapping des colonnes, et la logique d'écriture sont **identiques**
-au skill hebdomadaire. Se référer à `defectuosite.md` pour le détail complet.
+**Exécuter le script Python ci-dessous dans son intégralité.**
+Python fait tout : scan, extraction du bloc synthèse, remplissage Section 5 Atelier.
+L'IA ne lit pas le CSV. L'IA ne mappe pas les colonnes.
 
 ---
 
-## Workflow — Commande `/defectuosite-mensuel`
-
-### Étape 1 — Scanner le dossier
-
 ```python
-import pathlib, glob, os
+import os, glob, csv, io, pathlib
+from datetime import datetime
+
+# ─────────────────────────────────────────────
+# HELPER
+# ─────────────────────────────────────────────
 
 def find_dir(name):
     for p in [pathlib.Path.cwd()] + list(pathlib.Path.cwd().parents):
         candidate = p / name
         if candidate.is_dir():
             return candidate
-    raise FileNotFoundError(f"Cannot find directory '{name}' in any parent of {pathlib.Path.cwd()}")
+    raise FileNotFoundError(f"Cannot find directory '{name}'")
 
-folder = str(find_dir("monthly_recap") / "defectuosite")
+MOIS_FR = {
+    1:'janvier', 2:'février', 3:'mars', 4:'avril',
+    5:'mai', 6:'juin', 7:'juillet', 8:'août',
+    9:'septembre', 10:'octobre', 11:'novembre', 12:'décembre'
+}
+
+# ─────────────────────────────────────────────
+# STEP 1 — SCAN AND IDENTIFY CSV FILE
+# ─────────────────────────────────────────────
+
+folder    = str(find_dir("monthly_recap") / "defectuosite")
 csv_files = glob.glob(os.path.join(folder, "*.csv"))
 
 fichier_def = None
@@ -48,129 +61,134 @@ for f in csv_files:
     if 'technicien3' in content:
         fichier_def = f
         break
-```
 
-### Étape 2 — Extraire le mois et l'année
+assert fichier_def, "ERREUR : fichier défectuosité introuvable dans monthly_recap/defectuosite/"
 
-```python
-from datetime import datetime
+# ─────────────────────────────────────────────
+# STEP 2 — DETERMINE MONTH AND YEAR
+# ─────────────────────────────────────────────
 
-# Ligne contenant "ANNECY SEYNOD,01/03/2026,31/03/2026"
+# Line format: "ANNECY SEYNOD,01/03/2026,31/03/2026"
 lines = content.split('\r\n')
 for line in lines:
     if 'ANNECY' in line and '/' in line:
-        parts = line.split(',')
+        parts        = line.split(',')
         date_fin_str = parts[2].strip()
-        date_fin = datetime.strptime(date_fin_str, "%d/%m/%Y")
-        mois_num = date_fin.month
-        annee    = date_fin.year
+        date_fin     = datetime.strptime(date_fin_str, "%d/%m/%Y")
+        mois_str     = MOIS_FR[date_fin.month]
+        annee        = date_fin.year
         break
 
-MOIS_FR = {
-    1: 'janvier', 2: 'février', 3: 'mars', 4: 'avril',
-    5: 'mai', 6: 'juin', 7: 'juillet', 8: 'août',
-    9: 'septembre', 10: 'octobre', 11: 'novembre', 12: 'décembre'
-}
-mois_str = MOIS_FR[mois_num]
-```
+# ─────────────────────────────────────────────
+# STEP 3 — LOCATE REPORT FILE
+# ─────────────────────────────────────────────
 
-### Étape 3 — Trouver le fichier rapport mensuel
-
-```python
 rapport_dir  = str(find_dir("Rapport mensuel"))
 rapport_path = os.path.join(rapport_dir, f"rapport mensuel {mois_str} {annee}.md")
 
-if not os.path.exists(rapport_path):
-    raise FileNotFoundError(f"Rapport mensuel {mois_str} {annee} introuvable. Lance d'abord /chiffre-mensuel.")
-```
+assert os.path.exists(rapport_path), \
+    f"ERREUR : Rapport mensuel {mois_str} {annee} introuvable. Lance d'abord /chiffre-mensuel."
 
-### Étape 4 — Extraire le bloc synthèse par technicien
+# ─────────────────────────────────────────────
+# STEP 4 — EXTRACT SYNTHESIS BLOCK
+# ─────────────────────────────────────────────
 
-Parsing identique au skill hebdomadaire :
-
-```python
-import csv, io
-
-# Dernier bloc commençant par "technicien3"
-blocks = content.split('\r\n\r\n')
+blocks        = content.split('\r\n\r\n')
 synthese_block = None
 for block in blocks:
-    if block.startswith('technicien3'):
-        synthese_block = block
+    if block.strip().startswith('technicien3'):
+        synthese_block = block.strip()   # keep last occurrence
 
-reader = csv.DictReader(io.StringIO(synthese_block))
+assert synthese_block, "ERREUR : bloc synthèse 'technicien3' introuvable dans le CSV."
+
 techniciens = {}
+reader = csv.DictReader(io.StringIO(synthese_block))
 for row in reader:
     nom = row['technicien3'].strip()
     techniciens[nom] = row
-```
 
-### Étape 5 — Écrire dans le rapport
+# ─────────────────────────────────────────────
+# STEP 5 — FILL SECTION 5 ATELIER (pure str.replace)
+# ─────────────────────────────────────────────
+# Template column order (12 columns including name):
+# Technicien | Nb OR | Déf. Batterie | Disq AV | Disq AR |
+# Plaq Av | Plaq Ar | Def BEG | Déf. VCF (Frein) | Déf. VCR |
+# Déf. Amort | Déf. Pare-brise
+#
+# Template placeholder: |**Chandrack K.**||%|%|%|%|%|%|%|%|%|%|
+#
+# ⚠️  Monthly template uses "Viktor B. A." — verify CSV key below.
+# If the CSV still contains "ALISHAN A.", change 'VIKTOR B. A.' accordingly.
 
-```python
 NOM_MAP = {
-    'Alishan A.':      'ALISHAN A.',
     'Chandrack K.':    'CHANDRACK K.',
     'Mohammed Ali M.': 'MOHAMMED ALI M.',
+    'Viktor B. A.':    'VIKTOR B. A.',    # ⚠️ verify this CSV key
     'Gael R.':         'GAEL R.',
     'Denis D.':        'DENIS D.',
 }
 
+# Column order MUST match template header exactly.
+# Excluded from template: taux_def_nci3, taux_def_geometrie3
 COLS = [
-    ('nb_diag_realises',        'Nb OR'),
-    ('taux_def_batterie3',      'Déf. Batterie'),
-    ('taux_def_disques_av3',    'Disq AV'),
-    ('taux_def_disques_ar3',    'Disq AR'),
-    ('taux_def_plaquettes_av3', 'Plaq Av'),
-    ('taux_def_plaquettes_ar3', 'Plaq Ar'),
-    ('taux_def_nci3',           'Déf. NCI'),
-    ('taux_def_vcf3',           'Déf. VCF (Frein)'),
-    ('taux_def_geometrie3',     'Déf. Géo'),
-    ('taux_def_beg3',           'Def BEG'),
-    ('taux_def_vcr3',           'Déf. VCR'),
-    ('taux_def_amortisseurs3',  'Déf. Amort'),
-    ('taux_def_pare_brise',     'Déf. Pare-brise'),
+    'nb_diag_realises',        # Nb OR
+    'taux_def_batterie3',      # Déf. Batterie
+    'taux_def_disques_av3',    # Disq AV
+    'taux_def_disques_ar3',    # Disq AR
+    'taux_def_plaquettes_av3', # Plaq Av
+    'taux_def_plaquettes_ar3', # Plaq Ar
+    'taux_def_beg3',           # Def BEG       ← position 7 in template
+    'taux_def_vcf3',           # Déf. VCF (Frein)
+    'taux_def_vcr3',           # Déf. VCR
+    'taux_def_amortisseurs3',  # Déf. Amort
+    'taux_def_pare_brise',     # Déf. Pare-brise
 ]
 
 with open(rapport_path, 'r', encoding='utf-8') as fh:
     rapport = fh.read()
 
+written = []
+skipped = []
+
 for nom_template, nom_csv in NOM_MAP.items():
+    # Exact template placeholder: |**Chandrack K.**||%|%|%|%|%|%|%|%|%|%|
+    old = f"|**{nom_template}**||" + "%|" * 10
+
     if nom_csv not in techniciens:
+        skipped.append(f"{nom_template} (CSV: {nom_csv})")
         continue
+
     data = techniciens[nom_csv]
-    vals = [data.get(col, '').strip() or '-' for col, _ in COLS]
-    old = f"| **{nom_template}** |" + " |" * len(COLS)
-    new = f"| **{nom_template}** | " + " | ".join(vals) + " |"
+    vals = [data.get(col, '').strip() or '-' for col in COLS]
+    new  = f"|**{nom_template}**|" + "|".join(vals) + "|"
+
     rapport = rapport.replace(old, new)
+    written.append(nom_template)
 
 with open(rapport_path, 'w', encoding='utf-8') as fh:
     fh.write(rapport)
+
+# ─────────────────────────────────────────────
+# STEP 6 — CONFIRM
+# ─────────────────────────────────────────────
+
+print(f"✅ Section 5 Atelier mise à jour : {rapport_path}")
+print(f"✅ Techniciens écrits  : {', '.join(written)}")
+if skipped:
+    print(f"⚠️  Absents du CSV     : {', '.join(skipped)} — lignes laissées vides")
+
+print()
+print(f"{'Technicien':<20} {'Nb OR':>5}  {'Batterie':>10}  {'VCF':>8}  {'VCR':>8}  {'BEG':>8}")
+print("-" * 65)
+for nom_template, nom_csv in NOM_MAP.items():
+    if nom_csv in techniciens:
+        d = techniciens[nom_csv]
+        print(f"{nom_template:<20} "
+              f"{d.get('nb_diag_realises','').strip():>5}  "
+              f"{d.get('taux_def_batterie3','').strip():>10}  "
+              f"{d.get('taux_def_vcf3','').strip():>8}  "
+              f"{d.get('taux_def_vcr3','').strip():>8}  "
+              f"{d.get('taux_def_beg3','').strip():>8}")
+    else:
+        print(f"{nom_template:<20} {'— absent du CSV'}")
 ```
-
-### Étape 6 — Confirmer à l'utilisateur
-
-Indiquer le fichier mis à jour et les valeurs écrites par technicien.
-
----
-
-## Mapping techniciens CSV → Template
-
-| Nom CSV | Nom Template |
-|:--|:--|
-| `ALISHAN A.` | **Alishan A.** |
-| `CHANDRACK K.` | **Chandrack K.** |
-| `MOHAMMED ALI M.` | **Mohammed Ali M.** |
-| `GAEL R.` | **Gael R.** |
-| `DENIS D.` | **Denis D.** |
-
-> Techniciens exclus (ignorer) : Ihsan, Emilie, Nathan, et tout autre nom absent du template.
-
----
-
-## Règles de formatage
-
-- Taux déjà formatés `"24,0 %"` dans le CSV — conserver tel quel
-- `nb_diag_realises` : entier, sans `%`
-- Valeur absente : `-`
-- Séparateur décimal : **virgule**

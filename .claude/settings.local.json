@@ -39,7 +39,8 @@
       "Bash(\"C:\\\\Users\\\\mendo\\\\AppData\\\\Local\\\\Microsoft\\\\WindowsApps\\\\python3.exe\" --version)",
       "Bash(python3:*)",
       "Bash(python -c \":*)",
-      "Bash(ls c:/Users/mendo/Documents/Work/*.skill)"
+      "Bash(ls c:/Users/mendo/Documents/Work/*.skill)",
+      "Bash(git pull *)"
     ]
   }
 }

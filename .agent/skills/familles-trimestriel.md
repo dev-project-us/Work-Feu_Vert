@@ -1,292 +1,219 @@
 ---
-name: familles-trimestriel
-description: >
-  Fill the "Analyse spécifique / Familles" section of the Feu Vert Annecy quarterly report
-  from the comparatifCAv2_Famille CSV export. ALWAYS use when the user types /familles-trimestriel,
-  or says "remplis les familles trimestrielles", "analyse les familles du trimestre",
-  or wants to populate the product-family breakdown table (CA n, CA n-1, Evol. CA,
-  Marge n, Marge +/-, Qté n, Statut) in the rapport trimestriel.
+description: familles trimestriel
+---
+
+ALWAYS use this skill when the user types "/familles-trimestriel", or when
+/chiffre-trimestriel completes. Execute the Python script below in full. It parses
+the comparatifCAv2_Famille CSV, fills the Familles table with str.replace per row,
+then passes a compact summary to the AI for the "Points clés" section only.
+Do NOT read the CSV yourself.
+Other triggers: "remplis les familles trimestrielles", "analyse les familles du trimestre".
+
 ---
 
 # Skill : Analyse par Familles — Rapport Trimestriel Feu Vert Annecy
 
-## Vue d'ensemble
+## Instruction d'exécution
 
-Ce skill lit le fichier CSV `comparatifCAv2_Famille*.csv` (export SUC comparatif CA par
-famille) et remplit la section **"Analyse spécifique / Familles"** du rapport trimestriel,
-incluant le tableau de données et les points clés automatiques.
+**Exécuter le script Python ci-dessous dans son intégralité.**
+Python remplit chaque ligne famille avec str.replace.
+L'IA reçoit uniquement le dict `summary` pour rédiger les Points clés.
 
 ---
 
-## Workflow — Commande `/familles-trimestriel`
-
-### Étape 1 — Localiser les fichiers
-
 ```python
-import os, glob, pathlib, csv, re
-from datetime import datetime
+import os, glob, csv, pathlib
+
+# ─────────────────────────────────────────────
+# HELPER
+# ─────────────────────────────────────────────
 
 def find_dir(name):
     for p in [pathlib.Path.cwd()] + list(pathlib.Path.cwd().parents):
         candidate = p / name
         if candidate.is_dir():
             return candidate
-    raise FileNotFoundError(f"Cannot find directory '{name}' in any parent of {pathlib.Path.cwd()}")
+    raise FileNotFoundError(f"Cannot find directory '{name}'")
 
-# Fichier CSV familles trimestriel
+def parse_pct(s):
+    try:
+        return float(s.replace(' %','').replace(' pts','').replace(',','.').replace('+','').strip())
+    except:
+        return None
+
+def parse_int(s):
+    try:
+        return int(s.replace('\xa0','').replace(' ','').replace('€','').strip())
+    except:
+        return None
+
+def statut(evo_str):
+    val = parse_pct(evo_str)
+    if val is None: return '⚪'
+    if val > 0:     return '🟢'
+    if val == 0:    return '🟡'
+    return '🔴'
+
+def marge_delta(marge_n_str, marge_n1_str):
+    mn  = parse_pct(marge_n_str)
+    mn1 = parse_pct(marge_n1_str)
+    if mn is None or mn1 is None:
+        return 'N/A'
+    delta = round(mn - mn1, 1)
+    sign  = '+' if delta >= 0 else ''
+    return f'{sign}{delta:.1f} pts'.replace('.', ',')
+
+# ─────────────────────────────────────────────
+# STEP 1 — LOCATE FILES
+# ─────────────────────────────────────────────
+
 familles_folder = str(find_dir("Resources trimestrielles") / "Familles")
-csv_pattern = os.path.join(familles_folder, "comparatifCAv2_Famille*.csv")
-csv_files = glob.glob(csv_pattern)
-if not csv_files:
-    raise FileNotFoundError("Aucun fichier comparatifCAv2_Famille*.csv trouvé dans Resources trimestrielles/Familles/")
+csv_files       = glob.glob(os.path.join(familles_folder, "comparatifCAv2_Famille*.csv"))
+
+assert csv_files, "ERREUR : aucun fichier comparatifCAv2_Famille*.csv trouvé dans Resources trimestrielles/Familles/"
 fichier_familles = csv_files[0]
 
-# Rapport trimestriel existant
-rapport_dir = str(find_dir("Rapport trimestriel"))
-rapports = glob.glob(os.path.join(rapport_dir, "rapport trimestriel *.md"))
-if not rapports:
-    raise FileNotFoundError("Aucun rapport trimestriel trouvé dans Rapport trimestriel/.")
-rapport_path = sorted(rapports)[-1]   # prendre le plus récent
-```
+rapport_dir = str(find_dir("trimestres"))
+rapports    = glob.glob(os.path.join(rapport_dir, "rapport trimestriel *.md"))
+assert rapports, "ERREUR : aucun rapport trimestriel trouvé. Lancer /chiffre-trimestriel d'abord."
+rapport_path = sorted(rapports)[-1]   # most recent alphabetically
 
-> **Note** : Si plusieurs rapports existent, le plus récent (ordre alphabétique) est utilisé.
-> Les noms suivent le format `rapport trimestriel T1 2026.md`.
-
----
-
-### Étape 2 — Parser le CSV et extraire les données par famille
-
-#### Structure du fichier CSV
-
-| Ligne | Contenu |
-|:------|:--------|
-| 1 | En-tête magasin (`LIBELLEMAGASIN,...`) |
-| 2 | Valeurs magasin (`ANNECY SEYNOD, dates...`) |
-| 3 | Vide |
-| 4 | **Noms de colonnes** (la ligne longue avec `textbox48,...`) |
-| 5+ | Données produits (1 ligne par article, données famille répétées) |
-
-#### Mapping des colonnes (0-indexé depuis la ligne 4)
-
-| Index | Nom colonne   | Signification                  |
-|:------|:--------------|:-------------------------------|
-| 14    | `codeFamille` | Code famille (ex: `A-ENTRETIEN`) |
-| 15    | `CAHT_n_4`    | CA HT famille N (ex: `17 301`) |
-| 16    | `CAHT_n_1_1`  | CA HT famille N-1 (ex: `14 560`) |
-| 18    | `textbox57`   | Évolution CA % (ex: `18,8 %`) |
-| 21    | `MARGE_n`     | Taux de marge famille N % (ex: `44,7 %`) |
-| 22    | `MARGE_n_1`   | Taux de marge famille N-1 % (ex: `46,5 %`) |
-| 26    | `textbox63`   | Quantité vendue famille N (ex: `1 265`) |
-
-> **Principe clé** : le CSV contient une ligne par article (produit). Les données famille
-> sont identiques sur toutes les lignes appartenant à la même famille. Il suffit donc de
-> prendre la **première occurrence** de chaque `codeFamille`.
-
-```python
-seen_families = {}
+# ─────────────────────────────────────────────
+# STEP 2 — PARSE CSV AND EXTRACT PER-FAMILY DATA
+# ─────────────────────────────────────────────
 
 with open(fichier_familles, 'r', encoding='utf-8-sig') as f:
     lines = f.readlines()
 
-# Sauter les 4 premières lignes, partir des données
-data_lines = lines[4:]
-reader = csv.reader(data_lines)
+data_lines    = lines[4:]
+seen_families = {}
+reader        = csv.reader(data_lines)
 
 for row in reader:
-    if len(row) < 30:
+    if len(row) < 27:
         continue
     fam = row[14].strip()
     if not fam or fam in seen_families:
         continue
     seen_families[fam] = {
-        'ca_n':     row[15].strip(),
-        'ca_n1':    row[16].strip(),
-        'evo_ca':   row[18].strip(),
-        'marge_n':  row[21].strip(),
-        'marge_n1': row[22].strip(),
-        'qty_n':    row[26].strip(),
+        'ca_n':     row[15].strip(),   # CAHT_n_4
+        'ca_n1':    row[16].strip(),   # CAHT_n_1_1
+        'evo_ca':   row[18].strip(),   # textbox57
+        'marge_n':  row[21].strip(),   # MARGE_n
+        'marge_n1': row[22].strip(),   # MARGE_n_1
+        'qty_n':    row[26].strip(),   # textbox63
     }
-```
 
----
+# ─────────────────────────────────────────────
+# STEP 3 — FILL TABLE WITH str.replace PER ROW
+# ─────────────────────────────────────────────
+# Quarterly template placeholder per family (uses N/A, NOT empty cells):
+# | **A-ENTRETIEN** | N/A | N/A | N/A | N/A | N/A | N/A | ⚪ |
+# Replace with actual data when available, keep N/A if family absent.
 
-### Étape 3 — Calculer `Marge +/- (pts)` et `Statut`
-
-```python
-def parse_pct(s):
-    """Convertit '44,7 %' ou '-1,8 pts' ou '-' en float, ou None si impossible."""
-    try:
-        clean = s.replace(' %','').replace(' pts','').replace(',','.').replace('+','').strip()
-        return float(clean)
-    except:
-        return None
-
-def statut(evo_str):
-    """Retourne emoji selon signe de l'évolution CA."""
-    val = parse_pct(evo_str)
-    if val is None:   return '⚪'
-    if val > 0:       return '🟢'
-    if val == 0:      return '🟡'
-    return '🔴'
-
-def marge_delta(marge_n_str, marge_n1_str):
-    """Calcule écart en points entre marge N et marge N-1."""
-    mn  = parse_pct(marge_n_str)
-    mn1 = parse_pct(marge_n1_str)
-    if mn is None or mn1 is None:
-        return 'N/A'
-    delta = mn - mn1
-    sign = '+' if delta >= 0 else ''
-    return f'{sign}{delta:.1f} pts'.replace('.', ',')
-```
-
----
-
-### Étape 4 — Familles attendues dans le template
-
-Remplir **uniquement** les familles présentes dans le template. Ignorer les familles CSV
-absentes du template (ex: `T-FIDELITE`).
-
-| Code famille dans CSV       | Ligne template correspondante     |
-|:----------------------------|:----------------------------------|
-| `A-ENTRETIEN`               | **A-ENTRETIEN**                   |
-| `B-ELECTRICITE`             | **B-ELECTRICITE**                 |
-| `C-PIECES TECHNIQUES`       | **C-PIECES TECHNIQUES**           |
-| `D-OUTILLAGE`               | **D-OUTILLAGE**                   |
-| `E-EQUIPEMENT EXTERIEUR`    | **E-EQUIPEMENT EXTERIEUR**        |
-| `F-EQUIPEMENT INTERIEUR`    | **F-EQUIPEMENT INTERIEUR**        |
-| `G-AUTO SON`                | **G-AUTO SON**                    |
-| `H-LUBRIFIANTS`             | **H-LUBRIFIANTS**                 |
-| `I-PNEUMATIQUES`            | **I-PNEUMATIQUES**                |
-| `J-2 ROUES`                 | **J-2 ROUES**                     |
-| `U-SERVICES`                | **U-SERVICES**                    |
-| `W-DIVERS`                  | **W-DIVERS**                      |
-| `X-TARIF MAIN D'OEUVRE`     | **X-TARIF MAIN D'OEUVRE**         |
-
----
-
-### Étape 5 — Générer le tableau Markdown et remplacer dans le rapport
-
-```python
 TEMPLATE_FAMILIES = [
     'A-ENTRETIEN', 'B-ELECTRICITE', 'C-PIECES TECHNIQUES', 'D-OUTILLAGE',
     'E-EQUIPEMENT EXTERIEUR', 'F-EQUIPEMENT INTERIEUR', 'G-AUTO SON',
     'H-LUBRIFIANTS', 'I-PNEUMATIQUES', 'J-2 ROUES', 'U-SERVICES',
-    'W-DIVERS', "X-TARIF MAIN D'OEUVRE"
+    'W-DIVERS', "X-TARIF MAIN D'OEUVRE",
 ]
 
-rows = []
+with open(rapport_path, 'r', encoding='utf-8') as fh:
+    rapport = fh.read()
+
+filled  = []
+missing = []
+
 for fam in TEMPLATE_FAMILIES:
-    d = seen_families.get(fam)
+    # Exact placeholder in quarterly template
+    old = f"| **{fam}** | N/A | N/A | N/A | N/A | N/A | N/A | ⚪ |"
+    d   = seen_families.get(fam)
+
     if d:
-        ca_n   = f"{d['ca_n']} €"     if d['ca_n']  else 'N/A'
-        ca_n1  = f"{d['ca_n1']} €"    if d['ca_n1'] else 'N/A'
-        evo    = d['evo_ca']           or 'N/A'
-        mg_n   = d['marge_n']          or 'N/A'
-        mg_d   = marge_delta(d['marge_n'], d['marge_n1'])
-        qty    = d['qty_n']            or 'N/A'
-        st     = statut(d['evo_ca'])
+        ca_n  = f"{d['ca_n']} €"  if d['ca_n']  else 'N/A'
+        ca_n1 = f"{d['ca_n1']} €" if d['ca_n1'] else 'N/A'
+        evo   = d['evo_ca']        or 'N/A'
+        mg_n  = d['marge_n']       or 'N/A'
+        mg_d  = marge_delta(d['marge_n'], d['marge_n1'])
+        qty   = d['qty_n']         or 'N/A'
+        st    = statut(d['evo_ca'])
+        new   = f"| **{fam}** | {ca_n} | {ca_n1} | {evo} | {mg_n} | {mg_d} | {qty} | {st} |"
+        rapport = rapport.replace(old, new)
+        filled.append(fam)
     else:
-        ca_n = ca_n1 = evo = mg_n = mg_d = qty = st = 'N/A'
-    rows.append(f'| **{fam}** | {ca_n} | {ca_n1} | {evo} | {mg_n} | {mg_d} | {qty} | {st} |')
+        missing.append(fam)
+        # Placeholder already reads N/A — leave unchanged
 
-new_table = (
-    '| Famille | CA n (€) | CA n-1 (€) | Evol. CA (%) | Marge n (%) | Marge +/- (pts) | Qté n | Statut |\n'
-    '| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |\n'
-    + '\n'.join(rows)
-)
-```
+with open(rapport_path, 'w', encoding='utf-8') as fh:
+    fh.write(rapport)
 
-#### Remplacer le tableau dans le rapport
+# ─────────────────────────────────────────────
+# STEP 4 — BUILD COMPACT SUMMARY FOR AI
+# ─────────────────────────────────────────────
 
-Utiliser une regex pour cibler la section familles entre l'en-tête `## Analyse spécifique / Familles`
-et la ligne `### Points clés de l'analyse par famille`.
-
-```python
-import re
-
-with open(rapport_path, 'r', encoding='utf-8') as f:
-    rapport = f.read()
-
-# Remplacer le tableau existant (du header jusqu'avant les Points clés)
-pattern = r'(\| Famille \| CA n.*?\n)(\| :---.*?\n)((\|.*?\n)+)'
-replacement = new_table + '\n'
-rapport = re.sub(pattern, replacement, rapport, flags=re.DOTALL)
-
-with open(rapport_path, 'w', encoding='utf-8') as f:
-    f.write(rapport)
-```
-
----
-
-### Étape 6 — Générer les points clés automatiques
-
-Après avoir rempli le tableau, générer 3 à 5 points d'analyse pertinents dans la section
-`### Points clés de l'analyse par famille`. Chercher les éléments suivants :
-
-1. **Famille moteur** : la famille avec la plus forte croissance CA en valeur absolue (€) sur le trimestre
-2. **Famille en déclin** : la famille avec la plus forte baisse CA en %
-3. **Alerte marge** : famille avec la pire dégradation de marge (pts négatifs)
-4. **Anomalie notable** : CA négatif, quantité très faible (<20), ou écart marge > ±10 pts
-5. **Synthèse trimestrielle** : tendance globale du trimestre (est-ce que la majorité des familles progressent ?)
-
-```python
-# Exemple de logique de classement
 families_data = []
 for fam in TEMPLATE_FAMILIES:
     d = seen_families.get(fam)
     if not d:
         continue
-    ca_n_val  = parse_int(d['ca_n'])      # voir helper ci-dessous
-    ca_n1_val = parse_int(d['ca_n1'])
-    evo_val   = parse_pct(d['evo_ca'])
-    mg_delta  = parse_pct(d['marge_n']) - parse_pct(d['marge_n1']) \
-                if parse_pct(d['marge_n']) and parse_pct(d['marge_n1']) else None
-    families_data.append({
-        'fam': fam, 'ca_n': ca_n_val, 'ca_n1': ca_n1_val,
-        'evo': evo_val, 'mg_delta': mg_delta
-    })
+    ca_n_val     = parse_int(d['ca_n'])
+    evo_val      = parse_pct(d['evo_ca'])
+    mn           = parse_pct(d['marge_n'])
+    mn1          = parse_pct(d['marge_n1'])
+    mg_delta_val = round(mn - mn1, 1) if mn is not None and mn1 is not None else None
+    families_data.append({'fam': fam, 'ca_n': ca_n_val, 'evo': evo_val, 'mg_delta': mg_delta_val})
 
-def parse_int(s):
-    """Convertit '17 301' → 17301, gère None et vides."""
-    try:
-        return int(s.replace('\xa0','').replace(' ','').replace('€','').strip())
-    except:
-        return None
+top_gainers = sorted([f for f in families_data if f['evo'] is not None],
+                     key=lambda x: x['evo'], reverse=True)[:3]
+top_losers  = sorted([f for f in families_data if f['evo'] is not None],
+                     key=lambda x: x['evo'])[:3]
+mg_alerts   = [f for f in families_data
+               if f['mg_delta'] is not None and f['mg_delta'] < -5]
+
+summary = {
+    "rapport":         rapport_path,
+    "familles_remplies": len(filled),
+    "familles_absentes": missing,
+    "top_croissance":  [{"famille": f['fam'], "evo": f['evo']} for f in top_gainers],
+    "top_declin":      [{"famille": f['fam'], "evo": f['evo']} for f in top_losers],
+    "alertes_marge":   [{"famille": f['fam'], "delta_pts": f['mg_delta']} for f in mg_alerts],
+}
+
+# ─────────────────────────────────────────────
+# STEP 5 — CONFIRM
+# ─────────────────────────────────────────────
+
+print(f"✅ Tableau Familles mis à jour : {rapport_path}")
+print(f"✅ Familles remplies : {len(filled)}/13")
+if missing:
+    print(f"⚠️  Absentes du CSV  : {', '.join(missing)}")
+print()
+print("Top croissance CA :")
+for f in top_gainers:
+    print(f"  {f['fam']:<30} {f['evo']:+.1f} %")
+print("Top déclin CA :")
+for f in top_losers:
+    print(f"  {f['fam']:<30} {f['evo']:+.1f} %")
+if mg_alerts:
+    print("Alertes marge (dégradation > 5 pts) :")
+    for f in mg_alerts:
+        print(f"  {f['fam']:<30} {f['mg_delta']:+.1f} pts")
 ```
 
-Rédiger les points clés en **français**, de manière factuelle et orientée management, avec une
-perspective trimestrielle (tendances sur 3 mois, non hebdomadaires).
-
 ---
 
-### Étape 7 — Confirmer à l'utilisateur
+## Après exécution du script
 
-Afficher un résumé :
-- Nom du rapport modifié
-- Nombre de familles remplies
-- Top 3 familles en croissance CA
-- Top 3 familles en déclin CA
-- Familles avec alerte marge (dégradation > 5 pts)
+Le tableau Familles est rempli sans intervention de l'IA.
 
----
+**L'IA rédige uniquement les Points clés** depuis le dict `summary` :
 
-## Règles de formatage
+> "Rédige 4-5 points clés de l'analyse trimestrielle par famille pour Feu Vert Annecy.
+> Top croissance : {summary['top_croissance']}
+> Top déclin : {summary['top_declin']}
+> Alertes marge : {summary['alertes_marge']}
+> Perspective trimestrielle (tendances 3 mois, non ponctuelles).
+> Ton : factuel, orienté management, en français, puces courtes."
 
-- CA en **€ HT** (les colonnes CAHT_ sont hors taxes) — noter HT dans la colonne si besoin
-- Séparateur milliers : **espace** (ex: `17 301 €`) — conserver tel quel depuis le CSV
-- Séparateur décimal : **virgule** (ex: `18,8 %`)
-- Évolutions : toujours afficher le signe (`+18,8 %`, `-11,6 %`, `+4,3 pts`)
-- Valeur absente ou `-` dans le CSV : afficher `N/A`
-- Ne pas recalculer l'évolution CA — utiliser `textbox57` directement depuis le CSV
-- La colonne `Marge +/- (pts)` est **calculée** : `round(MARGE_n - MARGE_n_1, 1)` en pts
-
----
-
-## Identification du fichier CSV
-
-| Fichier | Pattern | Contenu |
-|:--------|:--------|:--------|
-| `comparatifCAv2_Famille*.csv` | Ligne 2 : `ANNECY SEYNOD, date_début, date_fin` | CA et marge par famille, sous-famille, gamme, article |
-
-Le fichier est placé dans `resources/Resources trimestrielles/Familles/`.
+Insérer le résultat dans la section `### Points clés de l'analyse par famille`
+en remplaçant les lignes `* [Point clé...]` existantes.
