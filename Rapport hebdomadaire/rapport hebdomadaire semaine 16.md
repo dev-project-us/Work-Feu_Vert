@@ -108,6 +108,8 @@ _Objectif : Rigueur technique et capacité de détection des besoins de sécurit
 | **Victor B.**       | 8     | 25,0 %        | 0,0 %   | 0,0 %   | 12,5 %  | 0,0 %   | 6,3 %   | 6,3 %            | 12,5 %   | 62,5 %     | 37,5 %          |
 | **Gael R.**         | 54    | 14,8 %        | 7,8 %   | 3,9 %   | 13,7 %  | 3,9 %   | 10,2 %  | 12,0 %           | 50,0 %   | 4,9 %      | 1,9 %           |
 | **Denis D.**        |       | %             | %       | %       | %       | %       | %       | %                | %        | %          | %               |
+> *Absence Chandrack et Denis : Arrêt maladie (cf section RH)*
+> *Victor : nouveau TMS intégration Mercredi 15 Avril*
 
 ---
 
@@ -115,12 +117,16 @@ _Objectif : Rigueur technique et capacité de détection des besoins de sécurit
 
 ### Plan d'Action Libre Service (LS)
 
-1. **Accompagnement ciblé de Sandrine, Pauline et Chouaib sur la proposition de la Garantie Pneu**
-    - Objectif : Redresser le taux de souscription de ces conseillers (actuellement à 0 %) pour augmenter la marge et redynamiser le Panier Moyen LS, en fort recul (-23,2 %).
-2. **Mise en avant des produits d'entretien (A-ENTRETIEN) et pièces techniques (C-PIECES TECHNIQUES) en vitrine ou tête de gondole**
-    - Objectif : Capitaliser au maximum sur ces seules familles en croissance ce mois-ci (+31,7 % et +13,6 % de CA) pour freiner la baisse alarmante du CA Magasin global (-24,0 %).
-3. **Audit du stock, de la démarque et de la tarification sur les familles G-AUTO SON et F-EQUIPEMENT INTERIEUR**
+1. **Accompagnement ciblé de Chouaib sur la proposition de la Garantie Pneu**
+    - Objectif : Redresser le taux de souscription de Chouaïb (actuellement à 0 %) pour augmenter la marge et redynamiser la marge et panier moyen  en fort recul.
+2. **Mise en avant des produits d'entretien (A-ENTRETIEN) et pièces techniques (C-PIECES TECHNIQUES) 
+    - Objectif : Capitaliser au maximum sur ces familles en croissance ce mois-ci (+31,7 % et +13,6 % de CA) pour freiner la baisse alarmante du CA Magasin global (-24,0 %).
+3.  **Mise en place OBIGATOIRE d'un personnel à la CAM LS en PERMANENCE**
+	- Objectif : Pousser l'accompagnement et la vente de LS par la présence constante d'une personne à proximité. Freiner drastiquement les vols également. 
+4. **Audit du stock, de la démarque et de la tarification sur les familles G-AUTO SON et F-EQUIPEMENT INTERIEUR**
     - Objectif : Stopper l'hémorragie de la marge Magasin (en baisse de 7,1 pts au global) en corrigeant en urgence les anomalies sur ces rayons dont la marge s'est effondrée (-13,6 pts et -8,8 pts).
+5. **Accompagnement accrue sur les ventes du rayon outillage**
+	- Objectif : Faire monter les ventes de la famille outillage et capitaliser sur le lancement autobest. 
 
 ### Plan d'Action Atelier
 
@@ -135,21 +141,23 @@ _Objectif : Rigueur technique et capacité de détection des besoins de sécurit
 
 ## 7. Reste à Faire (RAF) du Mois
 
-|Indicateur|Objectif|Réalisé (N)|% Réalisé|RAF|
-|:--|:--|:--|:--|:--|:--|
-|**CA**|263 985 €|146 074 €|55.3 %|117 911 €|
-|**Marge**|107 078 €|27 714 €|25.9 %|79 364 €|
-|**Contrat**|12|16|133,3 %|-4|
-|**Cofidis**|38|-|-|-|
+| Indicateur  | Objectif  | Réalisé (N) | % Réalisé | RAF       |
+| :---------- | :-------- | :---------- | :-------- | :-------- |
+| **CA**      | 263 985 € | 146 074 €   | 55.3 %    | 117 911 € |
+| **Marge**   | 107 078 € | 27 714 €    | 25.9 %    | 79 364 €  |
+| **Contrat** | 12        | 16          | 133,3 %   | -4        |
+| **Cofidis** | 38        | -           | -         | -         |
 
 ---
 
 ## 8. RH
 
 ### 8.1 Alerte RH
-
-> _[Insérer ici toute situation RH sensible ou urgente à signaler : conflit, comportement, avertissement, etc.]_
+> Prolongation de deux semaines de l'arrêt maladie de Chandrack
 
 ### 8.2 Absence / Congé
+> Arrêt maladie de Denis (du 16.03 au 16.05)
+> Arrêt maladie de Chandrack (du 31.03 au 05.05)
 
 ### 8.3 Recrutement / Départ
+> TMS : Victor (15.04.2026)
