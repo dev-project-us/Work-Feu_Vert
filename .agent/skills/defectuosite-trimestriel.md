@@ -46,7 +46,7 @@ et remplit la **Section 5 — Staff Atelier : Taux de Défectuosité** du rappor
 - Dossier source : `resources/trimestres/defectuosité/` (au lieu de `resources/defectuosite/` ou `Resources mensuelles/defectuosite/`)
 - Fichier rapport cible : `resources/trimestres/rapport trimestriel T{n} {année}.md`
 - Colonnes réduites : le template trimestriel utilise **8 colonnes** (Nb OR, Déf. Bat., Disq. AV, Disq. AR, Plaq. AV, Plaq. AR, Déf. VCF, Déf. VCR) au lieu des 13 du template hebdomadaire
-- Techniciens : **4 techniciens** (Chandrack K., Mohammed Ali M., Gael R., Denis D.) — Alishan A. n'est pas dans le template trimestriel
+- Techniciens : **4 techniciens** (Chandrack K., Mohammed Ali M., Gael R., Denis D.) — Victor B. n'est pas dans le template trimestriel
 
 Le parsing CSV et les règles de formatage sont **identiques** au skill hebdomadaire.
 Se référer à `defectuosite.md` pour le détail complet du parsing.
@@ -147,7 +147,7 @@ for row in reader:
 # Template placeholder: | **Chandrack K.** | | % | % | % | % | % | % | % |
 # ← empty Nb OR ────────┘└─── 7 % placeholders ──────────────────────────────┘
 #
-# NOTE: Quarterly template has 4 technicians only (no Alishan/Viktor).
+# NOTE: Quarterly template has 4 technicians only (no Victor B.).
 
 =======
 ```
@@ -338,7 +338,7 @@ Indiquer le fichier mis à jour et les valeurs écrites par technicien.
 | `GAEL R.` | **Gael R.** |
 | `DENIS D.` | **Denis D.** |
 
-> Techniciens exclus (ignorer) : Alishan, Ihsan, Emilie, Nathan, Ewan,
+> Techniciens exclus (ignorer) : Victor B., Ihsan, Emilie, Nathan, Ewan,
 > et tout autre nom absent du template trimestriel.
 
 ---

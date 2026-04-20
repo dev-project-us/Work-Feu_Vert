@@ -1,0 +1,1 @@
+Exécuter le skill familles : lire le fichier CSV comparatifCAv2_Famille dans resources/familles/ et remplir la section Analyse par Familles du rapport hebdomadaire Feu Vert Annecy.

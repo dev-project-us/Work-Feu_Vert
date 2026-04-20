@@ -104,7 +104,7 @@ _Objectif : Rigueur technique sur la durée — détecter les écarts structurel
 |:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|
 |**Chandrack K.**||%|%|%|%|%|%|%|%|%|%|
 |**Mohammed Ali M.**||%|%|%|%|%|%|%|%|%|%|
-|**Viktor B. A.**||%|%|%|%|%|%|%|%|%|%|
+|**Victor B.**||%|%|%|%|%|%|%|%|%|%|
 |**Gael R.**||%|%|%|%|%|%|%|%|%|%|
 |**Denis D.**||%|%|%|%|%|%|%|%|%|%|
 

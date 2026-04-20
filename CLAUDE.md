@@ -202,7 +202,7 @@ Ratios are already formatted as `"24,2 %"` in the CSV — preserve as-is. Output
 
 | CSV `technicien3` | Template name |
 |------------------|---------------|
-| `ALISHAN A.` | **Alishan A.** |
+| `VICTOR B.` | **Victor B.** |
 | `CHANDRACK K.` | **Chandrack K.** |
 | `MOHAMMED ALI M.` | **Mohammed Ali M.** |
 | `GAEL R.` | **Gael R.** |

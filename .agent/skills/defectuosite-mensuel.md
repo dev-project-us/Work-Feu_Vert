@@ -10,14 +10,6 @@ Section 5 Atelier of the monthly report. Do NOT interpret or read the CSV yourse
 
 # Skill : Taux de Défectuosité — Section 5 Atelier Rapport Mensuel Feu Vert Annecy
 
-## ⚠️ Note importante — NOM_MAP à vérifier
-
-Le template mensuel contient **`Viktor B. A.`** en lieu de `Alishan A.` (présent dans le
-template hebdomadaire). Le script utilise `VIKTOR B. A.` comme clé CSV par défaut.
-**Vérifier que ce nom correspond bien à l'entrée réelle dans le CSV mensuel.**
-Si le CSV contient toujours `ALISHAN A.`, remplacer `'VIKTOR B. A.'` par `'ALISHAN A.'`
-dans le NOM_MAP ci-dessous.
-
 ## Instruction d'exécution
 
 **Exécuter le script Python ci-dessous dans son intégralité.**
@@ -117,13 +109,10 @@ for row in reader:
 #
 # Template placeholder: |**Chandrack K.**||%|%|%|%|%|%|%|%|%|%|
 #
-# ⚠️  Monthly template uses "Viktor B. A." — verify CSV key below.
-# If the CSV still contains "ALISHAN A.", change 'VIKTOR B. A.' accordingly.
-
 NOM_MAP = {
     'Chandrack K.':    'CHANDRACK K.',
     'Mohammed Ali M.': 'MOHAMMED ALI M.',
-    'Viktor B. A.':    'VIKTOR B. A.',    # ⚠️ verify this CSV key
+    'Victor B.':       'VICTOR B.',
     'Gael R.':         'GAEL R.',
     'Denis D.':        'DENIS D.',
 }

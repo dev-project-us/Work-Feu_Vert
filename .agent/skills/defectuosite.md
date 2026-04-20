@@ -56,7 +56,7 @@ assert fichier_def, "ERREUR : fichier défectuosité introuvable dans resources/
 # ─────────────────────────────────────────────
 
 # Line format: "ANNECY SEYNOD,16/03/2026,22/03/2026"
-lines = content.split('\r\n')
+lines = content.split('\n')
 semaine = None
 for line in lines:
     if 'ANNECY' in line and '/' in line:
@@ -84,7 +84,7 @@ assert os.path.exists(rapport_path), \
 # The synthesis block is the LAST block starting with "technicien3".
 # Split on double CRLF, keep the last matching block.
 
-blocks        = content.split('\r\n\r\n')
+blocks        = content.split('\n\n')
 synthese_block = None
 for block in blocks:
     if block.strip().startswith('technicien3'):
@@ -113,7 +113,7 @@ for row in reader:
 NOM_MAP = {
     'Chandrack K.':    'CHANDRACK K.',
     'Mohammed Ali M.': 'MOHAMMED ALI M.',
-    'Alishan A.':      'ALISHAN A.',
+    'Victor B.':       'VICTOR B.',
     'Gael R.':         'GAEL R.',
     'Denis D.':        'DENIS D.',
 }
@@ -141,20 +141,24 @@ with open(rapport_path, 'r', encoding='utf-8') as fh:
 written = []
 skipped = []
 
-for nom_template, nom_csv in NOM_MAP.items():
-    # Exact template placeholder: |**Chandrack K.**||%|%|%|%|%|%|%|%|%|%|
-    old = f"|**{nom_template}**||" + "%|" * 10
+import re
 
+for nom_template, nom_csv in NOM_MAP.items():
     if nom_csv not in techniciens:
         skipped.append(nom_template)
         continue
 
     data = techniciens[nom_csv]
     vals = [data.get(col, '').strip() or '-' for col in COLS]
-    new  = f"|**{nom_template}**|" + "|".join(vals) + "|"
+    new  = f"| **{nom_template}** | " + " | ".join(vals) + " |"
 
-    rapport = rapport.replace(old, new)
-    written.append(nom_template)
+    # Match both raw template format and Obsidian-reformatted format (with spaces)
+    pattern = r'\|\s*\*\*' + re.escape(nom_template) + r'\*\*\s*\|(?:\s*%?\s*\|){10,11}'
+    rapport, n = re.subn(pattern, new, rapport)
+    if n:
+        written.append(nom_template)
+    else:
+        skipped.append(nom_template)
 
 with open(rapport_path, 'w', encoding='utf-8') as fh:
     fh.write(rapport)

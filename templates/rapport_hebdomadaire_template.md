@@ -42,6 +42,33 @@
 
 ---
 
+# Analyse par Familles (semaine)
+
+| Famille | CA n (€) | CA n-1 (€) | Evol. CA (%) | Marge n (%) | Marge +/- (pts) | Qté n | Statut |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **A-ENTRETIEN** | | | | | | | |
+| **B-ELECTRICITE** | | | | | | | |
+| **C-PIECES TECHNIQUES** | | | | | | | |
+| **D-OUTILLAGE** | | | | | | | |
+| **E-EQUIPEMENT EXTERIEUR** | | | | | | | |
+| **F-EQUIPEMENT INTERIEUR** | | | | | | | |
+| **G-AUTO SON** | | | | | | | |
+| **H-LUBRIFIANTS** | | | | | | | |
+| **I-PNEUMATIQUES** | | | | | | | |
+| **J-2 ROUES** | | | | | | | |
+| **U-SERVICES** | | | | | | | |
+| **W-DIVERS** | | | | | | | |
+| **X-TARIF MAIN D'OEUVRE** | | | | | | | |
+
+### Points clés de l'analyse par famille
+
+* [Point clé 1 — famille moteur de la semaine]
+* [Point clé 2 — famille en déclin]
+* [Point clé 3 — alerte marge]
+* [Point clé 4 — anomalie ou fait notable]
+
+---
+
 ## 4. Ratios Prioritaires (Performance Atelier)
 
 |KPI Prioritaire|Réalisé (N)|Objectif|Écart|Statut|
@@ -78,7 +105,7 @@ _Objectif : Rigueur technique et capacité de détection des besoins de sécurit
 |:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|
 |**Chandrack K.**||%|%|%|%|%|%|%|%|%|%|
 |**Mohammed Ali M.**||%|%|%|%|%|%|%|%|%|%|
-|**Alishan A.**||%|%|%|%|%|%|%|%|%|%|
+|**Victor B.**||%|%|%|%|%|%|%|%|%|%|
 |**Gael R.**||%|%|%|%|%|%|%|%|%|%|
 |**Denis D.**||%|%|%|%|%|%|%|%|%|%|
 

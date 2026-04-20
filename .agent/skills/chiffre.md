@@ -110,6 +110,35 @@ def parse_objectifs_block(content):
                     continue
     return {}
 
+def calc_weekly_obj_ca(content, date_debut, date_fin):
+    """Sum CATTC from objectifs journaliers for days in [date_debut, date_fin]."""
+    lines = content.replace('\r\n', '\n').split('\n')
+    headers = []
+    total = 0
+    in_block = False
+    for line in lines:
+        if 'libelleJour' in line:
+            headers = next(csv.reader([line]))
+            in_block = True
+            continue
+        if not in_block or not line.strip():
+            continue
+        row = next(csv.reader([line]))
+        d = dict(zip(headers, row))
+        date_str = d.get('dateDatetime', '').strip()
+        if not date_str:
+            continue
+        try:
+            row_date = datetime.strptime(date_str, "%d/%m/%Y")
+        except ValueError:
+            continue
+        if date_debut <= row_date <= date_fin:
+            try:
+                total += clean_num(d.get('CATTC', '0'))
+            except:
+                pass
+    return int(round(total))
+
 def parse_contrats(content):
     lines = content.replace('\r\n', '\n').split('\n')
     for i, line in enumerate(lines):
@@ -181,6 +210,7 @@ m = re.search(r'textbox1,textbox72\s+Du[^,]+,(\d{2}/\d{2}/\d{4})', sem_content)
 date_fin_str   = m.group(1)
 date_debut_str = extract_date_debut(sem_content)
 date_fin       = datetime.strptime(date_fin_str, "%d/%m/%Y")
+date_debut     = datetime.strptime(date_debut_str, "%d/%m/%Y")
 semaine        = date_fin.isocalendar()[1]
 annee          = date_fin.year
 
@@ -207,11 +237,11 @@ cattc_n    = clean_num(g.get('cattc_n', '0'))
 caht_evo   = clean_num(g.get('textbox4', '0'))
 marge_n    = clean_num(g.get('marge_n', '0'))
 marge_evo  = clean_num(g.get('textbox24', '0'))
-freq_n     = int(clean_num(g.get('textbox14', '0')))
-freq_evo   = clean_num(g.get('textbox17', '0'))
+freq_n     = int(clean_num(g.get('nbPassage_n', '0')))
+freq_evo   = clean_num(g.get('textbox14', '0'))
 panier_n   = clean_num(g.get('cattc_n_2', '0'))
 
-ca_obj_ttc  = int(clean_num(go.get('textbox8', '0')))
+ca_obj_ttc  = calc_weekly_obj_ca(obj_content, date_debut, date_fin)
 marge_obj   = clean_num(go.get('textbox50', '0'))
 
 # Objectif marge € : last non-empty column of objectives row
