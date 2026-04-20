@@ -115,21 +115,21 @@ _Objectif : Rigueur technique et capacité de détection des besoins de sécurit
 
 ### Plan d'Action Libre Service (LS)
 
-1. **[Action 1]**
-    - [Objectif]
-2. **[Action 2]**
-    - [Objectif]
-3. **[Action 3]**
-    - [Objectif]
+1. **Accompagnement ciblé de Sandrine, Pauline et Chouaib sur la proposition de la Garantie Pneu**
+    - Objectif : Redresser le taux de souscription de ces conseillers (actuellement à 0 %) pour augmenter la marge et redynamiser le Panier Moyen LS, en fort recul (-23,2 %).
+2. **Mise en avant des produits d'entretien (A-ENTRETIEN) et pièces techniques (C-PIECES TECHNIQUES) en vitrine ou tête de gondole**
+    - Objectif : Capitaliser au maximum sur ces seules familles en croissance ce mois-ci (+31,7 % et +13,6 % de CA) pour freiner la baisse alarmante du CA Magasin global (-24,0 %).
+3. **Audit du stock, de la démarque et de la tarification sur les familles G-AUTO SON et F-EQUIPEMENT INTERIEUR**
+    - Objectif : Stopper l'hémorragie de la marge Magasin (en baisse de 7,1 pts au global) en corrigeant en urgence les anomalies sur ces rayons dont la marge s'est effondrée (-13,6 pts et -8,8 pts).
 
 ### Plan d'Action Atelier
 
-1. **[Action 1]**
-    - [Objectif]
-2. **[Action 2]**
-    - [Objectif]
-3. **[Action 3]**
-    - [Objectif]
+1. **Brief quotidien des techniciens (Gael R. et Victor B.) sur l'importance du tour du véhicule et de l'inspection du freinage**
+    - Objectif : Combler l'écart sur le KPI "Plaquette" (actuellement à 8 % pour un objectif de 11 %) en augmentant systématiquement le taux de défectuosité renseigné sur les fiches de diagnostic.
+2. **Animation et relance de Gael R. et Mohammed Ali M. sur la détection Pare-brise**
+    - Objectif : Augmenter significativement le taux de défectuosité Pare-brise (anormalement bas à 1,9 % et 14,7 % pour eux) pour générer davantage de devis et d'interventions supplémentaires.
+3. **Sensibilisation de Mohammed Ali M. au test des batteries**
+    - Objectif : Améliorer son taux de défectuosité Batterie, qui reste très faible (5,9 %) en comparaison avec sa forte capacité de détection sur les autres éléments, afin de ne négliger aucune vente.
 
 ---
 
