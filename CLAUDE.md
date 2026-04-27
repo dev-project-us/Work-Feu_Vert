@@ -21,6 +21,7 @@ Run these commands inside Claude Code to trigger report generation:
 | `/ratios` | `.agent/skills/ratios_prioritaires.md` | Fill Section 4 (Priority KPIs) from ratios CSV |
 | `/defectuosite` | `.agent/skills/defectuosite.md` | Fill Section 5 Atelier (Taux de Défectuosité) from CA_Main_d_oeuvre CSV |
 | `/suivi_vendeur` | `.agent/skills/suivi_vendeur.md` | Fill Section 5 LS (Ratios de Vente par vendeur) from Suivi Individuel CSV |
+| `/pneus` | `.agent/skills/pneus.md` | Fill Pneus table (Catégorie × Marque) from `resources/Pneus/Pneus*.csv` |
 
 **Section 5 LS** is fully automated via `/suivi_vendeur` — all columns (Garantie Pneu, Géométrie, VCR, VCF, Plaquette, Dépollution) are implemented.
 
