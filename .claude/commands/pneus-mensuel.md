@@ -1,0 +1,1 @@
+Exécuter le skill pneus-mensuel : lire le fichier CSV dans resources/Resources mensuelles/pneus/ et remplir la section 3 (Analyse Pneus — CA & Marge par Marque) du rapport mensuel Feu Vert Annecy.
