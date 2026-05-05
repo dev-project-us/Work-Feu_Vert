@@ -9,23 +9,10 @@ report. Do NOT interpret or read the CSV yourself. Python does everything.
 
 ---
 
-# Skill : Ratios de Vente Individuels — Section 5 LS Rapport Hebdomadaire Feu Vert Annecy
-
-## Instruction d'exécution
-
-**Exécuter le script Python ci-dessous dans son intégralité.**
-Python fait tout : scan, extraction des 3 blocs CSV, remplissage Section 5 LS.
-L'IA ne lit pas le CSV. L'IA ne mappe pas les colonnes.
-
----
-
 ```python
 import os, glob, csv, pathlib
 from datetime import datetime
 
-# ─────────────────────────────────────────────
-# HELPER
-# ─────────────────────────────────────────────
 
 def find_dir(name):
     for p in [pathlib.Path.cwd()] + list(pathlib.Path.cwd().parents):
@@ -34,9 +21,6 @@ def find_dir(name):
             return candidate
     raise FileNotFoundError(f"Cannot find directory '{name}'")
 
-# ─────────────────────────────────────────────
-# STEP 1 — SCAN AND IDENTIFY CSV FILE
-# ─────────────────────────────────────────────
 
 folder    = str(find_dir("resources") / "suivi vendeur")
 csv_files = glob.glob(os.path.join(folder, "*.csv"))
@@ -51,9 +35,6 @@ for f in csv_files:
 
 assert fichier_suivi, "ERREUR : fichier suivi vendeur introuvable dans resources/suivi vendeur/"
 
-# ─────────────────────────────────────────────
-# STEP 2 — DETERMINE WEEK NUMBER
-# ─────────────────────────────────────────────
 
 # Line 2 format: "ANNECY 2,16/03/2026 - 22/03/2026"
 lines        = content.splitlines()
@@ -62,9 +43,6 @@ date_fin_str = date_part.split(' - ')[1].strip()
 date_fin     = datetime.strptime(date_fin_str, "%d/%m/%Y")
 semaine      = date_fin.isocalendar()[1]
 
-# ─────────────────────────────────────────────
-# STEP 3 — LOCATE REPORT FILE
-# ─────────────────────────────────────────────
 
 rapport_dir  = str(find_dir("Rapport hebdomadaire"))
 rapport_path = os.path.join(rapport_dir, f"rapport hebdomadaire semaine {semaine}.md")
@@ -72,9 +50,6 @@ rapport_path = os.path.join(rapport_dir, f"rapport hebdomadaire semaine {semaine
 assert os.path.exists(rapport_path), \
     f"ERREUR : Rapport semaine {semaine} introuvable. Lance d'abord /chiffre."
 
-# ─────────────────────────────────────────────
-# STEP 4 — EXTRACT RATIOS FROM BLOCS 1, 2 AND 4
-# ─────────────────────────────────────────────
 
 NOM_MAP = {
     'Sandrine': 'SANDRINE R.',
@@ -150,9 +125,6 @@ while i < len(lines) and lines[i].strip():
         vendeurs[nom]['depoll_ratio'] = row[17].strip() if len(row) > 17 else ''
     i += 1
 
-# ─────────────────────────────────────────────
-# STEP 5 — FILL SECTION 5 LS (pure str.replace)
-# ─────────────────────────────────────────────
 # Template column order (7 columns including name):
 # Collaborateur LS | Garantie Pneu | Géométrie | VCR | VCF | Plaquette | Dépoll.
 #
@@ -188,9 +160,6 @@ for nom_template, nom_csv in NOM_MAP.items():
 with open(rapport_path, 'w', encoding='utf-8') as fh:
     fh.write(rapport)
 
-# ─────────────────────────────────────────────
-# STEP 6 — CONFIRM
-# ─────────────────────────────────────────────
 
 print(f"✅ Section 5 LS mise à jour : {rapport_path}")
 print()

@@ -11,24 +11,10 @@ Other triggers: "remplis le rapport", "mets à jour les chiffres", "analyse les 
 
 ---
 
-# Skill : Analyse des Chiffres — Rapport Hebdomadaire Feu Vert Annecy
-
-## Instruction d'exécution
-
-**Exécuter le script Python ci-dessous dans son intégralité, en une seule fois.**
-Python fait tout : scan, extraction, calculs, création du fichier, remplissage.
-L'IA ne lit pas les CSV. L'IA n'interprète pas les données.
-À la fin du script, l'IA reçoit un dictionnaire `kpis` et génère uniquement la Section 1.
-
----
-
 ```python
 import os, glob, re, shutil, csv, io, pathlib
 from datetime import datetime
 
-# ─────────────────────────────────────────────
-# HELPER
-# ─────────────────────────────────────────────
 
 def find_dir(name):
     for p in [pathlib.Path.cwd()] + list(pathlib.Path.cwd().parents):
@@ -38,7 +24,6 @@ def find_dir(name):
     raise FileNotFoundError(f"Cannot find directory '{name}'")
 
 def clean_num(s):
-    """Remove spaces, currency, percent signs. Return float."""
     return float(s.replace('\xa0', '').replace(' ', '').replace('€', '')
                   .replace('%', '').replace(',', '.').replace('+', '').strip())
 
@@ -63,7 +48,6 @@ def read_raw(path):
         return fh.read()
 
 def parse_global_block(content):
-    """Extract the global block row from a SUC Situation de chiffre file."""
     lines = content.replace('\r\n', '\n').split('\n')
     for i, line in enumerate(lines):
         if line.startswith('caht_n,') or line.startswith('cattc_n,'):
@@ -91,7 +75,6 @@ def parse_atelier_block(content):
     return {}
 
 def parse_objectifs_block(content):
-    """Extract monthly objectives from the Objectifs Journaliers file."""
     lines = content.replace('\r\n', '\n').split('\n')
     headers = []
     for i, line in enumerate(lines):
@@ -111,7 +94,6 @@ def parse_objectifs_block(content):
     return {}
 
 def calc_weekly_obj_ca(content, date_debut, date_fin):
-    """Sum CATTC from objectifs journaliers for days in [date_debut, date_fin]."""
     lines = content.replace('\r\n', '\n').split('\n')
     headers = []
     total = 0
@@ -162,13 +144,9 @@ def extraire_marge_eur(content):
     return None
 
 def extract_date_debut(content):
-    """Extract start date from period line."""
     m = re.search(r'Du (\d{2}/\d{2}/\d{4})', content)
     return m.group(1) if m else ''
 
-# ─────────────────────────────────────────────
-# STEP 1 — SCAN AND IDENTIFY CSV FILES
-# ─────────────────────────────────────────────
 
 folder    = str(find_dir("resources") / "SUC")
 csv_files = glob.glob(os.path.join(folder, "SUC - *.csv"))
@@ -196,9 +174,6 @@ assert fichier_semaine,   "ERREUR : fichier semaine N introuvable dans resources
 assert fichier_mtd,       "ERREUR : fichier MTD introuvable dans resources/SUC/"
 assert fichier_objectifs, "ERREUR : fichier objectifs introuvable dans resources/SUC/"
 
-# ─────────────────────────────────────────────
-# STEP 2 — DETERMINE WEEK NUMBER AND DATES
-# ─────────────────────────────────────────────
 
 sem_content = read_raw(fichier_semaine)
 mtd_content = read_raw(fichier_mtd)
@@ -214,9 +189,6 @@ date_debut     = datetime.strptime(date_debut_str, "%d/%m/%Y")
 semaine        = date_fin.isocalendar()[1]
 annee          = date_fin.year
 
-# ─────────────────────────────────────────────
-# STEP 3 — CREATE REPORT FILE FROM TEMPLATE
-# ─────────────────────────────────────────────
 
 template_path = str(find_dir("templates") / "rapport_hebdomadaire_template.md")
 output_dir    = str(find_dir("Rapport hebdomadaire"))
@@ -225,9 +197,6 @@ output_name   = f"rapport hebdomadaire semaine {semaine}.md"
 output_path   = os.path.join(output_dir, output_name)
 shutil.copy(template_path, output_path)
 
-# ─────────────────────────────────────────────
-# STEP 4 — EXTRACT ALL VALUES FROM CSV FILES
-# ─────────────────────────────────────────────
 
 # — Global block from semaine file —
 g  = parse_global_block(sem_content)
@@ -323,9 +292,6 @@ marge_eur_pct = round(marge_mtd_eur / marge_obj_eur * 100, 1) if marge_obj_eur e
 marge_eur_raf = marge_obj_eur - marge_mtd_eur
 contrat_mtd = parse_contrats(mtd_content)
 
-# ─────────────────────────────────────────────
-# STEP 5 — FILL THE REPORT (pure str.replace)
-# ─────────────────────────────────────────────
 
 with open(output_path, 'r', encoding='utf-8') as fh:
     rapport = fh.read()
@@ -395,9 +361,6 @@ rapport = rapport.replace(S7_OLD, S7_NEW)
 with open(output_path, 'w', encoding='utf-8') as fh:
     fh.write(rapport)
 
-# ─────────────────────────────────────────────
-# STEP 6 — EXPOSE KPIs FOR SECTION 1 NARRATIVE
-# ─────────────────────────────────────────────
 # The AI receives ONLY this dictionary — not the raw CSV.
 # Use it to write the Section 1 strategic narrative in French.
 

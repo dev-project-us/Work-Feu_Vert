@@ -9,23 +9,10 @@ Other triggers: "remplis les ratios vendeurs trimestriels", "suivi vendeur du tr
 
 ---
 
-# Skill : Ratios de Vente Individuels — Section 5 LS Rapport Trimestriel Feu Vert Annecy
-
-## Instruction d'exécution
-
-**Exécuter le script Python ci-dessous dans son intégralité.**
-Python fait tout : scan, extraction des 3 blocs CSV, remplissage Section 5 LS.
-L'IA ne lit pas le CSV. L'IA ne mappe pas les colonnes.
-
----
-
 ```python
 import os, glob, csv, pathlib
 from datetime import datetime
 
-# ─────────────────────────────────────────────
-# HELPER
-# ─────────────────────────────────────────────
 
 def find_dir(name):
     for p in [pathlib.Path.cwd()] + list(pathlib.Path.cwd().parents):
@@ -36,9 +23,6 @@ def find_dir(name):
 
 TRIMESTRE_MAP = {3: 'T1', 6: 'T2', 9: 'T3', 12: 'T4'}
 
-# ─────────────────────────────────────────────
-# STEP 1 — SCAN AND IDENTIFY CSV FILE
-# ─────────────────────────────────────────────
 # File identified by presence of column "textbox390" in content.
 # Placed in: resources/trimestres/suivi vendeur/
 
@@ -55,9 +39,6 @@ for f in csv_files:
 
 assert fichier_suivi, "ERREUR : fichier suivi vendeur introuvable dans resources/trimestres/suivi vendeur/"
 
-# ─────────────────────────────────────────────
-# STEP 2 — DETERMINE QUARTER AND YEAR
-# ─────────────────────────────────────────────
 
 # Line 2 format: "ANNECY 2,01/01/2026 - 31/03/2026"
 lines        = content.splitlines()
@@ -67,9 +48,6 @@ date_fin     = datetime.strptime(date_fin_str, "%d/%m/%Y")
 trimestre    = TRIMESTRE_MAP.get(date_fin.month, 'T?')
 annee        = date_fin.year
 
-# ─────────────────────────────────────────────
-# STEP 3 — LOCATE REPORT FILE
-# ─────────────────────────────────────────────
 
 rapport_dir  = str(find_dir("trimestres"))
 rapport_path = os.path.join(rapport_dir, f"rapport trimestriel {trimestre} {annee}.md")
@@ -77,9 +55,6 @@ rapport_path = os.path.join(rapport_dir, f"rapport trimestriel {trimestre} {anne
 assert os.path.exists(rapport_path), \
     f"ERREUR : Rapport trimestriel {trimestre} {annee} introuvable. Lance d'abord /chiffre-trimestriel."
 
-# ─────────────────────────────────────────────
-# STEP 4 — EXTRACT RATIOS FROM BLOCS 1, 2 AND 4
-# ─────────────────────────────────────────────
 
 NOM_MAP = {
     'Sandrine': 'SANDRINE R.',
@@ -144,9 +119,6 @@ while i < len(lines) and lines[i].strip():
         vendeurs[nom]['depoll_ratio'] = row[17].strip() if len(row) > 17 else ''
     i += 1
 
-# ─────────────────────────────────────────────
-# STEP 5 — FILL SECTION 5 LS (pure str.replace)
-# ─────────────────────────────────────────────
 # Template column order: Garantie Pneu | Géométrie | VCR | VCF | Plaquette | Dépoll.
 # Template placeholder (with spaces): | **Sandrine** | % | % | % | % | % | % |
 
@@ -175,9 +147,6 @@ for nom_template, nom_csv in NOM_MAP.items():
 with open(rapport_path, 'w', encoding='utf-8') as fh:
     fh.write(rapport)
 
-# ─────────────────────────────────────────────
-# STEP 6 — CONFIRM
-# ─────────────────────────────────────────────
 
 print(f"✅ Section 5 LS mise à jour : {rapport_path}")
 print()

@@ -10,27 +10,8 @@ Other triggers: "remplis les pneus mensuel", "analyse les pneus mois", "mets à 
 
 ---
 
-# Skill : Analyse Pneus — Rapport Mensuel Feu Vert Annecy
-
-## Instruction d'exécution
-
-**Exécuter le script Python ci-dessous dans son intégralité.**
-Python remplit les tableaux Pneus avec str.replace par ligne.
-L'IA reçoit uniquement le dict `summary` pour rédiger les Points clés.
-
-**Différence vs le skill hebdomadaire** :
-- Dossier source : `Resources mensuelles/pneus/` au lieu de `resources/Pneus/`
-- Fichier rapport cible : `Rapport mensuel/rapport mensuel {mois} {année}.md`
-- Extraction de la période : mois et année au lieu du numéro de semaine
-
----
-
 ```python
 import os, glob, csv, pathlib, datetime
-
-# ─────────────────────────────────────────────
-# HELPER
-# ─────────────────────────────────────────────
 
 def find_dir(name):
     for p in [pathlib.Path.cwd()] + list(pathlib.Path.cwd().parents):
@@ -70,9 +51,7 @@ MOIS_FR = {
     9: 'septembre', 10: 'octobre', 11: 'novembre', 12: 'décembre'
 }
 
-# ─────────────────────────────────────────────
 # STEP 1 — LOCATE FILES
-# ─────────────────────────────────────────────
 
 pneus_folder = str(find_dir("Resources mensuelles") / "pneus")
 csv_files    = glob.glob(os.path.join(pneus_folder, "Pneus*.csv"))
@@ -83,45 +62,23 @@ rapport_dir = str(find_dir("Rapport mensuel"))
 rapports    = glob.glob(os.path.join(rapport_dir, "rapport mensuel *.md"))
 assert rapports, "ERREUR : aucun rapport mensuel trouvé. Lancer /chiffre-mensuel d'abord."
 
-# ─────────────────────────────────────────────
 # STEP 2 — PARSE CSV
-# ─────────────────────────────────────────────
-# The CSV has 4 blocks separated by blank lines, each representing a tire season type:
-#   Block 1 (header marque4,  lines 4-18):  ÉTÉ (Summer)
-#   Block 2 (header marque,   lines 20-32): 4 SAISONS (All Season)
-#   Block 3 (header marque2,  lines 34-47): HIVER (Winter)
-#   Block 4 (header marque3,  lines 49-57): other (not displayed)
-#
-# Column positions (same across all blocks):
-#   [0]  brand name
-#   [3]  qty realized (N)
-#   [4]  market share % (N)
-#   [8]  CA realized € (N)
-#   [9]  CA evo vs N-1 %
-#   [14] marge realized € (N)
-#   [15] marge % (N)
-#   [16] category (PREMIUM / MEDIUM / BUDGET)
-#   [19] category qty total
-#   [20] category PdM %
-#   [24] category CA total €
-#   [25] category CA evo %
-#   [30] category marge total €
-#   [31] category marge %
+# Blocks: marque4=ÉTÉ, marque=4SAISONS, marque2=HIVER; col[0]=brand, [3]=qty, [4]=pdm%,
+# [8]=CA€, [9]=CA_evo%, [14]=marge€, [15]=marge%, [16]=cat, [19]=cat_qty,
+# [20]=cat_pdm, [24]=cat_CA, [25]=cat_CA_evo, [30]=cat_marge€, [31]=cat_marge%
 
 with open(fichier_pneus, 'r', encoding='utf-8-sig') as f:
     content = f.read()
 
 lines = content.split('\n')
 
-# Extract period and month/year from line 2
 meta_row   = list(csv.reader([lines[1]]))[0]
-period_str = meta_row[1].strip()   # e.g. "01/04/2026 - 30/04/2026"
+period_str = meta_row[1].strip()
 end_date   = datetime.datetime.strptime(period_str.split(' - ')[1].strip(), '%d/%m/%Y').date()
 mois_num   = end_date.month
 annee      = end_date.year
 mois_str   = MOIS_FR[mois_num]
 
-# Find matching rapport
 rapport_path = None
 for r in rapports:
     if f"rapport mensuel {mois_str} {annee}" in os.path.basename(r).lower():
@@ -132,7 +89,6 @@ if rapport_path is None:
     print(f"⚠️  Rapport mensuel {mois_str} {annee} non trouvé — utilisation de : {os.path.basename(rapport_path)}")
 
 def find_block_range(lines, col0_value):
-    """Return (header_idx, data_start, data_end) for a block whose first CSV column equals col0_value."""
     for i, line in enumerate(lines):
         if not line.strip():
             continue
@@ -153,9 +109,8 @@ def find_block_range(lines, col0_value):
     return None, None, None
 
 def parse_block(lines, start, end):
-    """Parse one block: return (brand_data, cat_totals) dicts."""
-    brand_data = {}   # (cat, brand) -> metrics
-    cat_totals = {}   # cat -> metrics
+    brand_data = {}
+    cat_totals = {}
     for line in lines[start:end]:
         if not line.strip():
             continue
@@ -185,7 +140,6 @@ def parse_block(lines, start, end):
             }
     return brand_data, cat_totals
 
-# Parse the 3 season blocks (col0 = the block's first column header value)
 _, s1, e1 = find_block_range(lines, 'marque4')
 _, s2, e2 = find_block_range(lines, 'marque')
 _, s3, e3 = find_block_range(lines, 'marque2')
@@ -194,44 +148,52 @@ brand_data_ete,   cat_totals_ete   = parse_block(lines, s1, e1) if s1 else ({}, 
 brand_data_4s,    cat_totals_4s    = parse_block(lines, s2, e2) if s2 else ({}, {})
 brand_data_hiver, cat_totals_hiver = parse_block(lines, s3, e3) if s3 else ({}, {})
 
-# Compute grand total (sum across all 3 seasons)
-def sum_seasons(cat_totals_list, cats):
-    total_qty = total_ca = total_marge = 0
-    all_evo = []
-    for ct_dict in cat_totals_list:
-        for cat in cats:
-            ct = ct_dict.get(cat, {})
-            total_qty   += parse_int(ct.get('qty', 'N/A')) or 0
-            total_ca    += parse_int(ct.get('ca', 'N/A'))  or 0
-            total_marge += parse_int(ct.get('marge_eur', 'N/A')) or 0
-            evo = parse_pct(ct.get('ca_evo', 'N/A'))
-            if evo is not None:
-                all_evo.append(evo)
-    avg_evo = round(sum(all_evo)/len(all_evo), 1) if all_evo else None
-    return total_qty, total_ca, total_marge, avg_evo
-
 CATS = ['PREMIUM', 'MEDIUM', 'BUDGET']
-g_qty, g_ca, g_marge, g_evo = sum_seasons(
-    [cat_totals_ete, cat_totals_4s, cat_totals_hiver], CATS
-)
-g_marge_pct = round(g_marge / g_ca * 100, 2) if g_ca else None
 
-# ─────────────────────────────────────────────
+def sum_cats(ct_dict):
+    qty = ca = marge = 0
+    evos = []
+    for cat in CATS:
+        ct = ct_dict.get(cat, {})
+        qty   += parse_int(ct.get('qty', 'N/A'))       or 0
+        ca    += parse_int(ct.get('ca', 'N/A'))         or 0
+        marge += parse_int(ct.get('marge_eur', 'N/A')) or 0
+        evo = parse_pct(ct.get('ca_evo', 'N/A'))
+        if evo is not None:
+            evos.append(evo)
+    avg_evo = round(sum(evos)/len(evos), 1) if evos else None
+    marge_pct = round(marge/ca*100, 1) if ca else None
+    return qty, ca, marge, avg_evo, marge_pct
+
+s_ete   = sum_cats(cat_totals_ete)
+s_4s    = sum_cats(cat_totals_4s)
+s_hiver = sum_cats(cat_totals_hiver)
+
+g_qty   = s_ete[0] + s_4s[0] + s_hiver[0]
+g_ca    = s_ete[1] + s_4s[1] + s_hiver[1]
+g_marge = s_ete[2] + s_4s[2] + s_hiver[2]
+g_marge_pct = round(g_marge / g_ca * 100, 2) if g_ca else None
+g_evos  = [v[3] for v in (s_ete, s_4s, s_hiver) if v[3] is not None]
+g_evo   = round(sum(g_evos)/len(g_evos), 1) if g_evos else None
+
+season_summary = {
+    'ÉTÉ':       {'qty': s_ete[0],   'ca': s_ete[1],   'marge_pct': s_ete[4]},
+    '4 SAISONS': {'qty': s_4s[0],    'ca': s_4s[1],    'marge_pct': s_4s[4]},
+    'HIVER':     {'qty': s_hiver[0], 'ca': s_hiver[1], 'marge_pct': s_hiver[4]},
+}
+
 # STEP 3 — FILL TABLES WITH str.replace
-# ─────────────────────────────────────────────
 
 with open(rapport_path, 'r', encoding='utf-8') as fh:
     rapport = fh.read()
 
 SEASON_BLOCKS = [
-    ('ÉTÉ',       cat_totals_ete),
-    ('4 SAISONS', cat_totals_4s),
-    ('HIVER',     cat_totals_hiver),
+    ('ÉTÉ',       cat_totals_ete,   s_ete),
+    ('4 SAISONS', cat_totals_4s,    s_4s),
+    ('HIVER',     cat_totals_hiver, s_hiver),
 ]
 
-# --- Season summary table ---
-for saison, cat_totals in SEASON_BLOCKS:
-    # Per-category rows: placeholder "| **ÉTÉ** | PREMIUM | | | | | | | |"
+for saison, cat_totals, s_tot in SEASON_BLOCKS:
     for cat in CATS:
         old = f"| **{saison}** | {cat} | | | | | | | |"
         ct  = cat_totals.get(cat)
@@ -242,79 +204,43 @@ for saison, cat_totals in SEASON_BLOCKS:
             new = f"| **{saison}** | {cat} | N/A | N/A | N/A | N/A | N/A | N/A | ⚪ |"
         rapport = rapport.replace(old, new)
 
-    # Season total row: compute from category subtotals
-    s_qty = s_ca = s_marge = 0
-    s_evo_list = []
-    for cat in CATS:
-        ct = cat_totals.get(cat, {})
-        s_qty   += parse_int(ct.get('qty', 'N/A'))       or 0
-        s_ca    += parse_int(ct.get('ca', 'N/A'))         or 0
-        s_marge += parse_int(ct.get('marge_eur', 'N/A')) or 0
-        evo = parse_pct(ct.get('ca_evo', 'N/A'))
-        if evo is not None:
-            s_evo_list.append(evo)
-
-    s_evo_avg   = round(sum(s_evo_list)/len(s_evo_list), 1) if s_evo_list else None
-    s_marge_pct = round(s_marge / s_ca * 100, 2) if s_ca else None
-    s_evo_str   = f"{'+' if s_evo_avg and s_evo_avg >= 0 else ''}{s_evo_avg} %" if s_evo_avg is not None else 'N/A'
+    sq, sc, sm, s_evo_avg, s_marge_pct = s_tot
+    s_evo_str      = f"{'+' if s_evo_avg and s_evo_avg >= 0 else ''}{s_evo_avg} %" if s_evo_avg is not None else 'N/A'
     s_marge_pct_str = f"{s_marge_pct} %" if s_marge_pct is not None else 'N/A'
-    st_tot = statut(s_evo_str)
 
     old_tot = f"| *Total {saison}* | | | | | | | | |"
-    new_tot = f"| *Total {saison}* | | {s_qty} | — | {s_ca} € | {s_evo_str} | {s_marge} € | {s_marge_pct_str} | {st_tot} |"
+    new_tot = f"| *Total {saison}* | | {sq} | — | {sc} € | {s_evo_str} | {sm} € | {s_marge_pct_str} | {statut(s_evo_str)} |"
     rapport = rapport.replace(old_tot, new_tot)
 
-# Grand total row
-g_evo_str   = f"{'+' if g_evo and g_evo >= 0 else ''}{g_evo} %" if g_evo is not None else 'N/A'
+g_evo_str       = f"{'+' if g_evo and g_evo >= 0 else ''}{g_evo} %" if g_evo is not None else 'N/A'
 g_marge_pct_str = f"{round(g_marge_pct, 2)} %" if g_marge_pct is not None else 'N/A'
-st_grand = statut(g_evo_str)
 old_grand = "| **TOTAL PNEUS** | | | | | | | | |"
-new_grand = f"| **TOTAL PNEUS** | | {g_qty} | — | {g_ca} € | {g_evo_str} | {g_marge} € | {g_marge_pct_str} | {st_grand} |"
+new_grand = f"| **TOTAL PNEUS** | | {g_qty} | — | {g_ca} € | {g_evo_str} | {g_marge} € | {g_marge_pct_str} | {statut(g_evo_str)} |"
 rapport = rapport.replace(old_grand, new_grand)
 
-# --- ÉTÉ brand detail table ---
 TEMPLATE_BRANDS = {
     'PREMIUM': ['AUTRE', 'CONTINENTAL', 'GOODYEAR', 'MICHELIN', 'PIRELLI'],
     'MEDIUM':  ['AUTRE', 'FEU VERT', 'HANKOOK', 'KUMHO', 'NEXEN', 'NOKIAN'],
     'BUDGET':  ['AUTRE', 'ROVELO', 'TRACMAX'],
 }
 
-filled  = []
 missing = []
-
 for cat, brands in TEMPLATE_BRANDS.items():
     for brand in brands:
         old = f"| **{cat}** | {brand} | | | | | | | |"
         d   = brand_data_ete.get((cat, brand))
         if d:
-            st       = statut(d['ca_evo'])
-            ca_fmt   = fmt_eur(d['ca'])
-            mg_fmt   = fmt_eur(d['marge_eur'])
-            new = f"| **{cat}** | {brand} | {d['qty']} | {d['pdm']} | {ca_fmt} | {d['ca_evo']} | {mg_fmt} | {d['marge_pct']} | {st} |"
+            st  = statut(d['ca_evo'])
+            new = f"| **{cat}** | {brand} | {d['qty']} | {d['pdm']} | {fmt_eur(d['ca'])} | {d['ca_evo']} | {fmt_eur(d['marge_eur'])} | {d['marge_pct']} | {st} |"
             rapport = rapport.replace(old, new)
-            filled.append(f"{cat}/{brand}")
         else:
-            new = f"| **{cat}** | {brand} | N/A | N/A | N/A | N/A | N/A | N/A | ⚪ |"
-            rapport = rapport.replace(old, new)
+            rapport = rapport.replace(old, f"| **{cat}** | {brand} | N/A | N/A | N/A | N/A | N/A | N/A | ⚪ |")
             missing.append(f"{cat}/{brand}")
 
 with open(rapport_path, 'w', encoding='utf-8') as fh:
     fh.write(rapport)
 
-# ─────────────────────────────────────────────
 # STEP 4 — BUILD COMPACT SUMMARY FOR AI
-# ─────────────────────────────────────────────
-
-season_summary = {}
-for saison, ct_dict in [('ÉTÉ', cat_totals_ete), ('4 SAISONS', cat_totals_4s), ('HIVER', cat_totals_hiver)]:
-    sq = sm = sc = 0
-    for cat in CATS:
-        ct = ct_dict.get(cat, {})
-        sq += parse_int(ct.get('qty', 'N/A'))       or 0
-        sc += parse_int(ct.get('ca', 'N/A'))         or 0
-        sm += parse_int(ct.get('marge_eur', 'N/A')) or 0
-    sp = round(sm/sc*100, 1) if sc else None
-    season_summary[saison] = {'qty': sq, 'ca': sc, 'marge_pct': sp}
 
 brands_list = [
     {'cat': c, 'brand': b, 'ca': parse_int(d['ca']), 'evo': parse_pct(d['ca_evo']), 'marge_pct': parse_pct(d['marge_pct'])}
@@ -326,22 +252,20 @@ top_losers  = sorted([b for b in brands_list if b['evo'] and b['evo'] < 0], key=
 mg_alerts   = [b for b in brands_list if b['marge_pct'] and b['marge_pct'] < 10 and b['ca'] and b['ca'] > 0]
 
 summary = {
-    "rapport":        rapport_path,
-    "mois":           mois_str,
-    "annee":          annee,
-    "periode":        period_str,
-    "total_qty":      g_qty,
-    "total_ca":       g_ca,
+    "rapport":         rapport_path,
+    "mois":            mois_str,
+    "annee":           annee,
+    "periode":         period_str,
+    "total_qty":       g_qty,
+    "total_ca":        g_ca,
     "total_marge_pct": g_marge_pct_str,
-    "saisons":        season_summary,
-    "top_croissance": [{"cat": b['cat'], "brand": b['brand'], "evo": b['evo']} for b in top_gainers],
-    "top_declin":     [{"cat": b['cat'], "brand": b['brand'], "evo": b['evo']} for b in top_losers],
-    "alertes_marge":  [{"cat": b['cat'], "brand": b['brand'], "marge_pct": b['marge_pct']} for b in mg_alerts],
+    "saisons":         season_summary,
+    "top_croissance":  [{"cat": b['cat'], "brand": b['brand'], "evo": b['evo']} for b in top_gainers],
+    "top_declin":      [{"cat": b['cat'], "brand": b['brand'], "evo": b['evo']} for b in top_losers],
+    "alertes_marge":   [{"cat": b['cat'], "brand": b['brand'], "marge_pct": b['marge_pct']} for b in mg_alerts],
 }
 
-# ─────────────────────────────────────────────
 # STEP 5 — CONFIRM
-# ─────────────────────────────────────────────
 
 print(f"✅ Tableaux Pneus mis à jour : {rapport_path}")
 print(f"✅ Mois : {mois_str} {annee} — période : {period_str}")

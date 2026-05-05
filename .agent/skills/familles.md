@@ -10,22 +10,9 @@ Other triggers: "remplis les familles hebdo", "analyse les familles semaine", "m
 
 ---
 
-# Skill : Analyse par Familles — Rapport Hebdomadaire Feu Vert Annecy
-
-## Instruction d'exécution
-
-**Exécuter le script Python ci-dessous dans son intégralité.**
-Python remplit le tableau Familles avec str.replace par ligne.
-L'IA reçoit uniquement le dict `summary` pour rédiger les Points clés.
-
----
-
 ```python
 import os, glob, csv, pathlib
 
-# ─────────────────────────────────────────────
-# HELPER
-# ─────────────────────────────────────────────
 
 def find_dir(name):
     for p in [pathlib.Path.cwd()] + list(pathlib.Path.cwd().parents):
@@ -62,9 +49,6 @@ def marge_delta(marge_n_str, marge_n1_str):
     sign  = '+' if delta >= 0 else ''
     return f'{sign}{delta:.1f} pts'.replace('.', ',')
 
-# ─────────────────────────────────────────────
-# STEP 1 — LOCATE FILES
-# ─────────────────────────────────────────────
 
 familles_folder = str(find_dir("resources") / "familles")
 csv_files       = glob.glob(os.path.join(familles_folder, "comparatifCAv2_Famille*.csv"))
@@ -77,9 +61,6 @@ rapports    = glob.glob(os.path.join(rapport_dir, "rapport hebdomadaire semaine 
 assert rapports, "ERREUR : aucun rapport hebdomadaire trouvé. Lancer /chiffre d'abord."
 rapport_path = sorted(rapports)[-1]   # most recent by alphabetical order
 
-# ─────────────────────────────────────────────
-# STEP 2 — PARSE CSV AND EXTRACT PER-FAMILY DATA
-# ─────────────────────────────────────────────
 # Structure:
 # Line 1 : store header (LIBELLEMAGASIN,...)
 # Line 2 : store values (ANNECY SEYNOD,...)
@@ -110,9 +91,6 @@ for row in reader:
         'qty_n':    row[26].strip(),   # textbox63
     }
 
-# ─────────────────────────────────────────────
-# STEP 3 — FILL TABLE WITH str.replace PER ROW
-# ─────────────────────────────────────────────
 # Template exact placeholder per family:
 # | **A-ENTRETIEN** | | | | | | | |
 # Replace with:
@@ -154,9 +132,6 @@ for fam in TEMPLATE_FAMILIES:
 with open(rapport_path, 'w', encoding='utf-8') as fh:
     fh.write(rapport)
 
-# ─────────────────────────────────────────────
-# STEP 4 — BUILD COMPACT SUMMARY FOR AI
-# ─────────────────────────────────────────────
 
 families_data = []
 for fam in TEMPLATE_FAMILIES:
@@ -189,9 +164,6 @@ summary = {
     "alertes_marge":  [{"famille": f['fam'], "delta_pts": f['mg_delta']} for f in mg_alerts],
 }
 
-# ─────────────────────────────────────────────
-# STEP 5 — CONFIRM
-# ─────────────────────────────────────────────
 
 print(f"✅ Tableau Familles mis à jour : {rapport_path}")
 print(f"✅ Familles remplies : {len(filled)}/13")

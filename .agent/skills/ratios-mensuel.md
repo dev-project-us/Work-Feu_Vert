@@ -8,23 +8,10 @@ and fills Section 4 of the monthly report. Do NOT interpret or read the CSV your
 
 ---
 
-# Skill : Ratios Prioritaires — Section 4 Rapport Mensuel Feu Vert Annecy
-
-## Instruction d'exécution
-
-**Exécuter le script Python ci-dessous dans son intégralité.**
-Python fait tout : scan, extraction des 6 KPIs, calculs, remplissage Section 4.
-L'IA ne lit pas le CSV. L'IA ne calcule pas les écarts.
-
----
-
 ```python
 import os, glob, csv, pathlib
 from datetime import datetime
 
-# ─────────────────────────────────────────────
-# HELPER
-# ─────────────────────────────────────────────
 
 def find_dir(name):
     for p in [pathlib.Path.cwd()] + list(pathlib.Path.cwd().parents):
@@ -50,9 +37,6 @@ def statut(ecart_val):
     elif ecart_val == 0: return '🟡'
     else:                return '🔴'
 
-# ─────────────────────────────────────────────
-# STEP 1 — SCAN AND IDENTIFY CSV FILE
-# ─────────────────────────────────────────────
 
 folder    = str(find_dir("monthly_recap") / "ratios prioritaires")
 csv_files = glob.glob(os.path.join(folder, "*.csv"))
@@ -67,9 +51,6 @@ for f in csv_files:
 
 assert fichier_ratios, "ERREUR : fichier ratios introuvable dans monthly_recap/ratios prioritaires/"
 
-# ─────────────────────────────────────────────
-# STEP 2 — DETERMINE MONTH AND YEAR
-# ─────────────────────────────────────────────
 
 # Line 2 format: "ANNECY 2,01/03/2026-31/03/2026"
 lines        = content.replace('\r\n', '\n').split('\n')
@@ -78,9 +59,6 @@ date_fin     = datetime.strptime(date_fin_str, "%d/%m/%Y")
 mois_str     = MOIS_FR[date_fin.month]
 annee        = date_fin.year
 
-# ─────────────────────────────────────────────
-# STEP 3 — LOCATE REPORT FILE
-# ─────────────────────────────────────────────
 
 rapport_dir  = str(find_dir("Rapport mensuel"))
 rapport_path = os.path.join(rapport_dir, f"rapport mensuel {mois_str} {annee}.md")
@@ -88,9 +66,6 @@ rapport_path = os.path.join(rapport_dir, f"rapport mensuel {mois_str} {annee}.md
 assert os.path.exists(rapport_path), \
     f"ERREUR : Rapport mensuel {mois_str} {annee} introuvable. Lance d'abord /chiffre-mensuel."
 
-# ─────────────────────────────────────────────
-# STEP 4 — EXTRACT ALL 6 KPIs
-# ─────────────────────────────────────────────
 
 KPI_MAP = {
     'Garantie Pneu / Pneus vendus':                 'Garantie Pneu',
@@ -130,9 +105,6 @@ for line in lines:
                     'n1':      parts[8].strip(),   # ratioN_1
                 }
 
-# ─────────────────────────────────────────────
-# STEP 5 — FILL SECTION 4 (pure str.replace)
-# ─────────────────────────────────────────────
 # Template exact format (6 data columns):
 # |**Garantie Pneu**|%|50 %|pts|%|pts||
 # Replace with:
@@ -162,9 +134,6 @@ for kpi_name, obj_str in OBJECTIFS.items():
 with open(rapport_path, 'w', encoding='utf-8') as fh:
     fh.write(rapport)
 
-# ─────────────────────────────────────────────
-# STEP 6 — CONFIRM
-# ─────────────────────────────────────────────
 
 print(f"✅ Section 4 mise à jour : {rapport_path}")
 print(f"{'KPI':<20} {'Réalisé':>8}  {'Obj':>6}  {'Écart/Obj':>10}  {'N-1':>8}  {'Évo/N-1':>10}  Statut")

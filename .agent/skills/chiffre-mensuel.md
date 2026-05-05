@@ -11,24 +11,10 @@ Other triggers: "remplis le rapport mensuel", "mets à jour les chiffres du mois
 
 ---
 
-# Skill : Analyse des Chiffres — Rapport Mensuel Feu Vert Annecy
-
-## Instruction d'exécution
-
-**Exécuter le script Python ci-dessous dans son intégralité.**
-Python fait tout : scan, extraction, calculs, création du fichier, remplissage.
-L'IA ne lit pas les CSV. À la fin, l'IA reçoit uniquement le dict `kpis`
-pour rédiger la Section 1, puis invoque `/ratios-mensuel`.
-
----
-
 ```python
 import os, glob, re, shutil, csv, io, pathlib
 from datetime import datetime
 
-# ─────────────────────────────────────────────
-# HELPERS
-# ─────────────────────────────────────────────
 
 def find_dir(name):
     for p in [pathlib.Path.cwd()] + list(pathlib.Path.cwd().parents):
@@ -119,7 +105,6 @@ def extraire_marge_eur(content):
     return None
 
 def extraire_marge_obj_eur(obj_content):
-    """Last large numeric value from a data row in the objectifs file."""
     lines = obj_content.replace('\r\n', '\n').split('\n')
     headers = []
     for i, line in enumerate(lines):
@@ -141,9 +126,6 @@ def extraire_marge_obj_eur(obj_content):
                         continue
     return None
 
-# ─────────────────────────────────────────────
-# STEP 1 — SCAN AND IDENTIFY CSV FILES
-# ─────────────────────────────────────────────
 
 folder    = str(find_dir("monthly_recap") / "SUC")
 csv_files = glob.glob(os.path.join(folder, "SUC - *.csv"))
@@ -169,9 +151,6 @@ assert fichier_mtd,       "ERREUR : fichier MTD (année N) introuvable dans mont
 assert fichier_n1,        "ERREUR : fichier N-1 introuvable dans monthly_recap/SUC/"
 assert fichier_objectifs, "ERREUR : fichier objectifs introuvable dans monthly_recap/SUC/"
 
-# ─────────────────────────────────────────────
-# STEP 2 — DETERMINE MONTH AND YEAR
-# ─────────────────────────────────────────────
 
 mtd_content = read_raw(fichier_mtd)
 n1_content  = read_raw(fichier_n1)
@@ -187,9 +166,6 @@ mois_num = date_fin.month
 annee    = date_fin.year
 mois_str = MOIS_FR[mois_num]
 
-# ─────────────────────────────────────────────
-# STEP 3 — CREATE REPORT FILE FROM TEMPLATE
-# ─────────────────────────────────────────────
 
 template_path = str(find_dir("templates") / "rapport_mensuel_template.md")
 output_dir    = str(find_dir("Rapport mensuel"))
@@ -198,9 +174,6 @@ output_name   = f"rapport mensuel {mois_str} {annee}.md"
 output_path   = os.path.join(output_dir, output_name)
 shutil.copy(template_path, output_path)
 
-# ─────────────────────────────────────────────
-# STEP 4 — EXTRACT ALL VALUES
-# ─────────────────────────────────────────────
 
 # — Global block —
 g   = parse_global_block(mtd_content)
@@ -275,9 +248,6 @@ at_marge_delta = round(at_marge - at_marge_n1, 1)
 at_nb_or_evo_n1 = round((at_nb_or / at_nb_or_n1 - 1) * 100, 1) if at_nb_or_n1 else 0
 at_panier_evo_n1 = round((at_panier / at_panier_n1 - 1) * 100, 1) if at_panier_n1 else 0
 
-# ─────────────────────────────────────────────
-# STEP 5 — FILL THE REPORT (pure str.replace)
-# ─────────────────────────────────────────────
 
 with open(output_path, 'r', encoding='utf-8') as fh:
     rapport = fh.read()
@@ -338,9 +308,6 @@ rapport = rapport.replace(
 with open(output_path, 'w', encoding='utf-8') as fh:
     fh.write(rapport)
 
-# ─────────────────────────────────────────────
-# STEP 6 — EXPOSE KPIs FOR SECTION 1 NARRATIVE
-# ─────────────────────────────────────────────
 # The AI receives ONLY this dictionary — not the raw CSV.
 # Use it to write the Section 1 strategic narrative in French.
 

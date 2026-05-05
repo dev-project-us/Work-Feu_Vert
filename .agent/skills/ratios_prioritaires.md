@@ -9,23 +9,10 @@ Do NOT interpret or read the CSV yourself. Python does everything.
 
 ---
 
-# Skill : Ratios Prioritaires — Section 4 Rapport Hebdomadaire Feu Vert Annecy
-
-## Instruction d'exécution
-
-**Exécuter le script Python ci-dessous dans son intégralité.**
-Python fait tout : scan, extraction, calculs, remplissage de la Section 4.
-L'IA ne lit pas le CSV. L'IA ne calcule pas les écarts.
-
----
-
 ```python
 import os, glob, csv, pathlib
 from datetime import datetime
 
-# ─────────────────────────────────────────────
-# HELPER
-# ─────────────────────────────────────────────
 
 def find_dir(name):
     for p in [pathlib.Path.cwd()] + list(pathlib.Path.cwd().parents):
@@ -53,9 +40,6 @@ def statut(ecart_str):
     except:
         return ''
 
-# ─────────────────────────────────────────────
-# STEP 1 — SCAN AND IDENTIFY CSV FILE
-# ─────────────────────────────────────────────
 
 folder    = str(find_dir("resources") / "ratios prioritaires")
 csv_files = glob.glob(os.path.join(folder, "*.csv"))
@@ -70,9 +54,6 @@ for f in csv_files:
 
 assert fichier_ratios, "ERREUR : fichier ratios introuvable dans resources/ratios prioritaires/"
 
-# ─────────────────────────────────────────────
-# STEP 2 — DETERMINE WEEK NUMBER
-# ─────────────────────────────────────────────
 
 # Line 2 format: "ANNECY 2,16/03/2026-22/03/2026"
 lines = content.replace('\r\n', '\n').split('\n')
@@ -80,9 +61,6 @@ date_fin_str = lines[1].split(',')[1].split('-')[1].strip()
 date_fin     = datetime.strptime(date_fin_str, "%d/%m/%Y")
 semaine      = date_fin.isocalendar()[1]
 
-# ─────────────────────────────────────────────
-# STEP 3 — LOCATE REPORT FILE
-# ─────────────────────────────────────────────
 
 rapport_dir  = str(find_dir("Rapport hebdomadaire"))
 rapport_path = os.path.join(rapport_dir, f"rapport hebdomadaire semaine {semaine}.md")
@@ -90,9 +68,6 @@ rapport_path = os.path.join(rapport_dir, f"rapport hebdomadaire semaine {semaine
 assert os.path.exists(rapport_path), \
     f"ERREUR : Rapport semaine {semaine} introuvable. Lance d'abord /chiffre."
 
-# ─────────────────────────────────────────────
-# STEP 4 — EXTRACT ALL 6 KPIs FROM CSV
-# ─────────────────────────────────────────────
 
 KPI_MAP = {
     'Garantie Pneu / Pneus vendus':                 'Garantie Pneu',
@@ -134,9 +109,6 @@ for line in lines:
                     'n1':       parts[8].strip(),   # ratioN_1
                 }
 
-# ─────────────────────────────────────────────
-# STEP 5 — FILL SECTION 4 (pure str.replace)
-# ─────────────────────────────────────────────
 # Template exact format per row:
 # |**Garantie Pneu**|%|50 %|%||
 # Replace with:
@@ -162,9 +134,6 @@ for kpi_name, obj_str in OBJECTIFS.items():
 with open(rapport_path, 'w', encoding='utf-8') as fh:
     fh.write(rapport)
 
-# ─────────────────────────────────────────────
-# STEP 6 — CONFIRM
-# ─────────────────────────────────────────────
 
 print(f"✅ Section 4 mise à jour : {rapport_path}")
 print(f"{'KPI':<20} {'Réalisé':>8}  {'Objectif':>8}  {'Écart':>10}  Statut")

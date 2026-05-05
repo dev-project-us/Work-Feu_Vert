@@ -11,22 +11,9 @@ Other triggers: "remplis les familles trimestrielles", "analyse les familles du 
 
 ---
 
-# Skill : Analyse par Familles — Rapport Trimestriel Feu Vert Annecy
-
-## Instruction d'exécution
-
-**Exécuter le script Python ci-dessous dans son intégralité.**
-Python remplit chaque ligne famille avec str.replace.
-L'IA reçoit uniquement le dict `summary` pour rédiger les Points clés.
-
----
-
 ```python
 import os, glob, csv, pathlib
 
-# ─────────────────────────────────────────────
-# HELPER
-# ─────────────────────────────────────────────
 
 def find_dir(name):
     for p in [pathlib.Path.cwd()] + list(pathlib.Path.cwd().parents):
@@ -63,9 +50,6 @@ def marge_delta(marge_n_str, marge_n1_str):
     sign  = '+' if delta >= 0 else ''
     return f'{sign}{delta:.1f} pts'.replace('.', ',')
 
-# ─────────────────────────────────────────────
-# STEP 1 — LOCATE FILES
-# ─────────────────────────────────────────────
 
 familles_folder = str(find_dir("Resources trimestrielles") / "Familles")
 csv_files       = glob.glob(os.path.join(familles_folder, "comparatifCAv2_Famille*.csv"))
@@ -78,9 +62,6 @@ rapports    = glob.glob(os.path.join(rapport_dir, "rapport trimestriel *.md"))
 assert rapports, "ERREUR : aucun rapport trimestriel trouvé. Lancer /chiffre-trimestriel d'abord."
 rapport_path = sorted(rapports)[-1]   # most recent alphabetically
 
-# ─────────────────────────────────────────────
-# STEP 2 — PARSE CSV AND EXTRACT PER-FAMILY DATA
-# ─────────────────────────────────────────────
 
 with open(fichier_familles, 'r', encoding='utf-8-sig') as f:
     lines = f.readlines()
@@ -104,9 +85,6 @@ for row in reader:
         'qty_n':    row[26].strip(),   # textbox63
     }
 
-# ─────────────────────────────────────────────
-# STEP 3 — FILL TABLE WITH str.replace PER ROW
-# ─────────────────────────────────────────────
 # Quarterly template placeholder per family (uses N/A, NOT empty cells):
 # | **A-ENTRETIEN** | N/A | N/A | N/A | N/A | N/A | N/A | ⚪ |
 # Replace with actual data when available, keep N/A if family absent.
@@ -147,9 +125,6 @@ for fam in TEMPLATE_FAMILIES:
 with open(rapport_path, 'w', encoding='utf-8') as fh:
     fh.write(rapport)
 
-# ─────────────────────────────────────────────
-# STEP 4 — BUILD COMPACT SUMMARY FOR AI
-# ─────────────────────────────────────────────
 
 families_data = []
 for fam in TEMPLATE_FAMILIES:
@@ -179,9 +154,6 @@ summary = {
     "alertes_marge":   [{"famille": f['fam'], "delta_pts": f['mg_delta']} for f in mg_alerts],
 }
 
-# ─────────────────────────────────────────────
-# STEP 5 — CONFIRM
-# ─────────────────────────────────────────────
 
 print(f"✅ Tableau Familles mis à jour : {rapport_path}")
 print(f"✅ Familles remplies : {len(filled)}/13")

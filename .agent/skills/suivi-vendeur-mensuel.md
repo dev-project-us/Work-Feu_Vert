@@ -8,23 +8,10 @@ Section 5 LS of the monthly report. Do NOT interpret or read the CSV yourself.
 
 ---
 
-# Skill : Ratios de Vente Individuels — Section 5 LS Rapport Mensuel Feu Vert Annecy
-
-## Instruction d'exécution
-
-**Exécuter le script Python ci-dessous dans son intégralité.**
-Python fait tout : scan, extraction des 3 blocs CSV, remplissage Section 5 LS.
-L'IA ne lit pas le CSV. L'IA ne mappe pas les colonnes.
-
----
-
 ```python
 import os, glob, csv, pathlib
 from datetime import datetime
 
-# ─────────────────────────────────────────────
-# HELPER
-# ─────────────────────────────────────────────
 
 def find_dir(name):
     for p in [pathlib.Path.cwd()] + list(pathlib.Path.cwd().parents):
@@ -39,9 +26,6 @@ MOIS_FR = {
     9:'septembre', 10:'octobre', 11:'novembre', 12:'décembre'
 }
 
-# ─────────────────────────────────────────────
-# STEP 1 — SCAN AND IDENTIFY CSV FILE
-# ─────────────────────────────────────────────
 
 folder    = str(find_dir("monthly_recap") / "suivi vendeur")
 csv_files = glob.glob(os.path.join(folder, "*.csv"))
@@ -56,9 +40,6 @@ for f in csv_files:
 
 assert fichier_suivi, "ERREUR : fichier suivi vendeur introuvable dans monthly_recap/suivi vendeur/"
 
-# ─────────────────────────────────────────────
-# STEP 2 — DETERMINE MONTH AND YEAR
-# ─────────────────────────────────────────────
 
 # Line 2 format: "ANNECY 2,01/03/2026 - 31/03/2026"
 lines        = content.splitlines()
@@ -68,9 +49,6 @@ date_fin     = datetime.strptime(date_fin_str, "%d/%m/%Y")
 mois_str     = MOIS_FR[date_fin.month]
 annee        = date_fin.year
 
-# ─────────────────────────────────────────────
-# STEP 3 — LOCATE REPORT FILE
-# ─────────────────────────────────────────────
 
 rapport_dir  = str(find_dir("Rapport mensuel"))
 rapport_path = os.path.join(rapport_dir, f"rapport mensuel {mois_str} {annee}.md")
@@ -78,9 +56,6 @@ rapport_path = os.path.join(rapport_dir, f"rapport mensuel {mois_str} {annee}.md
 assert os.path.exists(rapport_path), \
     f"ERREUR : Rapport mensuel {mois_str} {annee} introuvable. Lance d'abord /chiffre-mensuel."
 
-# ─────────────────────────────────────────────
-# STEP 4 — EXTRACT RATIOS FROM BLOCS 1, 2 AND 4
-# ─────────────────────────────────────────────
 
 NOM_MAP = {
     'Sandrine': 'SANDRINE R.',
@@ -145,9 +120,6 @@ while i < len(lines) and lines[i].strip():
         vendeurs[nom]['depoll_ratio'] = row[17].strip() if len(row) > 17 else ''
     i += 1
 
-# ─────────────────────────────────────────────
-# STEP 5 — FILL SECTION 5 LS (pure str.replace)
-# ─────────────────────────────────────────────
 # Template column order: Garantie Pneu | Géométrie | VCR | VCF | Plaquette | Dépoll.
 # Template placeholder: |**Sandrine**|%|%|%|%|%|%|
 
@@ -175,9 +147,6 @@ for nom_template, nom_csv in NOM_MAP.items():
 with open(rapport_path, 'w', encoding='utf-8') as fh:
     fh.write(rapport)
 
-# ─────────────────────────────────────────────
-# STEP 6 — CONFIRM
-# ─────────────────────────────────────────────
 
 print(f"✅ Section 5 LS mise à jour : {rapport_path}")
 print()

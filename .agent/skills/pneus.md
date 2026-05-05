@@ -10,22 +10,9 @@ Other triggers: "remplis les pneus hebdo", "analyse les pneus semaine", "mets à
 
 ---
 
-# Skill : Analyse Pneus — Rapport Hebdomadaire Feu Vert Annecy
-
-## Instruction d'exécution
-
-**Exécuter le script Python ci-dessous dans son intégralité.**
-Python remplit les tableaux Pneus avec str.replace par ligne.
-L'IA reçoit uniquement le dict `summary` pour rédiger les Points clés.
-
----
-
 ```python
 import os, glob, csv, pathlib, datetime
 
-# ─────────────────────────────────────────────
-# HELPER
-# ─────────────────────────────────────────────
 
 def find_dir(name):
     for p in [pathlib.Path.cwd()] + list(pathlib.Path.cwd().parents):
@@ -59,9 +46,6 @@ def statut(evo_str):
 def fmt_eur(val):
     return f"{val} €" if val != 'N/A' else 'N/A'
 
-# ─────────────────────────────────────────────
-# STEP 1 — LOCATE FILES
-# ─────────────────────────────────────────────
 
 pneus_folder = str(find_dir("resources") / "Pneus")
 csv_files    = glob.glob(os.path.join(pneus_folder, "Pneus*.csv"))
@@ -72,9 +56,6 @@ rapport_dir = str(find_dir("Rapport hebdomadaire"))
 rapports    = glob.glob(os.path.join(rapport_dir, "rapport hebdomadaire semaine *.md"))
 assert rapports, "ERREUR : aucun rapport hebdomadaire trouvé. Lancer /chiffre d'abord."
 
-# ─────────────────────────────────────────────
-# STEP 2 — PARSE CSV
-# ─────────────────────────────────────────────
 # The CSV has 4 blocks separated by blank lines, each representing a tire season type:
 #   Block 1 (header marque4,  lines 4-18):  ÉTÉ (Summer)
 #   Block 2 (header marque,   lines 20-32): 4 SAISONS (All Season)
@@ -119,7 +100,6 @@ if rapport_path is None:
     print(f"⚠️  Rapport semaine {week_num} non trouvé — utilisation de : {os.path.basename(rapport_path)}")
 
 def find_block_range(lines, col0_value):
-    """Return (header_idx, data_start, data_end) for a block whose first CSV column equals col0_value."""
     for i, line in enumerate(lines):
         if not line.strip():
             continue
@@ -140,7 +120,6 @@ def find_block_range(lines, col0_value):
     return None, None, None
 
 def parse_block(lines, start, end):
-    """Parse one block: return (brand_data, cat_totals) dicts."""
     brand_data = {}   # (cat, brand) -> metrics
     cat_totals = {}   # cat -> metrics
     for line in lines[start:end]:
@@ -203,9 +182,6 @@ g_qty, g_ca, g_marge, g_evo = sum_seasons(
 )
 g_marge_pct = round(g_marge / g_ca * 100, 2) if g_ca else None
 
-# ─────────────────────────────────────────────
-# STEP 3 — FILL TABLES WITH str.replace
-# ─────────────────────────────────────────────
 
 with open(rapport_path, 'r', encoding='utf-8') as fh:
     rapport = fh.read()
@@ -288,9 +264,6 @@ for cat, brands in TEMPLATE_BRANDS.items():
 with open(rapport_path, 'w', encoding='utf-8') as fh:
     fh.write(rapport)
 
-# ─────────────────────────────────────────────
-# STEP 4 — BUILD COMPACT SUMMARY FOR AI
-# ─────────────────────────────────────────────
 
 season_summary = {}
 for saison, ct_dict in [('ÉTÉ', cat_totals_ete), ('4 SAISONS', cat_totals_4s), ('HIVER', cat_totals_hiver)]:
@@ -325,9 +298,6 @@ summary = {
     "alertes_marge":  [{"cat": b['cat'], "brand": b['brand'], "marge_pct": b['marge_pct']} for b in mg_alerts],
 }
 
-# ─────────────────────────────────────────────
-# STEP 5 — CONFIRM
-# ─────────────────────────────────────────────
 
 print(f"✅ Tableaux Pneus mis à jour : {rapport_path}")
 print(f"✅ Semaine {week_num} — période : {period_str}")

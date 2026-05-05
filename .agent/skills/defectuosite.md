@@ -9,23 +9,10 @@ read the CSV yourself. Python does everything.
 
 ---
 
-# Skill : Taux de Défectuosité — Section 5 Atelier Rapport Hebdomadaire Feu Vert Annecy
-
-## Instruction d'exécution
-
-**Exécuter le script Python ci-dessous dans son intégralité.**
-Python fait tout : scan, extraction du bloc synthèse, remplissage Section 5 Atelier.
-L'IA ne lit pas le CSV. L'IA ne mappe pas les colonnes.
-
----
-
 ```python
 import os, glob, csv, io, pathlib
 from datetime import datetime
 
-# ─────────────────────────────────────────────
-# HELPER
-# ─────────────────────────────────────────────
 
 def find_dir(name):
     for p in [pathlib.Path.cwd()] + list(pathlib.Path.cwd().parents):
@@ -34,9 +21,6 @@ def find_dir(name):
             return candidate
     raise FileNotFoundError(f"Cannot find directory '{name}'")
 
-# ─────────────────────────────────────────────
-# STEP 1 — SCAN AND IDENTIFY CSV FILE
-# ─────────────────────────────────────────────
 
 folder    = str(find_dir("resources") / "defectuosite")
 csv_files = glob.glob(os.path.join(folder, "*.csv"))
@@ -51,9 +35,6 @@ for f in csv_files:
 
 assert fichier_def, "ERREUR : fichier défectuosité introuvable dans resources/defectuosite/"
 
-# ─────────────────────────────────────────────
-# STEP 2 — DETERMINE WEEK NUMBER
-# ─────────────────────────────────────────────
 
 # Line format: "ANNECY SEYNOD,16/03/2026,22/03/2026"
 lines = content.split('\n')
@@ -68,9 +49,6 @@ for line in lines:
 
 assert semaine, "ERREUR : date de fin introuvable dans le fichier défectuosité."
 
-# ─────────────────────────────────────────────
-# STEP 3 — LOCATE REPORT FILE
-# ─────────────────────────────────────────────
 
 rapport_dir  = str(find_dir("Rapport hebdomadaire"))
 rapport_path = os.path.join(rapport_dir, f"rapport hebdomadaire semaine {semaine}.md")
@@ -78,9 +56,6 @@ rapport_path = os.path.join(rapport_dir, f"rapport hebdomadaire semaine {semaine
 assert os.path.exists(rapport_path), \
     f"ERREUR : Rapport semaine {semaine} introuvable. Lance d'abord /chiffre."
 
-# ─────────────────────────────────────────────
-# STEP 4 — EXTRACT SYNTHESIS BLOCK
-# ─────────────────────────────────────────────
 # The synthesis block is the LAST block starting with "technicien3".
 # Split on double CRLF, keep the last matching block.
 
@@ -98,9 +73,6 @@ for row in reader:
     nom = row['technicien3'].strip()
     techniciens[nom] = row
 
-# ─────────────────────────────────────────────
-# STEP 5 — FILL SECTION 5 ATELIER (pure str.replace)
-# ─────────────────────────────────────────────
 # Template column order (12 columns including name):
 # Technicien | Nb OR | Déf. Batterie | Disq AV | Disq AR |
 # Plaq Av | Plaq Ar | Def BEG | Déf. VCF (Frein) | Déf. VCR |
@@ -163,9 +135,6 @@ for nom_template, nom_csv in NOM_MAP.items():
 with open(rapport_path, 'w', encoding='utf-8') as fh:
     fh.write(rapport)
 
-# ─────────────────────────────────────────────
-# STEP 6 — CONFIRM
-# ─────────────────────────────────────────────
 
 print(f"✅ Section 5 Atelier mise à jour : {rapport_path}")
 print(f"✅ Techniciens écrits  : {', '.join(written)}")

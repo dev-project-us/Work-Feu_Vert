@@ -8,23 +8,10 @@ Section 5 Atelier of the monthly report. Do NOT interpret or read the CSV yourse
 
 ---
 
-# Skill : Taux de Défectuosité — Section 5 Atelier Rapport Mensuel Feu Vert Annecy
-
-## Instruction d'exécution
-
-**Exécuter le script Python ci-dessous dans son intégralité.**
-Python fait tout : scan, extraction du bloc synthèse, remplissage Section 5 Atelier.
-L'IA ne lit pas le CSV. L'IA ne mappe pas les colonnes.
-
----
-
 ```python
 import os, glob, csv, io, pathlib
 from datetime import datetime
 
-# ─────────────────────────────────────────────
-# HELPER
-# ─────────────────────────────────────────────
 
 def find_dir(name):
     for p in [pathlib.Path.cwd()] + list(pathlib.Path.cwd().parents):
@@ -39,9 +26,6 @@ MOIS_FR = {
     9:'septembre', 10:'octobre', 11:'novembre', 12:'décembre'
 }
 
-# ─────────────────────────────────────────────
-# STEP 1 — SCAN AND IDENTIFY CSV FILE
-# ─────────────────────────────────────────────
 
 folder    = str(find_dir("monthly_recap") / "defectuosite")
 csv_files = glob.glob(os.path.join(folder, "*.csv"))
@@ -56,9 +40,6 @@ for f in csv_files:
 
 assert fichier_def, "ERREUR : fichier défectuosité introuvable dans monthly_recap/defectuosite/"
 
-# ─────────────────────────────────────────────
-# STEP 2 — DETERMINE MONTH AND YEAR
-# ─────────────────────────────────────────────
 
 # Line format: "ANNECY SEYNOD,01/03/2026,31/03/2026"
 lines = content.split('\r\n')
@@ -71,9 +52,6 @@ for line in lines:
         annee        = date_fin.year
         break
 
-# ─────────────────────────────────────────────
-# STEP 3 — LOCATE REPORT FILE
-# ─────────────────────────────────────────────
 
 rapport_dir  = str(find_dir("Rapport mensuel"))
 rapport_path = os.path.join(rapport_dir, f"rapport mensuel {mois_str} {annee}.md")
@@ -81,9 +59,6 @@ rapport_path = os.path.join(rapport_dir, f"rapport mensuel {mois_str} {annee}.md
 assert os.path.exists(rapport_path), \
     f"ERREUR : Rapport mensuel {mois_str} {annee} introuvable. Lance d'abord /chiffre-mensuel."
 
-# ─────────────────────────────────────────────
-# STEP 4 — EXTRACT SYNTHESIS BLOCK
-# ─────────────────────────────────────────────
 
 blocks        = content.split('\r\n\r\n')
 synthese_block = None
@@ -99,9 +74,6 @@ for row in reader:
     nom = row['technicien3'].strip()
     techniciens[nom] = row
 
-# ─────────────────────────────────────────────
-# STEP 5 — FILL SECTION 5 ATELIER (pure str.replace)
-# ─────────────────────────────────────────────
 # Template column order (12 columns including name):
 # Technicien | Nb OR | Déf. Batterie | Disq AV | Disq AR |
 # Plaq Av | Plaq Ar | Def BEG | Déf. VCF (Frein) | Déf. VCR |
@@ -157,9 +129,6 @@ for nom_template, nom_csv in NOM_MAP.items():
 with open(rapport_path, 'w', encoding='utf-8') as fh:
     fh.write(rapport)
 
-# ─────────────────────────────────────────────
-# STEP 6 — CONFIRM
-# ─────────────────────────────────────────────
 
 print(f"✅ Section 5 Atelier mise à jour : {rapport_path}")
 print(f"✅ Techniciens écrits  : {', '.join(written)}")
