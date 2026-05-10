@@ -1,0 +1,14 @@
+[theme]
+base            = "dark"
+primaryColor    = "#78BE20"        # Feu Vert signature lime green
+backgroundColor = "#111827"        # Near-black with cool tint
+secondaryBackgroundColor = "#1f2937"  # Card surfaces
+textColor       = "#f3f4f6"        # Near-white
+
+[server]
+port            = 8501
+headless        = true
+enableCORS      = false
+
+[browser]
+gatherUsageStats = false
