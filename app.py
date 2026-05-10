@@ -414,6 +414,68 @@ def _kpi_strip(g: dict, ls: dict, at: dict) -> str:
     ])
     return f'<section class="kpi-strip">{cards}</section>'
 
+def _ls_kpi_strip(ls: dict) -> str:
+    def card(label, sublabel, value, dv, dlabel, trend):
+        arrow = "↑" if trend == "up" else "↓" if trend == "down" else "→"
+        return (f'<div class="kpi-card">'
+                f'<span class="kpi-label">{_e(label)}</span>'
+                f'<p class="kpi-sublabel">{sublabel}</p>'
+                f'<div class="kpi-value-row">'
+                f'<span class="kpi-value">{value}</span>'
+                f'<span class="kpi-delta {_dcls(dv)}">{arrow} {_e(dlabel)}</span>'
+                f'</div>{_spark(trend)}</div>')
+
+    cards = "".join([
+        card("CA Libre Service",
+             f"obj. {_eur(ls.get('ca_obj'))}",
+             _eur(ls.get("ca")),
+             ls.get("ca_evo"), _pct(ls.get("ca_evo"), True) + " vs N-1", "up"),
+        card("Marge LS",
+             f"obj. {_pct(ls.get('marge_obj'))}",
+             _pct(ls.get("marge")),
+             ls.get("marge_evo"), _pct(ls.get("marge_evo"), True) + " pts vs N-1", "up"),
+        card("Fréquentation LS",
+             f"N-1&nbsp;: {ls.get('freq_n1','—')} clients",
+             str(ls.get("freq") or "—"),
+             ls.get("freq_evo"), _pct(ls.get("freq_evo"), True) + " vs N-1", "up"),
+        card("Panier Moyen LS",
+             f"N-1&nbsp;: {_eur(ls.get('panier_n1'),1)}",
+             _eur(ls.get("panier"), 1) if ls.get("panier") else "—",
+             ls.get("panier_evo"), _pct(ls.get("panier_evo"), True) + " vs N-1", "down"),
+    ])
+    return f'<section class="kpi-strip">{cards}</section>'
+
+def _at_kpi_strip(at: dict) -> str:
+    def card(label, sublabel, value, dv, dlabel, trend):
+        arrow = "↑" if trend == "up" else "↓" if trend == "down" else "→"
+        return (f'<div class="kpi-card">'
+                f'<span class="kpi-label">{_e(label)}</span>'
+                f'<p class="kpi-sublabel">{sublabel}</p>'
+                f'<div class="kpi-value-row">'
+                f'<span class="kpi-value">{value}</span>'
+                f'<span class="kpi-delta {_dcls(dv)}">{arrow} {_e(dlabel)}</span>'
+                f'</div>{_spark(trend)}</div>')
+
+    cards = "".join([
+        card("CA Atelier",
+             f"obj. {_eur(at.get('ca_obj'))}",
+             _eur(at.get("ca")),
+             at.get("ca_evo"), _pct(at.get("ca_evo"), True) + " vs N-1", "up"),
+        card("Marge Atelier",
+             f"obj. {_pct(at.get('marge_obj'))}",
+             _pct(at.get("marge")),
+             at.get("marge_evo"), _pct(at.get("marge_evo"), True) + " pts vs N-1", "up"),
+        card("Nombre d'OR",
+             f"N-1&nbsp;: {at.get('nb_or_n1','—')}",
+             str(at.get("nb_or") or "—"),
+             at.get("nb_or_evo"), _pct(at.get("nb_or_evo"), True) + " vs N-1", "up"),
+        card("Panier Moyen Atelier",
+             f"N-1&nbsp;: {_eur(at.get('panier_n1'),1)}",
+             _eur(at.get("panier"), 1) if at.get("panier") else "—",
+             at.get("panier_evo"), _pct(at.get("panier_evo"), True) + " vs N-1", "up"),
+    ])
+    return f'<section class="kpi-strip">{cards}</section>'
+
 
 def _familles_html(fam_data: dict) -> str:
     if not fam_data.get("available"):
@@ -797,7 +859,7 @@ def _wrap(body: str) -> str:
             f'{_CSS}</head><body>{body}{_AUTOHEIGHT}</body></html>')
 
 
-def build_weekly_html(data: dict) -> str:
+def build_global_html(data: dict) -> str:
     kpis = data["kpis"]
     w    = kpis.get("week_num") or "?"
     p    = kpis.get("period") or (None, None)
@@ -805,23 +867,70 @@ def build_weekly_html(data: dict) -> str:
     ps   = (f"{p[0].strftime('%d/%m')} – {p[1].strftime('%d/%m/%Y')}"
             if p[0] and p[1] else "—")
 
-    if False: # Force render for mockup testing
-        pass
-    else:
-        g  = kpis.get("global", {})
-        ls = kpis.get("ls", {})
-        at = kpis.get("atelier", {})
-        body = (f'<div class="dashboard">'
-                f'{_header(wl, ps)}'
-                f'{_kpi_strip(g, ls, at)}'
-                f'<main class="main-content">'
-                f'{_retention_html()}'
-                f'{_leaderboard_html()}'
-                f'</main>'
-                f'<aside class="sidebar">'
-                f'{_charts_html()}'
-                f'{_heatmap_html()}'
-                f'</aside></div>')
+    g  = kpis.get("global", {})
+    ls = kpis.get("ls", {})
+    at = kpis.get("atelier", {})
+    body = (f'<div class="dashboard">'
+            f'{_header(wl, ps)}'
+            f'{_kpi_strip(g, ls, at)}'
+            f'<main class="main-content">'
+            f'{_retention_html()}'
+            f'{_leaderboard_html()}'
+            f'</main>'
+            f'<aside class="sidebar">'
+            f'{_charts_html()}'
+            f'{_heatmap_html()}'
+            f'</aside></div>')
+    return _wrap(body)
+
+def build_ls_html(data: dict) -> str:
+    kpis = data["kpis"]
+    w    = kpis.get("week_num") or "?"
+    p    = kpis.get("period") or (None, None)
+    wl   = f"S{w}"
+    ps   = (f"{p[0].strftime('%d/%m')} – {p[1].strftime('%d/%m/%Y')}"
+            if p[0] and p[1] else "—")
+
+    g  = kpis.get("global", {})
+    ls = kpis.get("ls", {})
+    at = kpis.get("atelier", {})
+
+    body = (f'<div class="dashboard">'
+            f'{_header(wl, ps)}'
+            f'{_ls_kpi_strip(ls)}'
+            f'<main class="main-content">'
+            f'{_familles_html(data["fam"])}'
+            f'{_pneus_html(data["tires"], w)}'
+            f'</main>'
+            f'<aside class="sidebar">'
+            f'{_staff_html(data["vendors"], w)}'
+            f'{_actions_html(data["fam"], data["ratios"])}'
+            f'</aside></div>')
+    return _wrap(body)
+
+def build_atelier_html(data: dict) -> str:
+    kpis = data["kpis"]
+    w    = kpis.get("week_num") or "?"
+    p    = kpis.get("period") or (None, None)
+    wl   = f"S{w}"
+    ps   = (f"{p[0].strftime('%d/%m')} – {p[1].strftime('%d/%m/%Y')}"
+            if p[0] and p[1] else "—")
+
+    g  = kpis.get("global", {})
+    ls = kpis.get("ls", {})
+    at = kpis.get("atelier", {})
+
+    body = (f'<div class="dashboard">'
+            f'{_header(wl, ps)}'
+            f'{_at_kpi_strip(at)}'
+            f'<main class="main-content">'
+            f'{_raf_html(kpis)}'
+            f'{_ratios_html(data["ratios"], w)}'
+            f'</main>'
+            f'<aside class="sidebar">'
+            f'{_staff_html(data["vendors"], w)}'
+            f'{_actions_html(data["fam"], data["ratios"])}'
+            f'</aside></div>')
     return _wrap(body)
 
 
@@ -932,7 +1041,13 @@ def _render(html: str, height: int) -> None:
         _cv1.html(html, height=height, scrolling=False)
 
 with tab1:
-    _render(build_weekly_html(data), height=2400)
+    sub_global, sub_ls, sub_atelier = st.tabs(["🌍 Global", "🛒 Libre Service", "🔧 Atelier"])
+    with sub_global:
+        _render(build_global_html(data), height=2400)
+    with sub_ls:
+        _render(build_ls_html(data), height=2400)
+    with sub_atelier:
+        _render(build_atelier_html(data), height=2400)
 
 with tab2:
     _render(build_monthly_html(data), height=1100)
