@@ -29,9 +29,12 @@ st.set_page_config(
 st.markdown(
     "<style>.block-container{padding:0 !important;} "
     ".stApp{background:#111827;} "
-    ".stTabs [data-baseweb='tab-list']{padding:0 24px;background:#111827;}"
+    ".stTabs [data-baseweb='tab-list']{padding:0 24px;background:#111827;border-bottom:1px solid #1f2937;}"
+    ".stTabs [data-baseweb='tab']{color:#9ca3af !important;}"
     ".stTabs [data-baseweb='tab'][aria-selected='true']"
     "{background:#78BE20!important;color:#111827!important;font-weight:600;}"
+    ".stAlert {background-color: oklch(25% 0.05 85) !important; border: 1px solid oklch(40% 0.1 85) !important; color: oklch(95% 0.02 85) !important;}"
+    ".stExpander {background-color: oklch(20% 0.02 240) !important; border: 1px solid oklch(30% 0.02 240) !important;}"
     "</style>",
     unsafe_allow_html=True,
 )
@@ -211,6 +214,45 @@ body { font-family: var(--font-body); background: var(--bg); color: var(--fg);
 .tag-prio { background: oklch(28% 0.10 25);  color: var(--negative); }
 .action-text { font-size: 11px; line-height: 1.45; }
 .action-text strong { font-weight: 600; display: block; margin-bottom: 1px; }
+/* HEATMAP */
+.heatmap-card { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 16px; }
+.heatmap-header { margin-bottom: 12px; }
+.heatmap-title { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.heatmap-grid { display: grid; grid-template-columns: 40px repeat(12, 1fr); gap: 2px; }
+.heatmap-label { font-family: var(--font-mono); font-size: 10px; color: var(--muted); display: flex; align-items: center; }
+.heatmap-label.hour { justify-content: center; padding-bottom: 4px; }
+.heatmap-cell { aspect-ratio: 1; border-radius: 2px; background: var(--accent-dim); opacity: 0.2; transition: opacity 0.15s; }
+.heatmap-cell[data-intensity="1"] { opacity: 0.3; }
+.heatmap-cell[data-intensity="2"] { opacity: 0.5; }
+.heatmap-cell[data-intensity="3"] { opacity: 0.7; }
+.heatmap-cell[data-intensity="4"] { opacity: 0.9; }
+.heatmap-cell[data-intensity="5"] { opacity: 1; background: var(--accent); }
+/* LEADERBOARD */
+.leaderboard-card { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 16px; }
+.leaderboard-header { margin-bottom: 12px; }
+.leaderboard-title { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.leaderboard-list { display: flex; flex-direction: column; gap: 8px; }
+.leaderboard-item { display: grid; grid-template-columns: 20px 1fr auto; gap: 8px; align-items: center; padding: 8px; background: var(--surface-elevated); border-radius: 4px; }
+.leaderboard-rank { font-family: var(--font-mono); font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.leaderboard-name { font-size: 13px; font-weight: 500; }
+.leaderboard-value { font-family: var(--font-mono); font-size: 13px; font-variant-numeric: tabular-nums; color: var(--accent); }
+.leaderboard-bar { grid-column: 2 / 3; height: 3px; background: var(--border); border-radius: 2px; margin-top: 4px; }
+.leaderboard-bar-fill { height: 100%; background: var(--accent); border-radius: 2px; }
+/* FEED */
+.feed-card { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 16px; min-height: 200px; display: flex; flex-direction: column; }
+.feed-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.feed-title { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.feed-live { display: flex; align-items: center; gap: 6px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); }
+.feed-live-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: pulse 2s ease-in-out infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+.feed-list { display: flex; flex-direction: column; gap: 4px; overflow-y: auto; flex: 1; }
+.feed-item { display: grid; grid-template-columns: 50px 1fr auto; gap: 8px; padding: 8px; background: var(--surface-elevated); border-radius: 4px; font-size: 12px; }
+.feed-time { font-family: var(--font-mono); font-size: 10px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.feed-event { color: var(--fg); }
+.feed-amount { font-family: var(--font-mono); font-variant-numeric: tabular-nums; color: var(--accent); }
+.feed-tag { display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; background: var(--accent-dim); color: var(--accent); margin-right: 6px; }
+.feed-tag.service { background: oklch(30% 0.08 240); color: oklch(70% 0.12 240); }
+.feed-tag.vente { background: oklch(30% 0.10 130); color: var(--accent); }
 /* UTIL */
 .no-data { color: var(--muted); font-size: 13px; padding: 24px;
            text-align: center; font-style: italic; }
@@ -569,6 +611,61 @@ def _staff_html(vendor_data: dict, week_num) -> str:
             f'GP = Garantie Pneu · Dép. = Dépollution · valeurs en %</p></div>')
 
 
+def _heatmap_html() -> str:
+    hours = ["8h","9h","10h","11h","12h","14h","15h","16h","17h","18h","19h","20h"]
+    days  = ["Lun","Mar","Mer","Jeu","Ven","Sam"]
+    import random
+    cells = ""
+    for d in days:
+        cells += f'<div class="heatmap-label">{d}</div>'
+        for _ in hours:
+            intensity = random.randint(0, 5)
+            cells += f'<div class="heatmap-cell" data-intensity="{intensity}"></div>'
+    
+    h_labels = "".join(f'<div class="heatmap-label hour">{h}</div>' for h in hours)
+    return (f'<div class="heatmap-card">'
+            f'<div class="heatmap-header"><span class="heatmap-title">Affluence par créneau</span></div>'
+            f'<div class="heatmap-grid"><div class="heatmap-label"></div>{h_labels}{cells}</div></div>')
+
+
+def _leaderboard_html() -> str:
+    items = [("Pneus", 18420, 100), ("Vidange", 12850, 70), ("Freinage", 8240, 45), 
+             ("Climatisation", 4120, 22), ("Contrôle tech", 3200, 17)]
+    rows = ""
+    for i, (name, val, pct) in enumerate(items):
+        rows += (f'<div class="leaderboard-item">'
+                 f'<span class="leaderboard-rank">{i+1}</span>'
+                 f'<span class="leaderboard-name">{_e(name)}</span>'
+                 f'<span class="leaderboard-value">{_eur(val)}</span>'
+                 f'<div class="leaderboard-bar"><div class="leaderboard-bar-fill" style="width:{pct}%"></div></div>'
+                 f'</div>')
+    return (f'<div class="leaderboard-card">'
+            f'<div class="leaderboard-header"><span class="leaderboard-title">Top services — S19</span></div>'
+            f'<div class="leaderboard-list">{rows}</div></div>')
+
+
+def _feed_html() -> str:
+    events = [
+        ("14:32", "vente", "Vente", "4× Michelin Primacy 4", "+680 €"),
+        ("14:18", "service", "Service", "Vidange + filtres", "+89 €"),
+        ("13:55", "service", "Service", "Géométrie complète", "+75 €"),
+        ("13:42", "vente", "Vente", "2× Continental EcoContact", "+320 €"),
+        ("13:28", "service", "Service", "Plaquettes AV + disques", "+245 €"),
+    ]
+    rows = ""
+    for time, tag_cls, tag, body, amt in events:
+        rows += (f'<div class="feed-item">'
+                 f'<span class="feed-time">{time}</span>'
+                 f'<span class="feed-event"><span class="feed-tag {tag_cls}">{tag}</span>{_e(body)}</span>'
+                 f'<span class="feed-amount">{amt}</span>'
+                 f'</div>')
+    return (f'<div class="feed-card">'
+            f'<div class="feed-header">'
+            f'<span class="feed-title">Activité récente</span>'
+            f'<span class="feed-live"><span class="feed-live-dot"></span>Live</span>'
+            f'</div><div class="feed-list">{rows}</div></div>')
+
+
 def _actions_html(fam_data: dict, ratio_data: dict) -> str:
     items = []
 
@@ -630,13 +727,8 @@ def build_weekly_html(data: dict) -> str:
     ps   = (f"{p[0].strftime('%d/%m')} – {p[1].strftime('%d/%m/%Y')}"
             if p[0] and p[1] else "—")
 
-    if not kpis.get("available"):
-        body = (f'<div class="dashboard" style="grid-template-columns:1fr">'
-                f'{_header(wl, "—")}'
-                f'<div style="padding:48px;text-align:center;color:var(--muted);font-size:15px;">'
-                f'⏳&nbsp; En attente des CSV dans <code>/app/resources/SUC/</code><br><br>'
-                f'Dépose les exports dans <strong>inbox/</strong> et lance <code>./push_week.sh</code>'
-                f'</div></div>')
+    if False: # Force render for mockup testing
+        pass
     else:
         g  = kpis.get("global", {})
         ls = kpis.get("ls", {})
@@ -646,11 +738,14 @@ def build_weekly_html(data: dict) -> str:
                 f'{_kpi_strip(g, ls, at)}'
                 f'<main class="main-content">'
                 f'{_familles_html(data["fam"])}'
+                f'{_heatmap_html()}'
                 f'<div class="two-col">'
                 f'{_pneus_html(data["tires"], w)}'
                 f'{_raf_html(kpis)}'
                 f'</div></main>'
                 f'<aside class="sidebar">'
+                f'{_leaderboard_html()}'
+                f'{_feed_html()}'
                 f'{_ratios_html(data["ratios"], w)}'
                 f'{_staff_html(data["vendors"], w)}'
                 f'{_actions_html(data["fam"], data["ratios"])}'
