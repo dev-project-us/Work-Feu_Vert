@@ -214,6 +214,35 @@ body { font-family: var(--font-body); background: var(--bg); color: var(--fg);
 .tag-prio { background: oklch(28% 0.10 25);  color: var(--negative); }
 .action-text { font-size: 11px; line-height: 1.45; }
 .action-text strong { font-weight: 600; display: block; margin-bottom: 1px; }
+
+/* CHARTS */
+.chart-stack { display: flex; flex-direction: column; gap: 16px; }
+.chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 16px; }
+.chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.chart-title { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.chart-legend { display: flex; gap: 16px; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); }
+.legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+.chart-area { height: 140px; position: relative; display: flex; align-items: flex-end; }
+.chart-svg { width: 100%; height: 100%; }
+.chart-grid-line { stroke: var(--border); stroke-width: 1; }
+.chart-line { fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.chart-line.primary { stroke: var(--accent); }
+.chart-line.secondary { stroke: var(--muted); }
+.chart-area-fill { opacity: 0.15; }
+.chart-area-fill.primary { fill: var(--accent); }
+
+/* RETENTION GRID */
+.retention-card { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 16px; }
+.retention-header { margin-bottom: 12px; }
+.retention-title { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.retention-grid { display: grid; grid-template-columns: 60px repeat(4, 1fr); gap: 2px; font-family: var(--font-mono); font-size: 10px; font-variant-numeric: tabular-nums; }
+.retention-label { color: var(--muted); display: flex; align-items: center; }
+.retention-label.header { justify-content: center; padding-bottom: 4px; }
+.retention-cell { background: var(--accent-dim); padding: 6px 4px; text-align: center; border-radius: 2px; color: var(--fg); }
+.retention-cell[data-value="high"] { background: var(--accent); color: var(--bg); }
+.retention-cell[data-value="medium"] { background: oklch(50% 0.14 130); }
+.retention-cell[data-value="low"] { background: oklch(35% 0.10 130); }
 /* HEATMAP */
 .heatmap-card { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 16px; }
 .heatmap-header { margin-bottom: 12px; }
@@ -611,6 +640,55 @@ def _staff_html(vendor_data: dict, week_num) -> str:
             f'GP = Garantie Pneu · Dép. = Dépollution · valeurs en %</p></div>')
 
 
+def _charts_html() -> str:
+    return (
+        f'<div class="chart-stack" data-od-id="charts">'
+        f'<div class="chart-card">'
+        f'<div class="chart-header">'
+        f'<span class="chart-title">Évolution CA hebdomadaire</span>'
+        f'<div class="chart-legend">'
+        f'<div class="legend-item"><span class="legend-dot" style="background: var(--accent)"></span><span>2025</span></div>'
+        f'<div class="legend-item"><span class="legend-dot" style="background: var(--muted)"></span><span>2024</span></div>'
+        f'</div></div>'
+        f'<div class="chart-area"><svg class="chart-svg" viewBox="0 0 600 140" preserveAspectRatio="none">'
+        f'<line class="chart-grid-line" x1="0" y1="35" x2="600" y2="35"/>'
+        f'<line class="chart-grid-line" x1="0" y1="70" x2="600" y2="70"/>'
+        f'<line class="chart-grid-line" x1="0" y1="105" x2="600" y2="105"/>'
+        f'<path class="chart-area-fill primary" d="M0,100 L50,95 L100,85 L150,90 L200,70 L250,65 L300,55 L350,60 L400,45 L450,40 L500,35 L550,30 L600,25 L600,140 L0,140 Z"/>'
+        f'<path class="chart-line primary" d="M0,100 L50,95 L100,85 L150,90 L200,70 L250,65 L300,55 L350,60 L400,45 L450,40 L500,35 L550,30 L600,25"/>'
+        f'<path class="chart-line secondary" d="M0,110 L50,105 L100,100 L150,105 L200,95 L250,90 L300,85 L350,90 L400,80 L450,75 L500,70 L550,65 L600,60"/>'
+        f'</svg></div></div>'
+        f'<div class="chart-card">'
+        f'<div class="chart-header">'
+        f'<span class="chart-title">Volume d\'interventions</span>'
+        f'<div class="chart-legend">'
+        f'<div class="legend-item"><span class="legend-dot" style="background: var(--accent)"></span><span>Réalisé</span></div>'
+        f'<div class="legend-item"><span class="legend-dot" style="background: var(--muted)"></span><span>Objectif</span></div>'
+        f'</div></div>'
+        f'<div class="chart-area"><svg class="chart-svg" viewBox="0 0 600 140" preserveAspectRatio="none">'
+        f'<line class="chart-grid-line" x1="0" y1="35" x2="600" y2="35"/>'
+        f'<line class="chart-grid-line" x1="0" y1="70" x2="600" y2="70"/>'
+        f'<line class="chart-grid-line" x1="0" y1="105" x2="600" y2="105"/>'
+        f'<path class="chart-area-fill primary" d="M0,95 L50,90 L100,80 L150,85 L200,75 L250,70 L300,60 L350,55 L400,50 L450,45 L500,40 L550,35 L600,30 L600,140 L0,140 Z"/>'
+        f'<path class="chart-line primary" d="M0,95 L50,90 L100,80 L150,85 L200,75 L250,70 L300,60 L350,55 L400,50 L450,45 L500,40 L550,35 L600,30"/>'
+        f'<path class="chart-line secondary" d="M0,85 L50,85 L100,85 L150,85 L200,85 L250,85 L300,85 L350,85 L400,85 L450,85 L500,85 L550,85 L600,85" stroke-dasharray="4 4"/>'
+        f'</svg></div></div></div>'
+    )
+
+def _retention_html() -> str:
+    return (
+        f'<div class="retention-card" data-od-id="retention">'
+        f'<div class="retention-header"><span class="retention-title">Rétention clients</span></div>'
+        f'<div class="retention-grid">'
+        f'<div class="retention-label"></div><div class="retention-label header">M1</div><div class="retention-label header">M3</div><div class="retention-label header">M6</div><div class="retention-label header">M12</div>'
+        f'<div class="retention-label">Jan</div><div class="retention-cell" data-value="high">92%</div><div class="retention-cell" data-value="high">78%</div><div class="retention-cell" data-value="medium">54%</div><div class="retention-cell" data-value="low">32%</div>'
+        f'<div class="retention-label">Fév</div><div class="retention-cell" data-value="high">88%</div><div class="retention-cell" data-value="high">72%</div><div class="retention-cell" data-value="medium">48%</div><div class="retention-cell" data-value="low">—</div>'
+        f'<div class="retention-label">Mar</div><div class="retention-cell" data-value="high">90%</div><div class="retention-cell" data-value="medium">68%</div><div class="retention-cell" data-value="low">—</div><div class="retention-cell" data-value="low">—</div>'
+        f'<div class="retention-label">Avr</div><div class="retention-cell" data-value="high">85%</div><div class="retention-cell" data-value="low">—</div><div class="retention-cell" data-value="low">—</div><div class="retention-cell" data-value="low">—</div>'
+        f'<div class="retention-label">Mai</div><div class="retention-cell" data-value="high">91%</div><div class="retention-cell" data-value="low">—</div><div class="retention-cell" data-value="low">—</div><div class="retention-cell" data-value="low">—</div>'
+        f'</div></div>'
+    )
+
 def _heatmap_html() -> str:
     hours = ["8h","9h","10h","11h","12h","14h","15h","16h","17h","18h","19h","20h"]
     days  = ["Lun","Mar","Mer","Jeu","Ven","Sam"]
@@ -737,18 +815,12 @@ def build_weekly_html(data: dict) -> str:
                 f'{_header(wl, ps)}'
                 f'{_kpi_strip(g, ls, at)}'
                 f'<main class="main-content">'
-                f'{_familles_html(data["fam"])}'
-                f'{_heatmap_html()}'
-                f'<div class="two-col">'
-                f'{_pneus_html(data["tires"], w)}'
-                f'{_raf_html(kpis)}'
-                f'</div></main>'
-                f'<aside class="sidebar">'
+                f'{_retention_html()}'
                 f'{_leaderboard_html()}'
-                f'{_feed_html()}'
-                f'{_ratios_html(data["ratios"], w)}'
-                f'{_staff_html(data["vendors"], w)}'
-                f'{_actions_html(data["fam"], data["ratios"])}'
+                f'</main>'
+                f'<aside class="sidebar">'
+                f'{_charts_html()}'
+                f'{_heatmap_html()}'
                 f'</aside></div>')
     return _wrap(body)
 
