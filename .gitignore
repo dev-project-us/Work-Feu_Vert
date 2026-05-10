@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+*.egg
+
+# Streamlit cache
+.streamlit/cache/
+
+# Inbox — temporary drop zone, never committed
+# (files are moved to data/weeks/ by push_week.py)
+inbox/*.csv
+inbox/*.CSV
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Docker build cache
+*.dockerignore
+
+# Secrets — never commit these
+.env
+*.pem
+*.key

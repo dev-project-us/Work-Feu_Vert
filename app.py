@@ -1,84 +1,725 @@
 """
 app.py — Feu Vert Annecy · Live Dashboard
 ────────────────────────────────────────────────────────────────────────────
-Entry point for the Streamlit application.
+Renders the custom index.html design, populated with live engine data.
 
-Architecture:
-  • All CSV parsing is in engine/ modules (no Streamlit imports there).
-  • This file handles only UI rendering.
-  • @st.cache_data(ttl=300) refreshes data every 5 minutes automatically.
-
-Run locally:  streamlit run app.py
-In Docker:    docker-compose up  (see docker-compose.yml)
+Strategy:
+  • st.components.v1.html() creates an isolated iframe → full CSS control,
+    zero conflict with Streamlit's own styles.
+  • All HTML/CSS is generated in Python; engine/ modules stay pure data.
+  • Auto-height JS resizes the iframe to fit content automatically.
 """
-
 from __future__ import annotations
 
-import pandas as pd
-import plotly.express as px
+import html as _html
 import streamlit as st
 
-# ── Page config (must be first Streamlit call) ───────────────────────────────
+from engine import defects, families, global_stats, ratios, tires, vendor_ratios
+from engine.utils import QUARTERLY_DIR
+
+# ── Page config ───────────────────────────────────────────────────────────────
 st.set_page_config(
-    page_title="Feu Vert Annecy — Dashboard",
+    page_title="Feu Vert Annecy",
     page_icon="🟢",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
 
-# ── Engine imports ────────────────────────────────────────────────────────────
-from engine import defects, families, global_stats, ratios, tires, vendor_ratios
-from engine.utils import QUARTERLY_DIR, fmt_eur, fmt_pct, status_from_evo
-
-# ── Global CSS overrides (complement .streamlit/config.toml) ─────────────────
+# Remove Streamlit chrome so the iframe fills cleanly
 st.markdown(
-    """
-    <style>
-    /* Hide default Streamlit top bar padding */
-    .block-container { padding-top: 1.5rem; }
-
-    /* Metric cards — accent the delta color */
-    [data-testid="stMetricDelta"] svg { display: none; }
-    [data-testid="stMetricValue"] { font-family: 'JetBrains Mono', monospace; }
-
-    /* Tabs — active tab uses accent green */
-    .stTabs [data-baseweb="tab-list"] { gap: 4px; }
-    .stTabs [data-baseweb="tab"][aria-selected="true"] {
-        background-color: #78BE20 !important;
-        color: #111827 !important;
-        font-weight: 600;
-    }
-    .stTabs [data-baseweb="tab"] { border-radius: 4px !important; }
-
-    /* DataFrames — compact header */
-    thead tr th { font-size: 12px !important; white-space: nowrap; }
-    tbody tr td { font-size: 12px !important; }
-
-    /* Section titles */
-    .section-title {
-        font-size: 13px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: .08em;
-        color: #9ca3af;
-        margin-bottom: .5rem;
-    }
-
-    /* Progress bar label container */
-    .raf-item { margin-bottom: .6rem; }
-    .raf-label {
-        display: flex;
-        justify-content: space-between;
-        font-size: 12px;
-        margin-bottom: 2px;
-    }
-    </style>
-    """,
+    "<style>.block-container{padding:0 !important;} "
+    ".stApp{background:#111827;} "
+    ".stTabs [data-baseweb='tab-list']{padding:0 24px;background:#111827;}"
+    ".stTabs [data-baseweb='tab'][aria-selected='true']"
+    "{background:#78BE20!important;color:#111827!important;font-weight:600;}"
+    "</style>",
     unsafe_allow_html=True,
 )
 
 
-# ── Data loading (cached for 5 minutes) ─────────────────────────────────────
+# ════════════════════════════════════════════════════════════════════════════
+# CSS — verbatim from index.html  +  Google Fonts
+# ════════════════════════════════════════════════════════════════════════════
+_CSS = """
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:               oklch(15% 0.015 240);
+  --surface:          oklch(20% 0.012 240);
+  --surface-elevated: oklch(24% 0.010 240);
+  --border:           oklch(30% 0.010 240);
+  --border-subtle:    oklch(22% 0.010 240);
+  --fg:               oklch(95% 0.005 240);
+  --muted:            oklch(65% 0.010 240);
+  --accent:           oklch(72% 0.20 130);
+  --accent-dim:       oklch(40% 0.12 130);
+  --positive:         oklch(72% 0.20 130);
+  --negative:         oklch(65% 0.20 25);
+  --warning:          oklch(75% 0.18 85);
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-body); background: var(--bg); color: var(--fg);
+       line-height: 1.5; font-size: 14px; }
+.dashboard { display: grid; grid-template-columns: 1fr 320px;
+             grid-template-rows: auto auto 1fr; gap: 16px;
+             padding: 24px; max-width: 1600px; margin: 0 auto; }
+/* HEADER */
+.header { grid-column: 1 / -1; display: flex; align-items: center;
+          justify-content: space-between; padding-bottom: 16px;
+          border-bottom: 1px solid var(--border); }
+.header-left { display: flex; align-items: center; gap: 16px; }
+.logo { width: 40px; height: 40px; background: var(--accent); border-radius: 6px;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 700; font-size: 18px; color: var(--bg); }
+.header-title  { font-size: 20px; font-weight: 600; letter-spacing: -0.02em; }
+.header-subtitle { font-size: 13px; color: var(--muted); font-family: var(--font-mono); }
+.week-badge { background: var(--surface); padding: 8px 16px; border-radius: 6px;
+              border: 1px solid var(--border); font-family: var(--font-mono); font-size: 13px; }
+/* KPI STRIP */
+.kpi-strip { grid-column: 1 / -1; display: grid;
+             grid-template-columns: repeat(6, 1fr); gap: 12px; }
+.kpi-card { background: var(--surface); border: 1px solid var(--border);
+            border-radius: 6px; padding: 16px;
+            display: flex; flex-direction: column; gap: 6px; }
+.kpi-label { font-size: 11px; text-transform: uppercase; letter-spacing: .08em;
+             color: var(--muted); font-weight: 500; }
+.kpi-sublabel { font-size: 10px; color: var(--muted); font-family: var(--font-mono); }
+.kpi-value-row { display: flex; align-items: baseline; gap: 10px; }
+.kpi-value { font-family: var(--font-mono); font-size: 24px; font-weight: 600;
+             font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+.kpi-delta { font-family: var(--font-mono); font-size: 11px; font-variant-numeric: tabular-nums; }
+.kpi-delta.pos  { color: var(--positive); }
+.kpi-delta.neg  { color: var(--negative); }
+.kpi-delta.warn { color: var(--warning);  }
+.kpi-sparkline { height: 20px; display: flex; align-items: flex-end; gap: 2px; margin-top: 2px; }
+.spark-bar     { flex: 1; background: var(--accent-dim); border-radius: 1px; }
+.spark-bar.cur { background: var(--accent); }
+/* LAYOUT */
+.main-content { display: flex; flex-direction: column; gap: 16px; }
+.card { background: var(--surface); border: 1px solid var(--border);
+        border-radius: 6px; padding: 16px; }
+.card-header { display: flex; justify-content: space-between; align-items: center;
+               margin-bottom: 14px; }
+.card-title { font-size: 13px; font-weight: 600; text-transform: uppercase;
+              letter-spacing: .06em; color: var(--muted); }
+.card-meta { font-size: 11px; color: var(--muted); font-family: var(--font-mono); }
+/* FAMILLES */
+.famille-header-row { display: grid; grid-template-columns: 140px 1fr 80px 58px;
+                      gap: 10px; padding-bottom: 6px; margin-bottom: 2px;
+                      border-bottom: 1px solid var(--border); }
+.col-label { font-size: 10px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.famille-item { display: grid; grid-template-columns: 140px 1fr 80px 58px;
+                gap: 10px; align-items: center;
+                padding: 5px 0; border-bottom: 1px solid var(--border-subtle); }
+.famille-item:last-child { border-bottom: none; }
+.famille-name { font-size: 12px; font-weight: 500; white-space: nowrap;
+                overflow: hidden; text-overflow: ellipsis; }
+.bar-track { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+.bar-fill  { height: 100%; border-radius: 4px; }
+.bar-green  { background: var(--accent); }
+.bar-red    { background: var(--negative); }
+.bar-orange { background: var(--warning); }
+.famille-ca { font-family: var(--font-mono); font-size: 12px;
+              font-variant-numeric: tabular-nums; text-align: right; }
+.evo-badge { font-family: var(--font-mono); font-size: 10px; font-variant-numeric: tabular-nums;
+             padding: 2px 5px; border-radius: 3px; text-align: center; white-space: nowrap; }
+.evo-up   { background: oklch(22% 0.08 130); color: var(--positive); }
+.evo-down { background: oklch(22% 0.08 25);  color: var(--negative); }
+/* TWO COL */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+/* PNEUS */
+.saison-list { display: flex; flex-direction: column; gap: 8px; }
+.saison-row { display: grid; grid-template-columns: 76px 1fr auto; gap: 12px;
+              align-items: center; background: var(--surface-elevated);
+              border-radius: 4px; padding: 10px 12px; }
+.saison-name { font-size: 12px; font-weight: 600; }
+.ete   { color: var(--warning); }
+.qs    { color: var(--accent); }
+.hiver { color: oklch(70% 0.12 220); }
+.saison-stats { display: flex; gap: 18px; }
+.s-stat { display: flex; flex-direction: column; gap: 1px; }
+.s-val  { font-family: var(--font-mono); font-size: 14px; font-weight: 600;
+          font-variant-numeric: tabular-nums; }
+.s-lbl  { font-size: 10px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.pneus-cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 10px; }
+.pneu-cat { background: var(--surface-elevated); border-radius: 4px; padding: 8px 10px; }
+.pneu-cat-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: .05em;
+                color: var(--muted); margin-bottom: 3px; }
+.pneu-cat-val { font-family: var(--font-mono); font-size: 16px; font-weight: 600; }
+.pneu-cat-sub { font-family: var(--font-mono); font-size: 10px; color: var(--muted); }
+/* RAF */
+.obj-list { display: flex; flex-direction: column; gap: 13px; }
+.obj-item { display: flex; flex-direction: column; gap: 5px; }
+.obj-row  { display: flex; justify-content: space-between; align-items: center; }
+.obj-lbl  { font-size: 13px; }
+.obj-vals { display: flex; align-items: baseline; gap: 8px; }
+.obj-cur  { font-family: var(--font-mono); font-size: 14px;
+            font-variant-numeric: tabular-nums; color: var(--accent); }
+.obj-tgt  { font-family: var(--font-mono); font-size: 12px;
+            font-variant-numeric: tabular-nums; color: var(--muted); }
+.obj-bar  { height: 4px; background: var(--border); border-radius: 2px; }
+.obj-fill { height: 100%; border-radius: 2px; }
+.fill-ok   { background: var(--positive); }
+.fill-warn { background: var(--warning); }
+.fill-bad  { background: var(--negative); }
+.obj-foot  { display: flex; justify-content: space-between;
+             font-size: 10px; color: var(--muted); font-family: var(--font-mono); }
+/* SIDEBAR */
+.sidebar { display: flex; flex-direction: column; gap: 16px; grid-row: 3 / 4; }
+/* RATIOS */
+.ratio-item { display: flex; flex-direction: column; gap: 4px;
+              padding: 8px 0; border-bottom: 1px solid var(--border-subtle); }
+.ratio-item:last-child { border-bottom: none; }
+.ratio-header { display: flex; justify-content: space-between; align-items: center; }
+.ratio-name   { font-size: 12px; font-weight: 500; }
+.ratio-vals   { display: flex; align-items: baseline; gap: 5px; }
+.ratio-cur    { font-family: var(--font-mono); font-size: 14px; font-weight: 600;
+                font-variant-numeric: tabular-nums; }
+.r-good { color: var(--positive); }
+.r-bad  { color: var(--negative); }
+.ratio-obj   { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+.ratio-ecart { font-family: var(--font-mono); font-size: 10px; }
+.ratio-track { height: 4px; background: var(--border); border-radius: 2px; }
+.ratio-fill  { height: 100%; border-radius: 2px; }
+.rf-good { background: var(--positive); }
+.rf-bad  { background: var(--negative); }
+/* STAFF */
+.staff-table { width: 100%; border-collapse: collapse; }
+.staff-table th { color: var(--muted); font-size: 10px; font-weight: 500;
+                  text-transform: uppercase; letter-spacing: .04em;
+                  padding: 4px; text-align: right;
+                  border-bottom: 1px solid var(--border); }
+.staff-table th:first-child { text-align: left; }
+.staff-table td { padding: 5px 4px; text-align: right; font-family: var(--font-mono);
+                  font-size: 10px; border-bottom: 1px solid var(--border-subtle); }
+.staff-table td:first-child { text-align: left; font-family: var(--font-body);
+                               font-size: 11px; font-weight: 500; }
+.staff-table tr:last-child td { border-bottom: none; }
+.t-good { color: var(--positive); }
+.t-bad  { color: var(--negative); }
+/* ACTIONS */
+.action-list { display: flex; flex-direction: column; gap: 7px; }
+.action-item { background: var(--surface-elevated); border-radius: 4px;
+               padding: 9px 11px; display: flex; gap: 9px; align-items: flex-start; }
+.action-tag  { flex-shrink: 0; font-size: 9px; text-transform: uppercase;
+               letter-spacing: .06em; padding: 2px 5px; border-radius: 3px; margin-top: 1px; }
+.tag-ls   { background: oklch(28% 0.08 130); color: var(--accent); }
+.tag-atel { background: oklch(28% 0.08 240); color: oklch(68% 0.14 240); }
+.tag-prio { background: oklch(28% 0.10 25);  color: var(--negative); }
+.action-text { font-size: 11px; line-height: 1.45; }
+.action-text strong { font-weight: 600; display: block; margin-bottom: 1px; }
+/* UTIL */
+.no-data { color: var(--muted); font-size: 13px; padding: 24px;
+           text-align: center; font-style: italic; }
+.kv-table { width: 100%; border-collapse: collapse; }
+.kv-table td { padding: 6px 4px; font-size: 12px;
+               border-bottom: 1px solid var(--border-subtle); }
+.kv-table td:last-child { text-align: right; font-family: var(--font-mono);
+                           font-variant-numeric: tabular-nums; }
+.kv-table tr:last-child td { border-bottom: none; }
+</style>"""
+
+# Auto-height JS — tells Streamlit to resize the iframe to fit
+_AUTOHEIGHT = """<script>
+function sendH(){
+  const h = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
+  window.parent.postMessage({type:'streamlit:setFrameHeight', height:h}, '*');
+}
+window.addEventListener('load', sendH);
+window.addEventListener('resize', sendH);
+new MutationObserver(sendH).observe(document.body,{subtree:true,childList:true});
+</script>"""
+
+
+# ════════════════════════════════════════════════════════════════════════════
+# FORMATTING HELPERS
+# ════════════════════════════════════════════════════════════════════════════
+
+def _e(s) -> str:
+    """HTML-escape a value for safe inline injection."""
+    return _html.escape(str(s)) if s is not None else "—"
+
+def _eur(v, d: int = 0) -> str:
+    if v is None: return "—"
+    try:
+        s = f"{int(v):,}".replace(",", "\u202f")
+        return f"{s}\u202f€"
+    except (TypeError, ValueError): return "—"
+
+def _pct(v, sign: bool = False) -> str:
+    if v is None: return "—"
+    try:
+        f = float(v)
+        prefix = "+" if sign and f >= 0 else ""
+        return f"{prefix}{f:.1f}\u202f%".replace(".", ",")
+    except (TypeError, ValueError): return "—"
+
+def _dcls(v) -> str:
+    if v is None: return ""
+    try: return "pos" if float(v) > 0 else "neg" if float(v) < 0 else ""
+    except: return ""
+
+def _evo_badge(v) -> str:
+    if v is None: return ""
+    try:
+        f   = float(v)
+        cls = "evo-up" if f >= 0 else "evo-down"
+        return f'<span class="evo-badge {cls}">{_pct(f, sign=True)}</span>'
+    except: return ""
+
+def _spark(trend: str = "up") -> str:
+    h = {"up":[35,42,50,58,62,70,80], "down":[85,78,72,68,65,60,55], "flat":[60,58,63,60,62,59,62]}
+    heights = h.get(trend, h["flat"])
+    bars = "".join(
+        f'<div class="spark-bar{"  cur" if i==len(heights)-1 else ""}" style="height:{v}%"></div>'
+        for i, v in enumerate(heights)
+    )
+    return f'<div class="kpi-sparkline">{bars}</div>'
+
+def _bar_w(val, max_val) -> float:
+    if not max_val: return 0
+    try: return min(100.0, max(0.0, abs(float(val)) / abs(float(max_val)) * 100))
+    except: return 0
+
+
+# ════════════════════════════════════════════════════════════════════════════
+# HTML SECTION BUILDERS
+# ════════════════════════════════════════════════════════════════════════════
+
+def _header(week_label: str, period_str: str) -> str:
+    return f"""
+<header class="header">
+  <div class="header-left">
+    <div class="logo">FV</div>
+    <div>
+      <h1 class="header-title">Feu Vert Annecy</h1>
+      <p class="header-subtitle">Briefing Hebdomadaire</p>
+    </div>
+  </div>
+  <div class="week-badge">{_e(week_label)}&nbsp;&nbsp;·&nbsp;&nbsp;{_e(period_str)}</div>
+</header>"""
+
+
+def _kpi_strip(g: dict, ls: dict, at: dict) -> str:
+    def card(label, sublabel, value, dv, dlabel, trend="up"):
+        arrow = "↑" if dv and float(dv) > 0 else ("↓" if dv and float(dv) < 0 else "→")
+        return (f'<div class="kpi-card">'
+                f'<span class="kpi-label">{_e(label)}</span>'
+                f'<p class="kpi-sublabel">{sublabel}</p>'
+                f'<div class="kpi-value-row">'
+                f'<span class="kpi-value">{value}</span>'
+                f'<span class="kpi-delta {_dcls(dv)}">{arrow} {_e(dlabel)}</span>'
+                f'</div>{_spark(trend)}</div>')
+
+    cards = "".join([
+        card("CA TTC Total",
+             f"obj. {_eur(g.get('ca_obj_ht'))} · écart {_pct(g.get('ca_ecart'),True)}",
+             _eur(g.get("ca_ht")),
+             g.get("ca_evo"), _pct(g.get("ca_evo"), True) + " vs N-1",
+             "up" if (g.get("ca_evo") or 0) >= 0 else "down"),
+        card("Marge Globale",
+             f"obj. {_pct(g.get('marge_obj'))} · {_pct(g.get('marge_ecart'),True)} pts",
+             _pct(g.get("marge")),
+             g.get("marge_evo"), _pct(g.get("marge_evo"), True) + " pts vs N-1", "up"),
+        card("Fréquentation",
+             f"N-1&nbsp;: {g.get('freq_n1','—')} clients",
+             str(g.get("freq") or "—"),
+             g.get("freq_evo"), _pct(g.get("freq_evo"), True) + " vs N-1", "up"),
+        card("Panier Moyen",
+             f"N-1&nbsp;: {_eur(g.get('panier'),1)} · Atel. {_eur(at.get('panier'),1)}",
+             _eur(g.get("panier"), 1) if g.get("panier") else "—",
+             g.get("panier_evo"), _pct(g.get("panier_evo"), True) + " vs N-1", "down"),
+        card("CA Atelier",
+             f"{at.get('nb_or','—')} OR · Marge {_pct(at.get('marge'))}",
+             _eur(at.get("ca")),
+             at.get("ca_evo"), _pct(at.get("ca_evo"), True) + " vs N-1", "up"),
+        card("CA Libre Service",
+             f"Panier {_eur(ls.get('panier'),1)} · Marge {_pct(ls.get('marge'))}",
+             _eur(ls.get("ca")),
+             ls.get("ca_evo"), _pct(ls.get("ca_evo"), True) + " vs N-1", "up"),
+    ])
+    return f'<section class="kpi-strip">{cards}</section>'
+
+
+def _familles_html(fam_data: dict) -> str:
+    if not fam_data.get("available"):
+        return '<div class="card"><p class="no-data">⏳ Données familles indisponibles</p></div>'
+
+    NAME_MAP = {
+        "X-TARIF MAIN D'OEUVRE":   "X · Main d'Œuvre",
+        "E-EQUIPEMENT EXTERIEUR":  "E · Équip. Extérieur",
+        "F-EQUIPEMENT INTERIEUR":  "F · Équip. Intérieur",
+        "I-PNEUMATIQUES":          "I · Pneumatiques",
+        "C-PIECES TECHNIQUES":     "C · Pièces Techniques",
+        "A-ENTRETIEN":             "A · Entretien",
+        "H-LUBRIFIANTS":           "H · Lubrifiants",
+        "B-ELECTRICITE":           "B · Électricité",
+        "G-AUTO SON":              "G · Auto Son",
+        "J-2 ROUES":               "J · 2 Roues",
+        "D-OUTILLAGE":             "D · Outillage",
+        "W-DIVERS":                "W · Divers",
+        "U-SERVICES":              "U · Services",
+    }
+
+    df      = fam_data["df"].copy()
+    valid   = df[df["CA N (€)"].notna()].sort_values("CA N (€)", ascending=False)
+    max_ca  = valid["CA N (€)"].abs().max() or 1
+
+    rows = ""
+    for _, r in valid.iterrows():
+        name  = r.get("Famille", "")
+        ca    = r.get("CA N (€)")
+        evo   = r.get("Évo. CA (%)")
+        mg_d  = r.get("Δ Marge (pts)")
+
+        short    = NAME_MAP.get(name, name)
+        is_neg   = ca is not None and ca < 0
+        mg_alert = mg_d is not None and mg_d < -5
+        evo_neg  = evo is not None and evo < 0
+
+        bar_cls  = "bar-red" if (is_neg or evo_neg) else "bar-orange" if mg_alert else "bar-green"
+        ca_style = ("color:var(--negative)" if is_neg
+                    else "color:var(--accent)" if name.startswith("X-")
+                    else "color:var(--warning)" if mg_alert else "")
+        ca_str   = f"−{_eur(abs(ca))}" if is_neg and ca else _eur(ca)
+        width    = _bar_w(ca, max_ca)
+
+        rows += (f'<div class="famille-item">'
+                 f'<span class="famille-name">{_e(short)}</span>'
+                 f'<div class="bar-track"><div class="bar-fill {bar_cls}" style="width:{width:.1f}%"></div></div>'
+                 f'<span class="famille-ca" style="{ca_style}">{ca_str}</span>'
+                 f'{_evo_badge(evo)}</div>')
+
+    return (f'<div class="card">'
+            f'<div class="card-header">'
+            f'<span class="card-title">Performance par Famille</span>'
+            f'<span class="card-meta">CA TTC · évolution vs N-1 · trié par CA décroissant</span>'
+            f'</div>'
+            f'<div class="famille-header-row">'
+            f'<span class="col-label">Famille</span>'
+            f'<span class="col-label">Proportion</span>'
+            f'<span class="col-label" style="text-align:right">CA TTC</span>'
+            f'<span class="col-label" style="text-align:center">Évo.</span>'
+            f'</div>{rows}</div>')
+
+
+def _pneus_html(tire_data: dict, week_num) -> str:
+    if not tire_data.get("available"):
+        return '<div class="card"><p class="no-data">⏳ Données pneus indisponibles</p></div>'
+
+    s    = tire_data["summary"]
+    df_s = tire_data["season_df"]
+    df_c = tire_data["category_mix_df"]
+
+    srows = ""
+    for label, cls, icon in [("ÉTÉ","ete","☀"),("4 SAISONS","qs","❄☀"),("HIVER","hiver","❄")]:
+        r = df_s[df_s["Saison"] == label]
+        if r.empty: continue
+        r   = r.iloc[0]
+        qty = int(r.get("Qté") or 0)
+        ca  = r.get("CA (€)") or 0
+        mp  = r.get("Marge (%)")
+        evo = r.get("Évo. CA (%)")
+        mc  = "color:var(--negative)" if mp and mp < 10 else "color:var(--accent)"
+        srows += (f'<div class="saison-row">'
+                  f'<span class="saison-name {cls}">{icon} {_e(label)}</span>'
+                  f'<div class="saison-stats">'
+                  f'<div class="s-stat"><span class="s-val">{qty}</span><span class="s-lbl">unités</span></div>'
+                  f'<div class="s-stat"><span class="s-val">{_eur(ca)}</span><span class="s-lbl">CA</span></div>'
+                  f'<div class="s-stat"><span class="s-val" style="{mc}">{_pct(mp)}</span><span class="s-lbl">Marge</span></div>'
+                  f'</div>{_evo_badge(evo)}</div>')
+
+    total_qty = int(df_c["Qté"].sum() or 1)
+    ccards = ""
+    for cat, col in [("PREMIUM","color:var(--accent)"),("MEDIUM","color:var(--warning)"),("BUDGET","color:var(--muted)")]:
+        cr  = df_c[df_c["Catégorie"] == cat]
+        if cr.empty: continue
+        qty = int(cr.iloc[0].get("Qté") or 0)
+        pct = round(qty / total_qty * 100, 1) if total_qty else 0
+        ccards += (f'<div class="pneu-cat">'
+                   f'<div class="pneu-cat-lbl">{_e(cat.capitalize())}</div>'
+                   f'<div class="pneu-cat-val" style="{col}">{qty}</div>'
+                   f'<div class="pneu-cat-sub">unités · {pct:.1f}\u202f%</div>'
+                   f'</div>')
+
+    meta = f"{s.get('qty',0)} unités · {_eur(s.get('ca'))} · marge {_pct(s.get('marge_pct'))}"
+    return (f'<div class="card">'
+            f'<div class="card-header">'
+            f'<span class="card-title">Pneus par Saison — S{week_num or "?"}</span>'
+            f'<span class="card-meta">{meta}</span>'
+            f'</div>'
+            f'<div class="saison-list">{srows}</div>'
+            f'<div style="margin-top:14px">'
+            f'<div style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;'
+            f'color:var(--muted);margin-bottom:8px">Mix catégorie — toutes saisons</div>'
+            f'<div class="pneus-cat-grid">{ccards}</div></div></div>')
+
+
+def _raf_html(kpis: dict) -> str:
+    mtd = kpis.get("mtd", {})
+    if not mtd:
+        return '<div class="card"><p class="no-data">⏳ Données MTD indisponibles</p></div>'
+
+    def item(label, cur_s, tgt_s, pct, raf_s, raf_color):
+        pct_c = min(100.0, max(0.0, float(pct or 0)))
+        fill  = "fill-ok" if pct_c >= 100 else "fill-warn" if pct_c >= 85 else "fill-bad"
+        raf_l = "Objectif dépassé ✓" if pct_c >= 100 else f"RAF\u202f: {raf_s}"
+        cc    = "color:var(--positive)" if pct_c >= 100 else "color:var(--accent)"
+        return (f'<div class="obj-item">'
+                f'<div class="obj-row">'
+                f'<span class="obj-lbl">{_e(label)}</span>'
+                f'<div class="obj-vals">'
+                f'<span class="obj-cur" style="{cc}">{cur_s}</span>'
+                f'<span class="obj-tgt">/ {tgt_s}</span>'
+                f'</div></div>'
+                f'<div class="obj-bar"><div class="obj-fill {fill}" style="width:{pct_c:.1f}%"></div></div>'
+                f'<div class="obj-foot">'
+                f'<span>{pct_c:.1f}\u202f% réalisé</span>'
+                f'<span style="{raf_color}">{raf_l}</span>'
+                f'</div></div>')
+
+    ca_pct  = mtd.get("ca_pct") or 0
+    mg_pct  = mtd.get("marge_pct") or 0
+    items   = "".join([
+        item("Chiffre d'Affaires", _eur(mtd.get("ca")), _eur(mtd.get("ca_obj")),
+             ca_pct, _eur(mtd.get("ca_raf")),
+             "color:var(--positive)" if ca_pct >= 100 else
+             "color:var(--warning)"  if ca_pct >= 85  else "color:var(--negative)"),
+        item("Marge", _eur(mtd.get("marge_eur")), _eur(mtd.get("marge_obj")),
+             mg_pct, _eur(mtd.get("marge_raf")),
+             "color:var(--positive)" if mg_pct >= 100 else
+             "color:var(--warning)"  if mg_pct >= 85  else "color:var(--negative)"),
+        item("Contrats", str(mtd.get("contrats") or "—"), "—",
+             None, "—", "color:var(--muted)"),
+    ])
+    return (f'<div class="card">'
+            f'<div class="card-header">'
+            f'<span class="card-title">Reste à Faire — Mois en cours</span>'
+            f'<span class="card-meta">Cumul mensuel</span>'
+            f'</div><div class="obj-list">{items}</div></div>')
+
+
+def _ratios_html(ratio_data: dict, week_num) -> str:
+    if not ratio_data.get("available"):
+        return '<div class="card"><p class="no-data">⏳ Données ratios indisponibles</p></div>'
+
+    rows = ""
+    for _, r in ratio_data["df"].iterrows():
+        real = r.get("Réalisé (%)")
+        obj  = r.get("Objectif (%)", 1) or 1
+        ec   = r.get("Écart obj")
+        ok   = r.get("Statut") == "🟢"
+        cc   = "r-good" if ok else "r-bad"
+        fc   = "rf-good" if ok else "rf-bad"
+        ecc  = "color:var(--positive)" if ok else "color:var(--negative)"
+        ecs  = (f"+{ec:.0f} pts" if ec and ec >= 0 else f"{ec:.0f} pts") if ec is not None else "—"
+        w    = _bar_w(real or 0, obj)
+        rows += (f'<div class="ratio-item">'
+                 f'<div class="ratio-header">'
+                 f'<span class="ratio-name">{_e(r.get("KPI",""))}</span>'
+                 f'<div class="ratio-vals">'
+                 f'<span class="ratio-cur {cc}">{_pct(real)}</span>'
+                 f'<span class="ratio-obj">/ obj. {_pct(obj)}</span>'
+                 f'<span class="ratio-ecart" style="{ecc}">{ecs}</span>'
+                 f'</div></div>'
+                 f'<div class="ratio-track"><div class="ratio-fill {fc}" style="width:{w:.0f}%"></div></div>'
+                 f'</div>')
+
+    return (f'<div class="card">'
+            f'<div class="card-header">'
+            f'<span class="card-title">Ratios Prioritaires</span>'
+            f'<span class="card-meta">Atelier · S{week_num or "?"}</span>'
+            f'</div>{rows}</div>')
+
+
+def _staff_html(vendor_data: dict, week_num) -> str:
+    if not vendor_data.get("available"):
+        return '<div class="card"><p class="no-data">⏳ Données vendeurs indisponibles</p></div>'
+
+    OBJ  = {"Garantie Pneu":50,"Géométrie":19,"VCR":7,"VCF":11,"Plaquette":11,"Dépoll.":35}
+    COLS = [("Garantie Pneu","GP"),("Géométrie","Géo"),("VCR","VCR"),("VCF","VCF"),("Dépoll.","Dép.")]
+
+    ths  = "".join(f'<th title="{_e(f)}">{_e(a)}</th>' for f, a in COLS)
+    rows = ""
+    for _, r in vendor_data["df"].iterrows():
+        tds = ""
+        for kpi, _ in COLS:
+            v = r.get(kpi)
+            o = OBJ.get(kpi, 0)
+            if v is None:
+                tds += "<td>—</td>"
+            else:
+                cls = "t-good" if v >= o else "t-bad"
+                tds += f'<td class="{cls}">{str(v).replace(".",",")}</td>'
+        rows += f'<tr><td>{_e(r.get("Vendeur",""))}</td>{tds}</tr>'
+
+    return (f'<div class="card">'
+            f'<div class="card-header">'
+            f'<span class="card-title">Ratios LS — Vendeurs</span>'
+            f'<span class="card-meta">S{week_num or "?"}</span>'
+            f'</div>'
+            f'<table class="staff-table">'
+            f'<thead><tr><th>Vendeur</th>{ths}</tr></thead>'
+            f'<tbody>{rows}</tbody>'
+            f'</table>'
+            f'<p style="margin-top:8px;font-size:10px;color:var(--muted)">'
+            f'GP = Garantie Pneu · Dép. = Dépollution · valeurs en %</p></div>')
+
+
+def _actions_html(fam_data: dict, ratio_data: dict) -> str:
+    items = []
+
+    if fam_data.get("available"):
+        for a in fam_data.get("margin_alerts", []):
+            fam = a.get("Famille", "")
+            pts = a.get("Δ Marge (pts)")
+            items.append(("tag-ls", "LS",
+                          f"Alerte marge — {fam}",
+                          f"Dégradation {_pct(pts,True)} pts — revoir mix produit et tarification."))
+        for l in fam_data.get("top_losers", []):
+            if (l.get("Évo. CA (%)") or 0) >= 0: continue
+            items.append(("tag-prio", "⚠ Prio",
+                          f"Déclin — {l.get('Famille','')}",
+                          f"CA {_pct(l.get('Évo. CA (%)'), True)} vs N-1 — animation commerciale ou révision stock."))
+
+    if ratio_data.get("available"):
+        for _, r in ratio_data["df"].iterrows():
+            if r.get("Statut") == "🔴":
+                ec = r.get("Écart obj")
+                if ec is not None and ec < -3:
+                    items.append(("tag-atel", "Atelier",
+                                  f"{r.get('KPI','')} sous objectif",
+                                  f"Écart {ec:+.0f} pts vs obj — questionnement client à renforcer."))
+
+    if not items:
+        items = [("tag-atel","Atelier","Aucune alerte critique","Maintenir le niveau de performance.")]
+
+    html_items = "".join(
+        f'<div class="action-item">'
+        f'<span class="action-tag {cls}">{_e(tag)}</span>'
+        f'<div class="action-text"><strong>{_e(title)}</strong>{_e(body)}</div>'
+        f'</div>'
+        for cls, tag, title, body in items[:6]
+    )
+    return (f'<div class="card">'
+            f'<div class="card-header">'
+            f'<span class="card-title">Plans d\'Action</span>'
+            f'<span class="card-meta">Semaine en cours</span>'
+            f'</div><div class="action-list">{html_items}</div></div>')
+
+
+# ════════════════════════════════════════════════════════════════════════════
+# PAGE ASSEMBLERS
+# ════════════════════════════════════════════════════════════════════════════
+
+def _wrap(body: str) -> str:
+    return (f'<!doctype html><html lang="fr"><head>'
+            f'<meta charset="UTF-8">'
+            f'<meta name="viewport" content="width=device-width,initial-scale=1">'
+            f'{_CSS}</head><body>{body}{_AUTOHEIGHT}</body></html>')
+
+
+def build_weekly_html(data: dict) -> str:
+    kpis = data["kpis"]
+    w    = kpis.get("week_num") or "?"
+    p    = kpis.get("period") or (None, None)
+    wl   = f"S{w}"
+    ps   = (f"{p[0].strftime('%d/%m')} – {p[1].strftime('%d/%m/%Y')}"
+            if p[0] and p[1] else "—")
+
+    if not kpis.get("available"):
+        body = (f'<div class="dashboard" style="grid-template-columns:1fr">'
+                f'{_header(wl, "—")}'
+                f'<div style="padding:48px;text-align:center;color:var(--muted);font-size:15px;">'
+                f'⏳&nbsp; En attente des CSV dans <code>/app/resources/SUC/</code><br><br>'
+                f'Dépose les exports dans <strong>inbox/</strong> et lance <code>./push_week.sh</code>'
+                f'</div></div>')
+    else:
+        g  = kpis.get("global", {})
+        ls = kpis.get("ls", {})
+        at = kpis.get("atelier", {})
+        body = (f'<div class="dashboard">'
+                f'{_header(wl, ps)}'
+                f'{_kpi_strip(g, ls, at)}'
+                f'<main class="main-content">'
+                f'{_familles_html(data["fam"])}'
+                f'<div class="two-col">'
+                f'{_pneus_html(data["tires"], w)}'
+                f'{_raf_html(kpis)}'
+                f'</div></main>'
+                f'<aside class="sidebar">'
+                f'{_ratios_html(data["ratios"], w)}'
+                f'{_staff_html(data["vendors"], w)}'
+                f'{_actions_html(data["fam"], data["ratios"])}'
+                f'</aside></div>')
+    return _wrap(body)
+
+
+def build_monthly_html(data: dict) -> str:
+    kpis = data["kpis"]
+    w    = kpis.get("week_num") or "?"
+    ls   = kpis.get("ls", {})
+    at   = kpis.get("atelier", {})
+
+    def kv(l, v): return f"<tr><td>{_e(l)}</td><td>{v}</td></tr>"
+
+    lsr = "".join([kv("CA HT", _eur(ls.get("ca"))), kv("Obj. CA", _eur(ls.get("ca_obj"))),
+                   kv("Évo. vs N-1", _pct(ls.get("ca_evo"),True)),
+                   kv("Marge", _pct(ls.get("marge"))),
+                   kv("Évo. Marge", _pct(ls.get("marge_evo"),True)+" pts"),
+                   kv("Fréquentation", str(ls.get("freq") or "—")),
+                   kv("Panier Moyen", _eur(ls.get("panier"),1))])
+    atr = "".join([kv("CA HT", _eur(at.get("ca"))), kv("Obj. CA", _eur(at.get("ca_obj"))),
+                   kv("Évo. vs N-1", _pct(at.get("ca_evo"),True)),
+                   kv("Marge", _pct(at.get("marge"))),
+                   kv("Évo. Marge", _pct(at.get("marge_evo"),True)+" pts"),
+                   kv("Nb OR", str(at.get("nb_or") or "—")),
+                   kv("Panier Moyen", _eur(at.get("panier"),1))])
+
+    body = (f'<div class="dashboard">'
+            f'{_header(f"S{w}", "Revue Mensuelle")}'
+            f'<main class="main-content" style="grid-column:1/-1">'
+            f'{_raf_html(kpis)}'
+            f'<div class="two-col">'
+            f'<div class="card"><div class="card-header">'
+            f'<span class="card-title">Libre Service — Semaine</span></div>'
+            f'<table class="kv-table">{lsr}</table></div>'
+            f'<div class="card"><div class="card-header">'
+            f'<span class="card-title">Atelier — Semaine</span></div>'
+            f'<table class="kv-table">{atr}</table></div>'
+            f'</div></main></div>')
+    return _wrap(body)
+
+
+def build_quarterly_html(data: dict) -> str:
+    import glob as _g
+    w = data["kpis"].get("week_num") or "?"
+    qf = _g.glob(str(QUARTERLY_DIR / "*.csv"))
+
+    q_block = (
+        f'<div class="card"><ul style="list-style:none;padding:0">' +
+        "".join(f'<li style="font-family:var(--font-mono);font-size:12px;padding:4px 0">{_e(f.split("/")[-1])}</li>' for f in qf) +
+        '</ul></div>'
+    ) if qf else (
+        '<div class="card"><p class="no-data">⏳ Aucun fichier trimestriel dans '
+        '<code>/app/trimestres/</code></p></div>'
+    )
+
+    body = (f'<div class="dashboard">'
+            f'{_header(f"S{w}", "Analyse Trimestrielle")}'
+            f'<main class="main-content" style="grid-column:1/-1">'
+            f'{q_block}'
+            f'{_ratios_html(data["ratios"], w)}'
+            f'</main></div>')
+    return _wrap(body)
+
+
+# ════════════════════════════════════════════════════════════════════════════
+# STREAMLIT SHELL
+# ════════════════════════════════════════════════════════════════════════════
 
 @st.cache_data(ttl=300)
 def load_data() -> dict:
@@ -93,506 +734,41 @@ def load_data() -> dict:
 
 
 data = load_data()
-kpis = data["kpis"]
 
-# ── Header ────────────────────────────────────────────────────────────────────
-week_label = ""
-if kpis.get("period") and kpis["period"][0]:
-    d0, d1 = kpis["period"]
-    week_label = f"S{kpis['week_num']} · {d0.strftime('%d/%m')} – {d1.strftime('%d/%m/%Y')}"
-
-col_logo, col_title, col_refresh = st.columns([1, 8, 2])
-with col_logo:
-    st.markdown(
-        '<div style="background:#78BE20;color:#111827;font-weight:700;font-size:22px;'
-        'width:48px;height:48px;border-radius:8px;display:flex;align-items:center;'
-        'justify-content:center;">FV</div>',
-        unsafe_allow_html=True,
-    )
-with col_title:
-    st.markdown(
-        f'<h1 style="margin:0;font-size:22px;font-weight:700;">Feu Vert Annecy</h1>'
-        f'<p style="margin:0;color:#9ca3af;font-size:13px;font-family:monospace;">'
-        f'Briefing Hebdomadaire &nbsp;·&nbsp; {week_label}</p>',
-        unsafe_allow_html=True,
-    )
-with col_refresh:
-    if st.button("⟳ Rafraîchir", use_container_width=True):
+# Minimal top bar: errors + refresh
+all_errors = sum((v.get("errors",[]) for v in data.values() if isinstance(v,dict)),[])
+col_e, col_b = st.columns([11, 1])
+with col_e:
+    if all_errors:
+        with st.expander(f"⚠️ {len(all_errors)} avertissement(s)", expanded=False):
+            for e in all_errors:
+                st.warning(e)
+with col_b:
+    if st.button("⟳", help="Rafraîchir"):
         st.cache_data.clear()
         st.rerun()
 
-st.divider()
+tab1, tab2, tab3 = st.tabs([
+    "📋  Briefing Hebdomadaire",
+    "📅  Revue Mensuelle",
+    "📊  Analyse Trimestrielle",
+])
 
-# ── Error banner ─────────────────────────────────────────────────────────────
-all_errors = (
-    kpis.get("errors", [])
-    + data["fam"].get("errors", [])
-    + data["tires"].get("errors", [])
-    + data["ratios"].get("errors", [])
-    + data["vendors"].get("errors", [])
-    + data["defects"].get("errors", [])
-)
-if all_errors:
-    with st.expander("⚠️  Données manquantes — détails", expanded=not kpis["available"]):
-        for err in all_errors:
-            st.warning(err)
+def _render(html: str, height: int) -> None:
+    """Render an HTML string in an isolated iframe (Streamlit 1.35+)."""
+    try:
+        # st.iframe with srcdoc is the current API (replaces components.v1.html)
+        st.iframe(srcdoc=html, height=height, scrolling=False)
+    except TypeError:
+        # Fallback for older Streamlit builds that don't accept srcdoc
+        import streamlit.components.v1 as _cv1
+        _cv1.html(html, height=height, scrolling=False)
 
-# ── Tabs ──────────────────────────────────────────────────────────────────────
-tab_weekly, tab_monthly, tab_quarterly = st.tabs(
-    ["📋  Briefing Hebdomadaire", "📅  Revue Mensuelle", "📊  Analyse Trimestrielle"]
-)
+with tab1:
+    _render(build_weekly_html(data), height=2400)
 
+with tab2:
+    _render(build_monthly_html(data), height=1100)
 
-# ════════════════════════════════════════════════════════════════════════════
-# TAB 1 — WEEKLY BRIEFING
-# ════════════════════════════════════════════════════════════════════════════
-with tab_weekly:
-    if not kpis["available"]:
-        st.info("⏳  En attente des fichiers CSV de la semaine dans `/app/resources/SUC/`")
-        st.stop()
-
-    g  = kpis["global"]
-    ls = kpis["ls"]
-    at = kpis["atelier"]
-
-    # ── KPI strip (6 metrics) ────────────────────────────────────────────────
-    st.markdown('<p class="section-title">📈 Performance Globale — Semaine</p>', unsafe_allow_html=True)
-    c1, c2, c3, c4, c5, c6 = st.columns(6)
-
-    def _delta_str(val, suffix="%", sign=True) -> str:
-        if val is None:
-            return "N/A"
-        prefix = "+" if sign and val >= 0 else ""
-        return f"{prefix}{val:.1f} {suffix}"
-
-    with c1:
-        st.metric(
-            "CA HT Total",
-            fmt_eur(g.get("ca_ht")),
-            _delta_str(g.get("ca_evo"), "%", True) + " vs N-1",
-            delta_color="normal",
-        )
-        if g.get("ca_obj_ht"):
-            st.caption(f"Obj. {fmt_eur(g['ca_obj_ht'])} · écart {_delta_str(g.get('ca_ecart'), '%')}")
-
-    with c2:
-        st.metric(
-            "Marge Globale",
-            fmt_pct(g.get("marge")),
-            _delta_str(g.get("marge_evo"), "pts", True) + " vs N-1",
-            delta_color="normal",
-        )
-        if g.get("marge_obj"):
-            st.caption(f"Obj. {fmt_pct(g['marge_obj'])} · écart {_delta_str(g.get('marge_ecart'), 'pts')}")
-
-    with c3:
-        st.metric(
-            "Fréquentation",
-            f"{g.get('freq', 'N/A')}",
-            _delta_str(g.get("freq_evo"), "%", True) + " vs N-1",
-            delta_color="normal",
-        )
-        if g.get("freq_n1"):
-            st.caption(f"N-1 : {g['freq_n1']} clients")
-
-    with c4:
-        st.metric(
-            "Panier Moyen HT",
-            fmt_eur(g.get("panier"), 1) if g.get("panier") else "N/A",
-            None,
-        )
-        if g.get("panier") and g.get("ca_ht") and g.get("freq"):
-            computed = round(g["ca_ht"] / g["freq"], 1)
-            st.caption(f"({computed} € calculé)")
-
-    with c5:
-        st.metric(
-            "CA Atelier HT",
-            fmt_eur(at.get("ca")),
-            _delta_str(at.get("ca_evo"), "%", True) + " vs N-1",
-            delta_color="normal",
-        )
-        st.caption(f"{at.get('nb_or', '—')} OR · Marge {fmt_pct(at.get('marge'))}")
-
-    with c6:
-        st.metric(
-            "CA Libre Service HT",
-            fmt_eur(ls.get("ca")),
-            _delta_str(ls.get("ca_evo"), "%", True) + " vs N-1",
-            delta_color="normal",
-        )
-        st.caption(f"Panier {fmt_eur(ls.get('panier'), 1)} · Marge {fmt_pct(ls.get('marge'))}")
-
-    st.divider()
-
-    # ── Main layout: 2 columns (chart | sidebar) ────────────────────────────
-    col_main, col_side = st.columns([3, 1], gap="large")
-
-    # ── LEFT: Familles bar chart ─────────────────────────────────────────────
-    with col_main:
-        st.markdown('<p class="section-title">📦 Performance par Famille</p>', unsafe_allow_html=True)
-
-        fam_data = data["fam"]
-        if not fam_data["available"]:
-            st.warning("Données familles indisponibles.")
-        else:
-            df_fam = fam_data["df"].copy()
-            df_fam_sorted = df_fam.dropna(subset=["CA N (€)"]).sort_values("CA N (€)", ascending=False)
-
-            # Colour each bar by growth direction
-            def _bar_color(row):
-                if row["Évo. CA (%)"] is None:
-                    return "neutral"
-                if row["Évo. CA (%)"] >= 0:
-                    return "positive"
-                return "negative"
-
-            df_fam_sorted["Couleur"] = df_fam_sorted.apply(_bar_color, axis=1)
-            color_map = {"positive": "#78BE20", "negative": "#ef4444", "neutral": "#6b7280"}
-
-            fig = px.bar(
-                df_fam_sorted,
-                y="Famille",
-                x="CA N (€)",
-                color="Couleur",
-                color_discrete_map=color_map,
-                orientation="h",
-                text=df_fam_sorted["Évo. CA (%)"].apply(
-                    lambda v: f"{v:+.1f}%" if v is not None else ""
-                ),
-                height=420,
-                template="plotly_dark",
-            )
-            fig.update_layout(
-                showlegend=False,
-                paper_bgcolor="rgba(0,0,0,0)",
-                plot_bgcolor="rgba(0,0,0,0)",
-                margin=dict(l=0, r=20, t=10, b=0),
-                xaxis_title="CA HT (€)",
-                yaxis_title="",
-                font=dict(size=11),
-                yaxis=dict(autorange="reversed"),
-            )
-            fig.update_traces(textposition="outside", textfont_size=10)
-            st.plotly_chart(fig, use_container_width=True)
-
-            # Detailed table below the chart
-            with st.expander("Tableau détail familles"):
-                display_df = df_fam[[
-                    "Famille", "CA N (€)", "CA N-1 (€)", "Évo. CA (%)",
-                    "Marge N (%)", "Δ Marge (pts)", "Qté N", "Statut"
-                ]].copy()
-                # Format for display
-                display_df["CA N (€)"]    = display_df["CA N (€)"].apply(lambda v: f"{int(v):,} €".replace(",", " ") if pd.notna(v) else "—")
-                display_df["CA N-1 (€)"]  = display_df["CA N-1 (€)"].apply(lambda v: f"{int(v):,} €".replace(",", " ") if pd.notna(v) else "—")
-                display_df["Évo. CA (%)"] = display_df["Évo. CA (%)"].apply(lambda v: f"{v:+.1f} %" if pd.notna(v) else "—")
-                display_df["Marge N (%)"] = display_df["Marge N (%)"].apply(lambda v: f"{v:.1f} %" if pd.notna(v) else "—")
-                display_df["Δ Marge (pts)"] = display_df["Δ Marge (pts)"].apply(lambda v: f"{v:+.1f} pts" if pd.notna(v) else "—")
-                st.dataframe(display_df, use_container_width=True, hide_index=True)
-
-        st.divider()
-
-        # ── Pneus par Saison ─────────────────────────────────────────────────
-        st.markdown('<p class="section-title">🔵 Analyse Pneus — S{}</p>'.format(
-            kpis.get("week_num", "?")), unsafe_allow_html=True)
-
-        tire_data = data["tires"]
-        if not tire_data["available"]:
-            st.warning("Données pneus indisponibles.")
-        else:
-            s = tire_data["summary"]
-            st.caption(
-                f"**Total semaine :** {s.get('qty', 0)} unités · "
-                f"{fmt_eur(s.get('ca'))} · Marge {fmt_pct(s.get('marge_pct'))}"
-            )
-
-            t1, t2 = st.columns(2)
-
-            with t1:
-                st.markdown("**Par saison**")
-                df_saison = tire_data["season_df"].copy()
-                df_saison["CA (€)"]    = df_saison["CA (€)"].apply(lambda v: f"{int(v):,} €".replace(",", " ") if pd.notna(v) else "—")
-                df_saison["Marge (%)"] = df_saison["Marge (%)"].apply(lambda v: f"{v:.1f} %" if pd.notna(v) else "—")
-                df_saison["Évo. CA (%)"] = df_saison["Évo. CA (%)"].apply(lambda v: f"{v:+.1f} %" if pd.notna(v) else "—")
-                st.dataframe(
-                    df_saison[["Saison", "Qté", "CA (€)", "Évo. CA (%)", "Marge (%)", "Statut"]],
-                    use_container_width=True, hide_index=True,
-                )
-
-            with t2:
-                st.markdown("**Mix catégorie (toutes saisons)**")
-                df_cat = tire_data["category_mix_df"].copy()
-                df_cat["CA (€)"]    = df_cat["CA (€)"].apply(lambda v: f"{int(v):,} €".replace(",", " ") if pd.notna(v) else "—")
-                df_cat["Marge (%)"] = df_cat["Marge (%)"].apply(lambda v: f"{v:.1f} %" if pd.notna(v) else "—")
-                # Add share
-                total_qty = df_cat["Qté"].sum()
-                df_cat["Part (%)"] = df_cat["Qté"].apply(
-                    lambda v: f"{v/total_qty*100:.1f} %" if total_qty else "—"
-                )
-                st.dataframe(
-                    df_cat[["Catégorie", "Qté", "Part (%)", "CA (€)", "Marge (%)"]],
-                    use_container_width=True, hide_index=True,
-                )
-
-            with st.expander("Détail marques ÉTÉ"):
-                df_brands = tire_data["ete_brand_df"].copy()
-                df_brands["CA (€)"]      = df_brands["CA (€)"].apply(lambda v: f"{int(v):,} €".replace(",", " ") if pd.notna(v) and v else "—")
-                df_brands["Évo. CA (%)"] = df_brands["Évo. CA (%)"].apply(lambda v: f"{v:+.1f} %" if pd.notna(v) else "—")
-                df_brands["Marge (%)"]   = df_brands["Marge (%)"].apply(lambda v: f"{v:.1f} %" if pd.notna(v) else "—")
-                st.dataframe(
-                    df_brands[["Catégorie","Marque","Qté","CA (€)","Évo. CA (%)","Marge (%)","Statut"]],
-                    use_container_width=True, hide_index=True,
-                )
-
-    # ── RIGHT SIDEBAR: Ratios + Staff ────────────────────────────────────────
-    with col_side:
-        # Ratios Prioritaires
-        st.markdown('<p class="section-title">⚙️ Ratios Prioritaires</p>', unsafe_allow_html=True)
-        ratio_data = data["ratios"]
-        if not ratio_data["available"]:
-            st.warning("Données ratios indisponibles.")
-        else:
-            df_r = ratio_data["df"]
-            for _, row in df_r.iterrows():
-                realise  = row["Réalisé (%)"]
-                objectif = row["Objectif (%)"]
-                ecart    = row["Écart obj"]
-                ok       = row["Statut"] == "🟢"
-
-                label_color = "#78BE20" if ok else "#ef4444"
-                ecart_str   = f"{ecart:+.1f} pts" if ecart is not None else "—"
-
-                st.markdown(
-                    f'<div class="raf-item">'
-                    f'<div class="raf-label">'
-                    f'<span style="font-size:12px;font-weight:500;">{row["Statut"]} {row["KPI"]}</span>'
-                    f'<span style="font-family:monospace;font-size:11px;color:{label_color};">'
-                    f'{fmt_pct(realise)} <span style="color:#6b7280;">/ {fmt_pct(objectif)}</span>'
-                    f'</span></div></div>',
-                    unsafe_allow_html=True,
-                )
-                pct_bar = min(100, int((realise or 0) / objectif * 100)) if objectif else 0
-                st.progress(pct_bar / 100)
-                st.caption(f"Écart obj. : {ecart_str}")
-
-        st.divider()
-
-        # Staff LS
-        st.markdown('<p class="section-title">👥 Vendeurs LS — Ratios</p>', unsafe_allow_html=True)
-        vendor_data = data["vendors"]
-        if not vendor_data["available"]:
-            st.warning("Données vendeurs indisponibles.")
-        else:
-            df_v = vendor_data["df"].copy()
-
-            # Colour values using background gradient: green if ≥ obj, red if < obj
-            OBJ_MAP = {
-                "Garantie Pneu": 50.0, "Géométrie": 19.0,
-                "VCR": 7.0, "VCF": 11.0, "Plaquette": 11.0, "Dépoll.": 35.0,
-            }
-
-            def _fmt_cell(val, obj):
-                if val is None or pd.isna(val):
-                    return "—"
-                color = "#78BE20" if val >= obj else "#ef4444"
-                return f'<span style="color:{color};font-weight:600;">{val:.1f}%</span>'
-
-            # Build HTML table
-            cols = list(OBJ_MAP.keys())
-            html = '<table style="width:100%;font-size:11px;border-collapse:collapse;">'
-            html += "<thead><tr>"
-            html += '<th style="text-align:left;padding:4px 4px;color:#9ca3af;">Vendeur</th>'
-            for c in cols:
-                abbr = c[:3] if len(c) > 6 else c
-                html += f'<th style="text-align:center;padding:4px 2px;color:#9ca3af;">{abbr}</th>'
-            html += "</tr></thead><tbody>"
-            for _, row in df_v.iterrows():
-                html += f'<tr><td style="padding:4px 4px;font-weight:500;">{row["Vendeur"]}</td>'
-                for c in cols:
-                    html += f'<td style="text-align:center;padding:4px 2px;">{_fmt_cell(row.get(c), OBJ_MAP[c])}</td>'
-                html += "</tr>"
-            html += "</tbody></table>"
-            st.markdown(html, unsafe_allow_html=True)
-            st.caption("Vert ≥ objectif · Rouge < objectif · GP=Garantie Pneu · Dép.=Dépollution")
-
-        st.divider()
-
-        # Atelier Défectuosité
-        st.markdown('<p class="section-title">🔧 Atelier — Défectuosité</p>', unsafe_allow_html=True)
-        def_data = data["defects"]
-        if not def_data["available"]:
-            st.warning("Données défectuosité indisponibles.")
-        else:
-            df_def = def_data["df"]
-            # Show compact table (Technicien + key columns)
-            key_cols = ["Technicien", "Nb OR", "Batterie", "VCR", "VCF", "BEG", "Amort."]
-            available_cols = [c for c in key_cols if c in df_def.columns]
-            st.dataframe(
-                df_def[available_cols],
-                use_container_width=True, hide_index=True,
-            )
-            with st.expander("Tableau complet"):
-                st.dataframe(df_def, use_container_width=True, hide_index=True)
-
-
-# ════════════════════════════════════════════════════════════════════════════
-# TAB 2 — MONTHLY REVIEW
-# ════════════════════════════════════════════════════════════════════════════
-with tab_monthly:
-    mtd = kpis.get("mtd", {})
-
-    if not mtd:
-        st.info("⏳  En attente des fichiers CSV MTD dans `/app/resources/SUC/`")
-    else:
-        st.markdown('<p class="section-title">📅 Reste à Faire — Mois en Cours</p>', unsafe_allow_html=True)
-
-        # ── RAF progress cards ────────────────────────────────────────────────
-        def _raf_card(label, current, objective, pct, raf, unit="€"):
-            if pct is None:
-                color = "#6b7280"
-                bar_v = 0
-            elif pct >= 100:
-                color = "#78BE20"
-                bar_v = 1.0
-            elif pct >= 85:
-                color = "#f59e0b"
-                bar_v = pct / 100
-            else:
-                color = "#ef4444"
-                bar_v = pct / 100
-
-            raf_str = (
-                fmt_eur(raf) if unit == "€" and raf is not None
-                else f"{raf}" if raf is not None else "—"
-            )
-            current_str = fmt_eur(current) if unit == "€" else f"{current}"
-            obj_str     = fmt_eur(objective) if unit == "€" else f"{objective}"
-
-            st.markdown(
-                f'<div style="background:#1f2937;border-radius:8px;padding:16px 20px;'
-                f'margin-bottom:8px;">'
-                f'<div style="display:flex;justify-content:space-between;align-items:center;">'
-                f'<span style="font-size:13px;font-weight:600;">{label}</span>'
-                f'<span style="font-family:monospace;font-size:14px;color:{color};">'
-                f'{pct:.1f} %</span></div>'
-                f'<div style="margin:8px 0;background:#374151;border-radius:4px;height:6px;">'
-                f'<div style="background:{color};width:{bar_v*100:.1f}%;height:100%;'
-                f'border-radius:4px;"></div></div>'
-                f'<div style="display:flex;justify-content:space-between;font-size:11px;'
-                f'color:#9ca3af;font-family:monospace;">'
-                f'<span>Réalisé : {current_str}</span>'
-                f'<span>Obj : {obj_str}</span>'
-                f'<span style="color:{color};">RAF : {raf_str}</span>'
-                f'</div></div>',
-                unsafe_allow_html=True,
-            )
-
-        col_raf1, col_raf2 = st.columns(2)
-
-        with col_raf1:
-            _raf_card(
-                "Chiffre d'Affaires",
-                mtd.get("ca"), mtd.get("ca_obj"),
-                mtd.get("ca_pct"), mtd.get("ca_raf"),
-            )
-            _raf_card(
-                "Marge €",
-                mtd.get("marge_eur"), mtd.get("marge_obj"),
-                mtd.get("marge_pct"), mtd.get("marge_raf"),
-            )
-
-        with col_raf2:
-            # Contrats — no RAF "amount" just count
-            contrats = mtd.get("contrats")
-            st.metric("Contrats Entretien (MTD)", contrats or "—", None)
-            st.caption("Objectif mensuel non fourni dans ce fichier CSV")
-
-        st.divider()
-
-        # ── LS vs Atelier dissociation ────────────────────────────────────────
-        st.markdown('<p class="section-title">⚖️ LS vs Atelier — Semaine</p>', unsafe_allow_html=True)
-        ls  = kpis["ls"]
-        at  = kpis["atelier"]
-
-        col_ls, col_at = st.columns(2)
-        with col_ls:
-            st.markdown("**Libre Service**")
-            ls_rows = [
-                ("CA HT",        fmt_eur(ls.get("ca"))),
-                ("Obj. CA HT",   fmt_eur(ls.get("ca_obj"))),
-                ("Évo. vs N-1",  fmt_pct(ls.get("ca_evo"), sign=True)),
-                ("Marge",        fmt_pct(ls.get("marge"))),
-                ("Évo. Marge",   fmt_pct(ls.get("marge_evo"), sign=True) + " pts"),
-                ("Fréquentation",f"{ls.get('freq', '—')}"),
-                ("Panier Moyen", fmt_eur(ls.get("panier"), 1)),
-            ]
-            st.table(pd.DataFrame(ls_rows, columns=["Indicateur", "Valeur"]))
-
-        with col_at:
-            st.markdown("**Atelier**")
-            at_rows = [
-                ("CA HT",        fmt_eur(at.get("ca"))),
-                ("Obj. CA HT",   fmt_eur(at.get("ca_obj"))),
-                ("Évo. vs N-1",  fmt_pct(at.get("ca_evo"), sign=True)),
-                ("Marge",        fmt_pct(at.get("marge"))),
-                ("Évo. Marge",   fmt_pct(at.get("marge_evo"), sign=True) + " pts"),
-                ("Nb OR",        f"{at.get('nb_or', '—')}"),
-                ("Évo. OR",      fmt_pct(at.get("nb_or_evo"), sign=True)),
-                ("Panier Moyen", fmt_eur(at.get("panier"), 1)),
-            ]
-            st.table(pd.DataFrame(at_rows, columns=["Indicateur", "Valeur"]))
-
-
-# ════════════════════════════════════════════════════════════════════════════
-# TAB 3 — QUARTERLY ANALYSIS
-# ════════════════════════════════════════════════════════════════════════════
-with tab_quarterly:
-    st.markdown('<p class="section-title">📊 Analyse Trimestrielle</p>', unsafe_allow_html=True)
-
-    # Check for quarterly CSV files
-    import glob as _glob
-    q_files = _glob.glob(str(QUARTERLY_DIR / "*.csv"))
-
-    if not q_files:
-        st.info(
-            "⏳  Aucun fichier trimestriel détecté dans `/app/trimestres/`.\n\n"
-            "Déposez vos exports CSV SUC trimestriels dans ce dossier pour activer cet onglet."
-        )
-    else:
-        st.success(f"{len(q_files)} fichier(s) trimestriel(s) détecté(s).")
-        st.markdown(
-            "**Les données trimestrielles sont disponibles.**  "
-            "Cet onglet affichera les agrégats Q1/Q2/Q3/Q4 dès que les parsers "
-            "trimestriels seront connectés."
-        )
-        # Display file list for transparency
-        with st.expander("Fichiers disponibles"):
-            for f in q_files:
-                st.text(f.split("/")[-1])
-
-    # Always show ratios trends across weeks
-    st.divider()
-    st.markdown('<p class="section-title">📈 Tendance Ratios (semaine courante)</p>', unsafe_allow_html=True)
-
-    ratio_data = data["ratios"]
-    if ratio_data["available"]:
-        df_r = ratio_data["df"]
-        fig_r = px.bar(
-            df_r,
-            x="KPI",
-            y=["Réalisé (%)", "Objectif (%)"],
-            barmode="group",
-            color_discrete_map={"Réalisé (%)": "#78BE20", "Objectif (%)": "#6b7280"},
-            template="plotly_dark",
-            height=350,
-            title="Ratios Prioritaires : Réalisé vs Objectif",
-        )
-        fig_r.update_layout(
-            paper_bgcolor="rgba(0,0,0,0)",
-            plot_bgcolor="rgba(0,0,0,0)",
-            legend_title_text="",
-            margin=dict(l=0, r=0, t=40, b=0),
-        )
-        st.plotly_chart(fig_r, use_container_width=True)
-    else:
-        st.warning("Données ratios indisponibles pour le graphique de tendance.")
+with tab3:
+    _render(build_quarterly_html(data), height=900)

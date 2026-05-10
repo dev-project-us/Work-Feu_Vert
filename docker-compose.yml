@@ -33,28 +33,20 @@ services:
       - "8501:8501"
 
     volumes:
-      # ── Weekly data ─────────────────────────────────────────────────────────
-      # Source: CSV exports in the local resources/ folder (Obsidian vault).
-      # Left side = host path (relative to this file); right side = container path.
-      # Folder names with spaces must be quoted.
+      # ── Weekly data — always points to data/current/ ────────────────────────
+      # data/current/ is updated automatically by push_week.sh each week.
+      # You never need to touch docker-compose.yml to update data.
 
-      - ./resources/SUC:/app/resources/SUC:ro
-      - ./resources/familles:/app/resources/familles:ro
-      - ./resources/Pneus:/app/resources/Pneus:ro
-      - "./resources/ratios prioritaires:/app/resources/ratios prioritaires:ro"
-      - "./resources/suivi vendeur:/app/resources/suivi vendeur:ro"
-      - ./resources/defectuosite:/app/resources/defectuosite:ro
-      - "./resources/objectifs vendeurs:/app/resources/objectifs vendeurs:ro"
+      - ./data/current/SUC:/app/resources/SUC:ro
+      - ./data/current/familles:/app/resources/familles:ro
+      - ./data/current/Pneus:/app/resources/Pneus:ro
+      - ./data/current/ratios_prioritaires:/app/resources/ratios prioritaires:ro
+      - ./data/current/suivi_vendeur:/app/resources/suivi vendeur:ro
+      - ./data/current/defectuosite:/app/resources/defectuosite:ro
 
-      # ── Monthly data ─────────────────────────────────────────────────────────
-      # Host: resources/Resources mensuelles/  →  container: /app/monthly_recap
-      # Sub-folders (SUC/, suivi vendeur/, defectuosite/, ratios prioritaires/,
-      # pneus/, familles/) are preserved inside the mount.
-      - "./resources/Resources mensuelles:/app/monthly_recap:ro"
-
-      # ── Quarterly data ───────────────────────────────────────────────────────
-      # Uncomment once resources/trimestres/ exists on the host.
-      # - ./resources/trimestres:/app/trimestres:ro
+      # ── Monthly & Quarterly aggregates ──────────────────────────────────────
+      - ./data/monthly_recap:/app/monthly_recap:ro
+      - ./data/trimestres:/app/trimestres:ro
 
       # ── Streamlit config (allows live theme tweaks without rebuild) ──────────
       - ./.streamlit:/app/.streamlit:ro
