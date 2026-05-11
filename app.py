@@ -28,6 +28,9 @@ st.set_page_config(
 # Remove Streamlit chrome + style sidebar to match dark theme
 st.markdown(
     "<style>"
+    "[data-testid='stHeader']{display:none !important;} "
+    "#MainMenu{visibility:hidden !important;} "
+    "footer{visibility:hidden !important;} "
     ".block-container{padding:0 !important;} "
     ".stApp{background:#111827;} "
     "[data-testid='stSidebar']{background:#111827 !important;border-right:1px solid #1f2937 !important;} "
