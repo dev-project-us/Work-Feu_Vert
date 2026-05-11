@@ -401,7 +401,7 @@ def _kpi_strip(g: dict, ls: dict, at: dict) -> str:
                 f'<div class="kpi-value-row">'
                 f'<span class="kpi-value">{value}</span>'
                 f'<span class="kpi-delta {_dcls(dv)}">{arrow} {_e(dlabel)}</span>'
-                f'</div>{_spark(trend)}</div>')
+                f'</div></div>')
 
     cards = "".join([
         card("CA TTC Total",
@@ -441,7 +441,7 @@ def _ls_kpi_strip(ls: dict) -> str:
                 f'<div class="kpi-value-row">'
                 f'<span class="kpi-value">{value}</span>'
                 f'<span class="kpi-delta {_dcls(dv)}">{arrow} {_e(dlabel)}</span>'
-                f'</div>{_spark(trend)}</div>')
+                f'</div></div>')
 
     cards = "".join([
         card("CA Libre Service",
@@ -472,7 +472,7 @@ def _at_kpi_strip(at: dict) -> str:
                 f'<div class="kpi-value-row">'
                 f'<span class="kpi-value">{value}</span>'
                 f'<span class="kpi-delta {_dcls(dv)}">{arrow} {_e(dlabel)}</span>'
-                f'</div>{_spark(trend)}</div>')
+                f'</div></div>')
 
     cards = "".join([
         card("CA Atelier",
