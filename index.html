@@ -50,40 +50,82 @@
     .view { display: none; }
     .view.active { display: flex; flex-direction: column; gap: 16px; }
 
+    /* ── Brief Global ── */
+    .brief-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 14px 16px;
+    }
+
+    .brief-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .brief-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+
+    .brief-period {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--muted);
+      background: var(--surface-elevated);
+      padding: 2px 8px;
+      border-radius: 3px;
+    }
+
+    .brief-text {
+      font-size: 13px;
+      line-height: 1.65;
+      color: var(--fg);
+    }
+
     /* ── KPI Strip ── */
     .kpi-strip {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 10px;
     }
 
     .kpi-card {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 6px;
-      padding: 16px;
+      padding: 10px 12px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
     }
 
     .kpi-label {
-      font-size: 11px;
+      font-size: 10px;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.07em;
       color: var(--muted);
       font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .kpi-value-row {
       display: flex;
       align-items: baseline;
-      gap: 12px;
+      gap: 8px;
+      flex-wrap: wrap;
     }
 
     .kpi-value {
       font-family: var(--font-mono);
-      font-size: 28px;
+      font-size: 20px;
       font-weight: 600;
       font-variant-numeric: tabular-nums;
       letter-spacing: -0.02em;
@@ -91,7 +133,7 @@
 
     .kpi-delta {
       font-family: var(--font-mono);
-      font-size: 12px;
+      font-size: 11px;
       font-variant-numeric: tabular-nums;
       display: flex;
       align-items: center;
@@ -102,14 +144,14 @@
     .kpi-delta.negative { color: var(--negative); }
 
     .kpi-sparkline {
-      height: 24px;
+      height: 20px;
       display: flex;
       align-items: flex-end;
       gap: 2px;
     }
 
     .spark-bar {
-      width: 4px;
+      width: 3px;
       background: var(--accent-dim);
       border-radius: 1px;
     }
@@ -404,6 +446,15 @@
 
       <!-- Hebdo > Global -->
       <div id="view-global" class="view active">
+
+        <div class="brief-card">
+          <div class="brief-header">
+            <span class="brief-title">1. Brief global</span>
+            <span class="brief-period">S19 · 5–11 mai 2025</span>
+          </div>
+          <p class="brief-text">La semaine 19 affiche un CA TTC de 56 688 € en retrait de 9,0 % sur l'objectif et de 3,0 % vs N-1, mais ce déficit de volume est largement compensé par une marge brute de 52,5 %, soit +3,2 pts au-dessus de la cible — signe d'un mix produit maîtrisé. La fréquentation est en nette progression (+10,1 % vs N-1, 821 clients), tandis que le panier moyen recule à 69 € (-11,9 %), révélant un atelier concentré sur de petites interventions (187 OR, panier 185 € vs 224 € N-1). Côté LS, la dynamique est solide (+11,8 % CA, marge à 42,1 %). Point notable : l'avancement mensuel est à 27,8 % de l'objectif mai (252 219 €), avec un RAF de 182 069 € à réaliser sur les 21 jours restants — un rythme qui devra s'accélérer pour atteindre la cible mensuelle.</p>
+        </div>
+
         <section class="kpi-strip">
 
           <div class="kpi-card">
