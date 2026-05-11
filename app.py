@@ -799,7 +799,7 @@ def _tire_brands_html(brands: dict, week_num) -> str:
                else "var(--negative)" if "🔴" in st else "var(--warning)")
         rows += (f'<tr>'
                  f'<td>{_e(r.get("Catégorie",""))}</td>'
-                 f'<td>{_e(r.get("Marque",""))}</td>'
+                 f'<td style="text-align:left">{_e(r.get("Marque",""))}</td>'
                  f'<td style="text-align:right">{int(r["Qté_n"])}</td>'
                  f'<td style="text-align:right">{_eur(r.get("CA_n"))}</td>'
                  f'<td style="text-align:right">{_pct(evo, True) if evo is not None else "—"}</td>'
