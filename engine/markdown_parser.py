@@ -43,7 +43,7 @@ def parse_int(s):
 
 def extract_tables(content: str) -> list[pd.DataFrame]:
     # Extract markdown tables
-    tables = re.findall(r'(\|[^\n]+\|\n)((?:\|[-:\s]+\|\n)+)((\|[^\n]+\|\n)+)', content)
+    tables = re.findall(r'(\|[^\n]+\|\n)((?:\|[-:|\s]+\|\n)+)(\|[^\n]+\|\n(?:\|[^\n]+\|\n)*)', content)
     
     extracted = []
     for header, sep, body in tables:
@@ -83,13 +83,60 @@ def parse_latest_report() -> dict:
     period_match = re.search(r'\*\*Période\s*:\*\*\s*(\d{2}/\d{2}/\d{4})\s+au\s+(\d{2}/\d{2}/\d{4})', content)
     period_str = f"{period_match.group(1)} – {period_match.group(2)}" if period_match else None
 
+    # Section 8 — RH
+    rh_data = {"available": False, "alerte": [], "absence": [], "recrutement": []}
+    rh_sec = re.search(r'## 8\. RH\s*\n([\s\S]+?)(?=\n---|\Z)', content)
+    if rh_sec:
+        rh_text = rh_sec.group(1)
+        rh_data["available"] = True
+        for key, pat in [
+            ("alerte",      r'### 8\.1[^\n]+\n((?:> [^\n]*\n?)+)'),
+            ("absence",     r'### 8\.2[^\n]+\n((?:> [^\n]*\n?)+)'),
+            ("recrutement", r'### 8\.3[^\n]+\n((?:> [^\n]*\n?)+)'),
+        ]:
+            m = re.search(pat, rh_text)
+            if m:
+                rh_data[key] = [ln.lstrip('> ').strip() for ln in m.group(1).strip().split('\n') if ln.strip()]
+
+    # Bullet-point notes (familles + pneus key points)
+    def _bullets(pat):
+        m = re.search(pat, content, re.DOTALL)
+        if not m:
+            return []
+        return [re.sub(r'\*+', '', ln.lstrip('*- ')).strip()
+                for ln in m.group(1).split('\n')
+                if ln.strip() and ln.strip()[0] in ('*', '-')]
+
+    notes_fam  = _bullets(r"### Points clés de l'analyse par famille\s*\n([\s\S]+?)(?=\n###|\n##|\n---)")
+    notes_pneu = _bullets(r"### Points clés de l'analyse pneus\s*\n([\s\S]+?)(?=\n###|\n##|\n---)")
+
+    # Action plans (numbered lists → list of {title, obj} dicts)
+    def _plan_items(pat):
+        m = re.search(pat, content, re.DOTALL)
+        if not m:
+            return []
+        items, cur = [], None
+        for ln in m.group(1).split('\n'):
+            ln = ln.strip()
+            nm = re.match(r'^\d+\.\s+\*\*(.+?)\*\*', ln)
+            if nm:
+                cur = {"title": nm.group(1), "obj": ""}
+                items.append(cur)
+            elif cur and ln.startswith('- ') and 'Objectif' in ln:
+                cur["obj"] = re.sub(r'\*(.+?)\*', r'\1', ln.lstrip('- '))
+        return items
+
+    plan_ls = _plan_items(r"### Plan d'Action Libre Service[^\n]*\n([\s\S]+?)(?=\n### |\n## |\n---|\Z)")
+    plan_at = _plan_items(r"### Plan d'Action Atelier[^\n]*\n([\s\S]+?)(?=\n### |\n## |\n---|\Z)")
+
     kpis = {"available": True, "week_num": week_num, "brief": brief_text, "period_str": period_str, "global": {}, "ls": {}, "atelier": {}, "mtd": {}, "period": (None, None)}
     fam = {"available": True, "df": pd.DataFrame(), "margin_alerts": [], "top_losers": []}
     tires = {"available": True, "summary": {}, "season_df": pd.DataFrame(), "category_mix_df": pd.DataFrame()}
     ratios = {"available": True, "df": pd.DataFrame()}
     vendors = {"available": True, "df": pd.DataFrame()}
     defects = {"available": True, "df": pd.DataFrame()}
-    
+    tire_brands = {"available": False, "df": pd.DataFrame()}
+
     for df in tables:
         cols = df.columns.tolist()
         
@@ -239,11 +286,27 @@ def parse_latest_report() -> dict:
             df_d = df.copy()
             defects["df"] = df_d
 
+        # Tire brands (Détail par Marque)
+        elif "Catégorie" in cols and "Marque" in cols and "Qté" in cols:
+            df_b = df.copy()
+            df_b["Qté_n"]     = df_b["Qté"].apply(parse_int)
+            df_b["CA_n"]      = df_b["CA (€)"].apply(parse_euros)
+            df_b["Marge_pct"] = df_b["Marge %"].apply(parse_pct_str)
+            df_b["Evo_pct"]   = df_b["Évo CA %"].apply(parse_pct_str)
+            tire_brands["df"]        = df_b
+            tire_brands["available"] = True
+
     return {
-        "kpis": kpis,
-        "fam": fam,
-        "tires": tires,
-        "ratios": ratios,
-        "vendors": vendors,
-        "defects": defects,
+        "kpis":        kpis,
+        "fam":         fam,
+        "tires":       tires,
+        "ratios":      ratios,
+        "vendors":     vendors,
+        "defects":     defects,
+        "tire_brands": tire_brands,
+        "rh":          rh_data,
+        "notes_fam":   notes_fam,
+        "notes_pneu":  notes_pneu,
+        "plan_ls":     plan_ls,
+        "plan_at":     plan_at,
     }

@@ -733,6 +733,133 @@ def _brief_html(brief_text: str | None, week_num, period_str: str | None) -> str
             f'<p class="brief-text">{text}</p>'
             f'</div>')
 
+def _section_label(number: str, title: str) -> str:
+    return (f'<div style="display:flex;align-items:center;gap:12px;'
+            f'padding:20px 0 6px;border-top:1px solid var(--border)">'
+            f'<span style="font-size:10px;font-weight:700;text-transform:uppercase;'
+            f'letter-spacing:.1em;color:var(--bg);background:var(--accent);'
+            f'padding:3px 9px;border-radius:3px">{_e(number)}</span>'
+            f'<span style="font-size:14px;font-weight:600;color:var(--fg)">{_e(title)}</span>'
+            f'</div>')
+
+
+def _rh_html(rh: dict) -> str:
+    if not rh.get("available"):
+        return '<div class="card"><p class="no-data">⏳ Données RH indisponibles</p></div>'
+
+    def sub(label, items):
+        if not items:
+            return ''
+        lis = "".join(
+            f'<li style="font-size:13px;padding:4px 0;color:var(--fg)">{_e(i)}</li>'
+            for i in items
+        )
+        return (f'<div style="margin-bottom:14px">'
+                f'<div style="font-size:10px;font-weight:600;text-transform:uppercase;'
+                f'letter-spacing:.06em;color:var(--muted);margin-bottom:6px">{_e(label)}</div>'
+                f'<ul style="list-style:disc;padding-left:16px;margin:0">{lis}</ul></div>')
+
+    body = (sub("Alertes", rh.get("alerte", [])) +
+            sub("Absences / Congés", rh.get("absence", [])) +
+            sub("Recrutement / Départs", rh.get("recrutement", [])))
+    if not body:
+        body = '<p class="no-data">Aucune information RH</p>'
+
+    return (f'<div class="card">'
+            f'<div class="card-header"><span class="card-title">Ressources Humaines</span></div>'
+            f'{body}</div>')
+
+
+def _notes_html(notes: list, title: str) -> str:
+    if not notes:
+        return ''
+    lis = "".join(
+        f'<li style="font-size:12px;line-height:1.6;padding:5px 0;'
+        f'border-bottom:1px solid var(--border-subtle);color:var(--fg)">{_e(n)}</li>'
+        for n in notes
+    )
+    return (f'<div class="card">'
+            f'<div class="card-header"><span class="card-title">{_e(title)}</span></div>'
+            f'<ul style="list-style:none;padding:0;margin:0">{lis}</ul></div>')
+
+
+def _tire_brands_html(brands: dict, week_num) -> str:
+    if not brands.get("available") or brands["df"].empty:
+        return '<div class="card"><p class="no-data">⏳ Détail marques indisponible</p></div>'
+
+    df    = brands["df"]
+    valid = df[df["Qté_n"].notna()].copy()
+
+    rows = ""
+    for _, r in valid.iterrows():
+        evo = r.get("Evo_pct")
+        mg  = r.get("Marge_pct")
+        st  = str(r.get("Statut", ""))
+        sc  = ("var(--positive)" if "🟢" in st
+               else "var(--negative)" if "🔴" in st else "var(--warning)")
+        rows += (f'<tr>'
+                 f'<td>{_e(r.get("Catégorie",""))}</td>'
+                 f'<td>{_e(r.get("Marque",""))}</td>'
+                 f'<td style="text-align:right">{int(r["Qté_n"])}</td>'
+                 f'<td style="text-align:right">{_eur(r.get("CA_n"))}</td>'
+                 f'<td style="text-align:right">{_pct(evo, True) if evo is not None else "—"}</td>'
+                 f'<td style="text-align:right;color:{sc}">{_pct(mg)}</td>'
+                 f'</tr>')
+
+    return (f'<div class="card">'
+            f'<div class="card-header">'
+            f'<span class="card-title">Détail par Marque</span>'
+            f'<span class="card-meta">ÉTÉ · S{week_num or "?"}</span>'
+            f'</div>'
+            f'<table class="staff-table"><thead><tr>'
+            f'<th style="text-align:left">Catégorie</th>'
+            f'<th style="text-align:left">Marque</th>'
+            f'<th>Qté</th><th>CA</th><th>Évo.</th><th>Marge</th>'
+            f'</tr></thead><tbody>{rows}</tbody></table></div>')
+
+
+def _defects_html(defect_data: dict, week_num) -> str:
+    if not defect_data.get("available") or defect_data["df"].empty:
+        return '<div class="card"><p class="no-data">⏳ Données défectuosité indisponibles</p></div>'
+
+    df        = defect_data["df"]
+    stat_cols = [c for c in df.columns if c != "Technicien"]
+    ths       = "".join(f'<th>{_e(c)}</th>' for c in stat_cols)
+    rows      = ""
+    for _, r in df.iterrows():
+        tds = "".join(f'<td>{_e(r.get(c, "—"))}</td>' for c in stat_cols)
+        rows += f'<tr><td>{_e(r.get("Technicien",""))}</td>{tds}</tr>'
+
+    return (f'<div class="card">'
+            f'<div class="card-header">'
+            f'<span class="card-title">Taux de Défectuosité</span>'
+            f'<span class="card-meta">S{week_num or "?"}</span>'
+            f'</div>'
+            f'<div style="overflow-x:auto">'
+            f'<table class="staff-table"><thead><tr>'
+            f'<th>Technicien</th>{ths}</tr></thead>'
+            f'<tbody>{rows}</tbody></table></div></div>')
+
+
+def _plan_html(items: list, title: str, tag_cls: str = "tag-ls") -> str:
+    if not items:
+        return (f'<div class="card"><div class="card-header">'
+                f'<span class="card-title">{_e(title)}</span></div>'
+                f'<p class="no-data">Plan non disponible</p></div>')
+
+    html_items = "".join(
+        f'<div class="action-item">'
+        f'<span class="action-tag {tag_cls}" style="min-width:20px;text-align:center">{i + 1}</span>'
+        f'<div class="action-text"><strong>{_e(it["title"])}</strong>'
+        f'{"<br>" + _e(it["obj"]) if it.get("obj") else ""}'
+        f'</div></div>'
+        for i, it in enumerate(items)
+    )
+    return (f'<div class="card">'
+            f'<div class="card-header"><span class="card-title">{_e(title)}</span></div>'
+            f'<div class="action-list">{html_items}</div></div>')
+
+
 def _charts_html() -> str:
     return (
         f'<div class="chart-stack" data-od-id="charts">'
@@ -904,10 +1031,14 @@ def build_global_html(data: dict) -> str:
             f'{_brief_html(kpis.get("brief"), w, ps)}'
             f'{_kpi_strip(kpis.get("global", {}), kpis.get("ls", {}), kpis.get("atelier", {}))}'
             f'<main class="main-content" style="grid-column:1/-1">'
+            f'{_section_label("7", "Reste à Faire — Mois en cours")}'
             f'{_raf_html(kpis)}'
+            f'{_section_label("8", "Ressources Humaines")}'
+            f'{_rh_html(data.get("rh", {}))}'
             f'</main>'
             f'</div>')
     return _wrap(body)
+
 
 def build_ls_html(data: dict) -> str:
     kpis = data["kpis"]
@@ -922,16 +1053,21 @@ def build_ls_html(data: dict) -> str:
 
     body = (f'<div class="dashboard">'
             f'{_header(wl, ps)}'
+            f'<main class="main-content" style="grid-column:1/-1">'
+            f'{_section_label("3", "Libre Service vs N-1")}'
             f'{_ls_kpi_strip(ls)}'
-            f'<main class="main-content">'
             f'{_familles_html(data["fam"])}'
+            f'{_notes_html(data.get("notes_fam") or [], "Points clés — Analyse par Famille")}'
             f'{_pneus_html(data["tires"], w)}'
-            f'</main>'
-            f'<aside class="sidebar">'
+            f'{_tire_brands_html(data.get("tire_brands") or {}, w)}'
+            f'{_notes_html(data.get("notes_pneu") or [], "Points clés — Analyse Pneus")}'
+            f'{_section_label("5", "Staff Libre Service — Ratios de Vente")}'
             f'{_staff_html(data["vendors"], w)}'
-            f'{_actions_html(data["fam"], data["ratios"])}'
-            f'</aside></div>')
+            f'{_section_label("6", "Plan d\'Action Libre Service")}'
+            f'{_plan_html(data.get("plan_ls") or [], "Plan d\'Action Libre Service", "tag-ls")}'
+            f'</main></div>')
     return _wrap(body)
+
 
 def build_atelier_html(data: dict) -> str:
     kpis = data["kpis"]
@@ -946,19 +1082,20 @@ def build_atelier_html(data: dict) -> str:
 
     body = (f'<div class="dashboard">'
             f'{_header(wl, ps)}'
+            f'<main class="main-content" style="grid-column:1/-1">'
+            f'{_section_label("3", "Atelier vs N-1")}'
             f'{_at_kpi_strip(at)}'
-            f'<main class="main-content">'
-            f'{_raf_html(kpis)}'
+            f'{_section_label("4", "Ratios Prioritaires")}'
             f'{_ratios_html(data["ratios"], w)}'
-            f'</main>'
-            f'<aside class="sidebar">'
-            f'{_staff_html(data["vendors"], w)}'
-            f'{_actions_html(data["fam"], data["ratios"])}'
-            f'</aside></div>')
+            f'{_section_label("5", "Staff Atelier — Taux de Défectuosité")}'
+            f'{_defects_html(data["defects"], w)}'
+            f'{_section_label("6", "Plan d\'Action Atelier")}'
+            f'{_plan_html(data.get("plan_at") or [], "Plan d\'Action Atelier", "tag-atel")}'
+            f'</main></div>')
     return _wrap(body)
 
 
-def build_monthly_html(data: dict) -> str:
+def build_monthly_global_html(data: dict) -> str:
     kpis = data["kpis"]
     w    = kpis.get("week_num") or "?"
     ls   = kpis.get("ls", {})
@@ -980,17 +1117,55 @@ def build_monthly_html(data: dict) -> str:
                    kv("Panier Moyen", _eur(at.get("panier"),1))])
 
     body = (f'<div class="dashboard">'
-            f'{_header(f"S{w}", "Revue Mensuelle")}'
+            f'{_header(f"S{w}", "Revue Mensuelle · Global")}'
             f'<main class="main-content" style="grid-column:1/-1">'
             f'{_raf_html(kpis)}'
             f'<div class="two-col">'
             f'<div class="card"><div class="card-header">'
-            f'<span class="card-title">Libre Service — Semaine</span></div>'
+            f'<span class="card-title">Libre Service — Mensuel</span></div>'
             f'<table class="kv-table">{lsr}</table></div>'
             f'<div class="card"><div class="card-header">'
-            f'<span class="card-title">Atelier — Semaine</span></div>'
+            f'<span class="card-title">Atelier — Mensuel</span></div>'
             f'<table class="kv-table">{atr}</table></div>'
             f'</div></main></div>')
+    return _wrap(body)
+
+
+def build_monthly_ls_html(data: dict) -> str:
+    kpis = data["kpis"]
+    w    = kpis.get("week_num") or "?"
+    ls   = kpis.get("ls", {})
+
+    body = (f'<div class="dashboard">'
+            f'{_header(f"S{w}", "Revue Mensuelle · Libre Service")}'
+            f'{_ls_kpi_strip(ls)}'
+            f'<main class="main-content">'
+            f'{_familles_html(data["fam"])}'
+            f'{_pneus_html(data["tires"], w)}'
+            f'</main>'
+            f'<aside class="sidebar">'
+            f'{_staff_html(data["vendors"], w)}'
+            f'{_actions_html(data["fam"], data["ratios"])}'
+            f'</aside></div>')
+    return _wrap(body)
+
+
+def build_monthly_atelier_html(data: dict) -> str:
+    kpis = data["kpis"]
+    w    = kpis.get("week_num") or "?"
+    at   = kpis.get("atelier", {})
+
+    body = (f'<div class="dashboard">'
+            f'{_header(f"S{w}", "Revue Mensuelle · Atelier")}'
+            f'{_at_kpi_strip(at)}'
+            f'<main class="main-content">'
+            f'{_raf_html(kpis)}'
+            f'{_ratios_html(data["ratios"], w)}'
+            f'</main>'
+            f'<aside class="sidebar">'
+            f'{_staff_html(data["vendors"], w)}'
+            f'{_actions_html(data["fam"], data["ratios"])}'
+            f'</aside></div>')
     return _wrap(body)
 
 
@@ -1042,10 +1217,16 @@ st.session_state.setdefault("view", "global")
 
 with st.sidebar:
     st.markdown(
-        '<div style="padding:20px 4px 4px;font-size:15px;font-weight:700;'
+        '<div style="padding:20px 4px 4px;font-size:22px;font-weight:700;'
         'color:#78BE20;letter-spacing:-.01em">Feu Vert Annecy 203</div>'
-        '<div style="font-size:11px;color:#6b7280;margin-bottom:20px;'
+        '<div style="font-size:11px;color:#6b7280;margin-bottom:8px;'
         'font-family:monospace">Tableau de bord</div>',
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        '<div style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;'
+        'color:#4b5563;font-weight:600;padding:12px 4px 6px">Périodes</div>',
         unsafe_allow_html=True,
     )
 
@@ -1057,9 +1238,9 @@ with st.sidebar:
 
     if hebdo_active:
         for label, view_id in [
-            ("  🌍 Global",        "global"),
-            ("  🛒 Libre Service", "ls"),
-            ("  🔧 Atelier",       "atelier"),
+            ("  🌍 Global centre",  "global"),
+            ("  🛒 Libre Service",  "ls"),
+            ("  🔧 Atelier",        "atelier"),
         ]:
             if st.button(label, use_container_width=True,
                          type="primary" if st.session_state.view == view_id else "secondary",
@@ -1067,11 +1248,25 @@ with st.sidebar:
                 st.session_state.view = view_id
                 st.rerun()
 
+    mensuel_views = ("mensuel_global", "mensuel_ls", "mensuel_atelier")
+    mensuel_active = st.session_state.view in mensuel_views
     if st.button("📅 Rapports mensuels", use_container_width=True,
-                 type="primary" if st.session_state.view == "mensuel" else "secondary",
+                 type="primary" if mensuel_active else "secondary",
                  key="nav_mensuel"):
-        st.session_state.view = "mensuel"
+        st.session_state.view = "mensuel_global"
         st.rerun()
+
+    if mensuel_active:
+        for label, view_id in [
+            ("  🌍 Global centre",  "mensuel_global"),
+            ("  🛒 Libre Service",  "mensuel_ls"),
+            ("  🔧 Atelier",        "mensuel_atelier"),
+        ]:
+            if st.button(label, use_container_width=True,
+                         type="primary" if st.session_state.view == view_id else "secondary",
+                         key=f"nav_{view_id}"):
+                st.session_state.view = view_id
+                st.rerun()
 
     if st.button("📊 Rapports trimestriels", use_container_width=True,
                  type="primary" if st.session_state.view == "trimestriel" else "secondary",
@@ -1098,7 +1293,11 @@ elif view == "ls":
     _render(build_ls_html(data), height=2400)
 elif view == "atelier":
     _render(build_atelier_html(data), height=2400)
-elif view == "mensuel":
-    _render(build_monthly_html(data), height=1100)
+elif view == "mensuel_global":
+    _render(build_monthly_global_html(data), height=1100)
+elif view == "mensuel_ls":
+    _render(build_monthly_ls_html(data), height=2400)
+elif view == "mensuel_atelier":
+    _render(build_monthly_atelier_html(data), height=2400)
 elif view == "trimestriel":
     _render(build_quarterly_html(data), height=900)
