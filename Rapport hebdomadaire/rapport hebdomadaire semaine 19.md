@@ -6,7 +6,7 @@ in # Rapport d'Analyse Hebdomadaire - Feu Vert Annecy
 
 ## 1. Brief global
 
-**Vision Globale :** La semaine 19 affiche un CA TTC de 56 688 € en retrait de 9,0 % sur l'objectif et de 3,0 % vs N-1, mais ce déficit de volume est largement compensé par une marge brute de 52,5 %, soit +3,2 pts au-dessus de la cible — signe d'un mix produit maîtrisé. La fréquentation est en nette progression (+10,1 % vs N-1, 821 clients), tandis que le panier moyen recule à 69 € (-11,9 %), révélant un atelier concentré sur de petites interventions (187 OR, panier 185 € vs 224 € N-1). Côté LS, la dynamique est solide (+11,8 % CA, marge à 42,1 %). Point notable : l'objectif mensuel est d'ores et déjà dépassé à 112,6 % du cumul, ce qui offre une marge de manœuvre pour la fin de mois.
+**Vision Globale :** La semaine 19 affiche un CA TTC de 56 688 € en retrait de 9,0 % sur l'objectif et de 3,0 % vs N-1, mais ce déficit de volume est largement compensé par une marge brute de 52,5 %, soit +3,2 pts au-dessus de la cible — signe d'un mix produit maîtrisé. La fréquentation est en nette progression (+10,1 % vs N-1, 821 clients), tandis que le panier moyen recule à 69 € (-11,9 %), révélant un atelier concentré sur de petites interventions (187 OR, panier 185 € vs 224 € N-1). Côté LS, la dynamique est solide (+11,8 % CA, marge à 42,1 %). Point notable : l'avancement mensuel est à 27,8 % de l'objectif mai (252 219 €), avec un RAF de 182 069 € à réaliser sur les 21 jours restants — un rythme qui devra s'accélérer pour atteindre la cible mensuelle.
 
 ---
 
@@ -115,14 +115,14 @@ in # Rapport d'Analyse Hebdomadaire - Feu Vert Annecy
 
 ## 4. Ratios Prioritaires (Performance Atelier)
 
-|KPI Prioritaire|Réalisé (N)|Objectif|Écart|Statut|
-|:--|:--|:--|:--|:--|:--|
-|**Garantie Pneu**|51 %|50 %|+1,0 pts|🟢|
-|**Géométrie**|17 %|19 %|-2,0 pts|🔴|
-|**VCR (Refroid)**|10 %|7 %|+3,0 pts|🟢|
-|**VCF (Frein)**|12 %|11 %|+1,0 pts|🟢|
-|**Plaquette**|13 %|11 %|+2,0 pts|🟢|
-|**Dépollution**|53 %|35 %|+18,0 pts|🟢|
+| KPI Prioritaire   | Réalisé (N) | Objectif | Écart     | Statut |
+| :---------------- | :---------- | :------- | :-------- | :----- |
+| **Garantie Pneu** | 51 %        | 50 %     | +1,0 pts  | 🟢     |
+| **Géométrie**     | 17 %        | 19 %     | -2,0 pts  | 🔴     |
+| **VCR (Refroid)** | 10 %        | 7 %      | +3,0 pts  | 🟢     |
+| **VCF (Frein)**   | 12 %        | 11 %     | +1,0 pts  | 🟢     |
+| **Plaquette**     | 13 %        | 11 %     | +2,0 pts  | 🟢     |
+| **Dépollution**   | 53 %        | 35 %     | +18,0 pts | 🟢     |
 
 ---
 
@@ -146,13 +146,13 @@ _Objectif : Capacité des conseillers à transformer l'accueil en prestations pr
 
 _Objectif : Rigueur technique et capacité de détection des besoins de sécurité._
 
-|Technicien|Nb OR|Déf. Batterie|Disq AV|Disq AR|Plaq Av|Plaq Ar|Def BEG|Déf. VCF (Frein)|Déf. VCR|Déf. Amort|Déf. Pare-brise|
-|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|
-|**Chandrack K.**|46|13,0 %|2,8 %|0,0 %|2,8 %|0,0 %|25,0 %|3,3 %|13,0 %|2,7 %|6,5 %|
-|**Mohammed Ali M.**|31|3,2 %|46,2 %|3,8 %|50,0 %|3,8 %|19,4 %|38,7 %|80,6 %|23,1 %|3,2 %|
-|**Victor B.**|29|17,2 %|6,9 %|6,9 %|27,6 %|17,2 %|0,0 %|3,4 %|10,3 %|36,2 %|3,4 %|
-|**Gael R.**|33|3,0 %|6,3 %|6,3 %|6,3 %|6,3 %|4,5 %|0,0 %|51,5 %|14,1 %|3,0 %|
-|**Denis D.**|N/A|N/A|N/A|N/A|N/A|N/A|N/A|N/A|N/A|N/A|N/A|
+| Technicien          | Nb OR | Déf. Batterie | Disq AV | Disq AR | Plaq Av | Plaq Ar | Def BEG | Déf. VCF (Frein) | Déf. VCR | Déf. Amort | Déf. Pare-brise |
+| :------------------ | :---- | :------------ | :------ | :------ | :------ | :------ | :------ | :--------------- | :------- | :--------- | :-------------- |
+| **Chandrack K.**    | 46    | 13,0 %        | 2,8 %   | 0,0 %   | 2,8 %   | 0,0 %   | 25,0 %  | 3,3 %            | 13,0 %   | 2,7 %      | 6,5 %           |
+| **Mohammed Ali M.** | 31    | 3,2 %         | 46,2 %  | 3,8 %   | 50,0 %  | 3,8 %   | 19,4 %  | 38,7 %           | 80,6 %   | 23,1 %     | 3,2 %           |
+| **Victor B.**       | 29    | 17,2 %        | 6,9 %   | 6,9 %   | 27,6 %  | 17,2 %  | 0,0 %   | 3,4 %            | 10,3 %   | 36,2 %     | 3,4 %           |
+| **Gael R.**         | 33    | 3,0 %         | 6,3 %   | 6,3 %   | 6,3 %   | 6,3 %   | 4,5 %   | 0,0 %            | 51,5 %   | 14,1 %     | 3,0 %           |
+| **Denis D.**        | N/A   | N/A           | N/A     | N/A     | N/A     | N/A     | N/A     | N/A              | N/A      | N/A        | N/A             |
 
 ---
 
@@ -180,12 +180,12 @@ _Objectif : Rigueur technique et capacité de détection des besoins de sécurit
 
 ## 7. Reste à Faire (RAF) du Mois
 
-|Indicateur|Objectif|Réalisé (N)|% Réalisé|RAF|
-|:--|:--|:--|:--|:--|:--|
-|**CA**|62 315 €|70 150 €|112.6 %|-7 835 €|
-|**Marge**|103 632 €|13 950 €|13.5 %|89 682 €|
-|**Contrat**|14|10|71.4 %|4|
-|**Cofidis**|39|7|17.9 %|32|
+| Indicateur  | Objectif  | Réalisé (N) | % Réalisé | RAF      |
+| :---------- | :-------- | :---------- | :-------- | :------- |
+| **CA**      | 252 219 € | 70 150 €    | 27.8 %    | 182 069 € |
+| **Marge**   | 103 632 € | 13 950 €    | 13.5 %    | 89 682 € |
+| **Contrat** | 14        | 10          | 71.4 %    | 4        |
+| **Cofidis** | 39        | 7           | 17.9 %    | 32       |
 
 ---
 

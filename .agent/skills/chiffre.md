@@ -285,8 +285,28 @@ else:
 # — Section 7 RAF (MTD values) —
 g_mtd       = parse_global_block(mtd_content)
 ca_mtd      = clean_num(g_mtd.get('cattc_n', '0'))
-ca_pct      = round(ca_mtd / ca_obj_ttc * 100, 1) if ca_obj_ttc else 0
-ca_raf      = int(ca_obj_ttc - ca_mtd)
+
+# Monthly CA TTC objective from objectif journalier (textbox8 — constant column)
+ca_monthly_obj_ttc = 0
+_obj_hdrs = []
+for _line in obj_content.replace('\r\n', '\n').split('\n'):
+    if 'libelleJour' in _line:
+        _obj_hdrs = next(csv.reader([_line]))
+        continue
+    if not _line.strip() or not _obj_hdrs:
+        continue
+    try:
+        _row = next(csv.reader([_line]))
+        _d = dict(zip(_obj_hdrs, _row))
+        _val = clean_num(_d.get('textbox8', '0'))
+        if _val > 0:
+            ca_monthly_obj_ttc = int(_val)
+            break
+    except:
+        continue
+
+ca_pct      = round(ca_mtd / ca_monthly_obj_ttc * 100, 1) if ca_monthly_obj_ttc else 0
+ca_raf      = int(ca_monthly_obj_ttc - ca_mtd)
 marge_mtd_eur = extraire_marge_eur(mtd_content) or 0
 marge_eur_pct = round(marge_mtd_eur / marge_obj_eur * 100, 1) if marge_obj_eur else 0
 marge_eur_raf = marge_obj_eur - marge_mtd_eur
@@ -351,7 +371,7 @@ S7_OLD = (
     "|**Cofidis**|||%||"
 )
 S7_NEW = (
-    f"|**CA**|{fmt_eur(ca_obj_ttc)}|{fmt_eur(ca_mtd)}|{ca_pct} %|{fmt_eur(ca_raf)}|\n"
+    f"|**CA**|{fmt_eur(ca_monthly_obj_ttc)}|{fmt_eur(ca_mtd)}|{ca_pct} %|{fmt_eur(ca_raf)}|\n"
     f"|**Marge**|{fmt_eur(marge_obj_eur)}|{fmt_eur(marge_mtd_eur)}|{marge_eur_pct} %|{fmt_eur(marge_eur_raf)}|\n"
     f"|**Contrat**|-|{contrat_mtd}|-|-|\n"
     f"|**Cofidis**|-|-|-|-|"
@@ -383,6 +403,7 @@ kpis = {
     "at_evo_pct":     at_evo,
     "at_marge_pct":   at_marge,
     "at_nb_or":       at_nb_or,
+    "ca_monthly_obj": ca_monthly_obj_ttc,
     "ca_mtd":         int(ca_mtd),
     "ca_raf":         ca_raf,
     "ca_avancement":  ca_pct,
@@ -410,7 +431,7 @@ Aucun CSV n'est transmis au modèle. Le prompt envoyé est :
 > CA TTC réalisé : {kpis['ca_ttc']} € | Objectif : {kpis['ca_obj']} € | Écart : {kpis['ca_ecart_pct']} %
 > Marge : {kpis['marge_pct']} % | Objectif : {kpis['marge_obj_pct']} % | Écart : {kpis['marge_ecart_pts']} pts
 > LS : {kpis['ls_ca']} € ({kpis['ls_evo_pct']:+} % vs N-1) | Atelier : {kpis['at_ca']} € ({kpis['at_evo_pct']:+} % vs N-1)
-> Avancement mensuel : {kpis['ca_avancement']} % — RAF : {kpis['ca_raf']} €
+> Avancement mensuel : {kpis['ca_avancement']} % (objectif mois : {kpis['ca_monthly_obj']} €) — RAF : {kpis['ca_raf']} €
 > Ton : senior business analyst, 3-4 phrases, en français."
 
 Ensuite, invoquer automatiquement `/ratios` pour remplir la Section 4.
