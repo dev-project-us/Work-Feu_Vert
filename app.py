@@ -997,16 +997,11 @@ def build_quarterly_html(data: dict) -> str:
 # STREAMLIT SHELL
 # ════════════════════════════════════════════════════════════════════════════
 
+from engine import markdown_parser
+
 @st.cache_data(ttl=300)
 def load_data() -> dict:
-    return {
-        "kpis":    global_stats.weekly_kpis(),
-        "fam":     families.parse_families(),
-        "tires":   tires.parse_tires(),
-        "ratios":  ratios.parse_ratios(),
-        "vendors": vendor_ratios.parse_vendor_ratios(),
-        "defects": defects.parse_defects(),
-    }
+    return markdown_parser.parse_latest_report()
 
 
 data = load_data()
