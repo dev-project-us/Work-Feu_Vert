@@ -59,7 +59,10 @@ def extract_tables(content: str) -> list[pd.DataFrame]:
     return extracted
 
 def parse_latest_report() -> dict:
-    files = sorted(glob.glob(str(REPORT_DIR / "*.md")), key=lambda f: int(re.search(r"semaine (\d+)", f.lower()).group(1)) if re.search(r"semaine (\d+)", f.lower()) else 0, reverse=True)
+    _week_re = re.compile(r"semaine (\d+)")
+    files = sorted(glob.glob(str(REPORT_DIR / "*.md")),
+                   key=lambda f: int(m.group(1)) if (m := _week_re.search(f.lower())) else 0,
+                   reverse=True)
     
     if not files:
         return {"kpis": {"available": False}, "fam": {"available": False}, "tires": {"available": False}, "ratios": {"available": False}, "vendors": {"available": False}, "defects": {"available": False}}
@@ -72,7 +75,15 @@ def parse_latest_report() -> dict:
     
     tables = extract_tables(content)
     
-    kpis = {"available": True, "week_num": week_num, "global": {}, "ls": {}, "atelier": {}, "mtd": {}, "period": (None, None)}
+    # Extract Brief Global text
+    brief_match = re.search(r'\*\*Vision Globale\s*:\*\*\s*(.+?)(?=\n---|\n##|\Z)', content, re.DOTALL)
+    brief_text = brief_match.group(1).strip() if brief_match else None
+
+    # Extract period string from header line
+    period_match = re.search(r'\*\*Période\s*:\*\*\s*(\d{2}/\d{2}/\d{4})\s+au\s+(\d{2}/\d{2}/\d{4})', content)
+    period_str = f"{period_match.group(1)} – {period_match.group(2)}" if period_match else None
+
+    kpis = {"available": True, "week_num": week_num, "brief": brief_text, "period_str": period_str, "global": {}, "ls": {}, "atelier": {}, "mtd": {}, "period": (None, None)}
     fam = {"available": True, "df": pd.DataFrame(), "margin_alerts": [], "top_losers": []}
     tires = {"available": True, "summary": {}, "season_df": pd.DataFrame(), "category_mix_df": pd.DataFrame()}
     ratios = {"available": True, "df": pd.DataFrame()}

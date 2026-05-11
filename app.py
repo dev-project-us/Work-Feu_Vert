@@ -282,6 +282,15 @@ body { font-family: var(--font-body); background: var(--bg); color: var(--fg);
 .feed-tag { display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; background: var(--accent-dim); color: var(--accent); margin-right: 6px; }
 .feed-tag.service { background: oklch(30% 0.08 240); color: oklch(70% 0.12 240); }
 .feed-tag.vente { background: oklch(30% 0.10 130); color: var(--accent); }
+/* BRIEF GLOBAL */
+.brief-card { background: var(--surface); border: 1px solid var(--border);
+              border-radius: 6px; padding: 14px 16px; grid-column: 1 / -1; }
+.brief-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.brief-title { font-size: 11px; font-weight: 600; text-transform: uppercase;
+               letter-spacing: .08em; color: var(--muted); }
+.brief-period { font-family: var(--font-mono); font-size: 10px; color: var(--muted);
+                background: var(--surface-elevated); padding: 2px 8px; border-radius: 3px; }
+.brief-text { font-size: 13px; line-height: 1.65; color: var(--fg); }
 /* UTIL */
 .no-data { color: var(--muted); font-size: 13px; padding: 24px;
            text-align: center; font-style: italic; }
@@ -366,7 +375,7 @@ def _header(week_label: str, period_str: str) -> str:
   <div class="header-left">
     <div class="logo">FV</div>
     <div>
-      <h1 class="header-title">Feu Vert Annecy</h1>
+      <h1 class="header-title">Feu Vert Annecy 203</h1>
       <p class="header-subtitle">Briefing Hebdomadaire</p>
     </div>
   </div>
@@ -702,6 +711,19 @@ def _staff_html(vendor_data: dict, week_num) -> str:
             f'GP = Garantie Pneu · Dép. = Dépollution · valeurs en %</p></div>')
 
 
+def _brief_html(brief_text: str | None, week_num, period_str: str | None) -> str:
+    w_label = f"S{week_num}" if week_num else "—"
+    p_label = period_str or "—"
+    badge = f"{w_label} · {p_label}"
+    text = _e(brief_text) if brief_text else "<em style='color:var(--muted)'>Brief global non disponible</em>"
+    return (f'<div class="brief-card">'
+            f'<div class="brief-header">'
+            f'<span class="brief-title">1. Brief global</span>'
+            f'<span class="brief-period">{badge}</span>'
+            f'</div>'
+            f'<p class="brief-text">{text}</p>'
+            f'</div>')
+
 def _charts_html() -> str:
     return (
         f'<div class="chart-stack" data-od-id="charts">'
@@ -864,23 +886,18 @@ def build_global_html(data: dict) -> str:
     w    = kpis.get("week_num") or "?"
     p    = kpis.get("period") or (None, None)
     wl   = f"S{w}"
-    ps   = (f"{p[0].strftime('%d/%m')} – {p[1].strftime('%d/%m/%Y')}"
-            if p[0] and p[1] else "—")
+    ps   = kpis.get("period_str") or (
+               f"{p[0].strftime('%d/%m')} – {p[1].strftime('%d/%m/%Y')}"
+               if p and p[0] and p[1] else "—")
 
-    g  = kpis.get("global", {})
-    ls = kpis.get("ls", {})
-    at = kpis.get("atelier", {})
     body = (f'<div class="dashboard">'
             f'{_header(wl, ps)}'
-            f'{_kpi_strip(g, ls, at)}'
-            f'<main class="main-content">'
-            f'{_retention_html()}'
-            f'{_leaderboard_html()}'
+            f'{_brief_html(kpis.get("brief"), w, ps)}'
+            f'{_kpi_strip(kpis.get("global", {}), kpis.get("ls", {}), kpis.get("atelier", {}))}'
+            f'<main class="main-content" style="grid-column:1/-1">'
+            f'{_raf_html(kpis)}'
             f'</main>'
-            f'<aside class="sidebar">'
-            f'{_charts_html()}'
-            f'{_heatmap_html()}'
-            f'</aside></div>')
+            f'</div>')
     return _wrap(body)
 
 def build_ls_html(data: dict) -> str:
@@ -888,12 +905,11 @@ def build_ls_html(data: dict) -> str:
     w    = kpis.get("week_num") or "?"
     p    = kpis.get("period") or (None, None)
     wl   = f"S{w}"
-    ps   = (f"{p[0].strftime('%d/%m')} – {p[1].strftime('%d/%m/%Y')}"
-            if p[0] and p[1] else "—")
+    ps   = kpis.get("period_str") or (
+               f"{p[0].strftime('%d/%m')} – {p[1].strftime('%d/%m/%Y')}"
+               if p and p[0] and p[1] else "—")
 
-    g  = kpis.get("global", {})
     ls = kpis.get("ls", {})
-    at = kpis.get("atelier", {})
 
     body = (f'<div class="dashboard">'
             f'{_header(wl, ps)}'
@@ -913,11 +929,10 @@ def build_atelier_html(data: dict) -> str:
     w    = kpis.get("week_num") or "?"
     p    = kpis.get("period") or (None, None)
     wl   = f"S{w}"
-    ps   = (f"{p[0].strftime('%d/%m')} – {p[1].strftime('%d/%m/%Y')}"
-            if p[0] and p[1] else "—")
+    ps   = kpis.get("period_str") or (
+               f"{p[0].strftime('%d/%m')} – {p[1].strftime('%d/%m/%Y')}"
+               if p and p[0] and p[1] else "—")
 
-    g  = kpis.get("global", {})
-    ls = kpis.get("ls", {})
     at = kpis.get("atelier", {})
 
     body = (f'<div class="dashboard">'
