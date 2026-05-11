@@ -139,6 +139,7 @@ _Objectif : Capacité des conseillers à transformer l'accueil en prestations pr
 |**Kamilia**|%|%|%|%|%|%|
 |**Chouaib**|%|%|%|%|%|%|
 |**Pauline**|%|%|%|%|%|%|
+|**Ridvan**|%|%|%|%|%|%|
 |**Valentin**|%|%|%|%|%|%|
 
 ### Staff Atelier : Taux de Défectuosité

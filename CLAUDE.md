@@ -167,6 +167,7 @@ File identified by presence of `textbox390` in content. Parsed raw with `open(..
 | **Kamilia** | `KAMILIA A.` |
 | **Chouaib** | `CHOUAIB G.` |
 | **Pauline** | `PAULINE R.` |
+| **Ridvan** | `RIDVAN K.` |
 | **Valentin** | `VALENTIN C.` |
 
 Vendeurs présents dans le CSV mais absents du template (Arnaud B., Elyne S., Isabelle P., Sofiane B.) sont ignorés.

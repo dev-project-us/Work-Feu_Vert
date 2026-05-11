@@ -57,6 +57,7 @@ NOM_MAP = {
     'Kamilia':  'KAMILIA A.',
     'Chouaib':  'CHOUAIB G.',
     'Pauline':  'PAULINE R.',
+    'Ridvan':   'RIDVAN K.',
     'Valentin': 'VALENTIN C.',
 }
 
@@ -151,7 +152,7 @@ for nom_template, nom_csv in NOM_MAP.items():
     old = f"|**{nom_template}**|" + "%|" * 6
 
     data = vendeurs.get(nom_csv, {})
-    vals = [data.get(key) or '0 %' for key in COLS]
+    vals = [data.get(key) or 'N/A' for key in COLS]
     new  = f"|**{nom_template}**|" + "|".join(vals) + "|"
 
     rapport = rapport.replace(old, new)
