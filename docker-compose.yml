@@ -45,6 +45,7 @@ services:
       - ./data/current/defectuosite:/app/resources/defectuosite:ro
 
       # ── Monthly & Quarterly aggregates ──────────────────────────────────────
+      - "./Rapport hebdomadaire:/app/Rapport hebdomadaire:ro"
       - ./data/monthly_recap:/app/monthly_recap:ro
       - ./data/trimestres:/app/trimestres:ro
 

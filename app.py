@@ -22,19 +22,25 @@ st.set_page_config(
     page_title="Feu Vert Annecy",
     page_icon="🟢",
     layout="wide",
-    initial_sidebar_state="collapsed",
+    initial_sidebar_state="expanded",
 )
 
-# Remove Streamlit chrome so the iframe fills cleanly
+# Remove Streamlit chrome + style sidebar to match dark theme
 st.markdown(
-    "<style>.block-container{padding:0 !important;} "
+    "<style>"
+    ".block-container{padding:0 !important;} "
     ".stApp{background:#111827;} "
-    ".stTabs [data-baseweb='tab-list']{padding:0 24px;background:#111827;border-bottom:1px solid #1f2937;}"
-    ".stTabs [data-baseweb='tab']{color:#9ca3af !important;}"
-    ".stTabs [data-baseweb='tab'][aria-selected='true']"
-    "{background:#78BE20!important;color:#111827!important;font-weight:600;}"
-    ".stAlert {background-color: oklch(25% 0.05 85) !important; border: 1px solid oklch(40% 0.1 85) !important; color: oklch(95% 0.02 85) !important;}"
-    ".stExpander {background-color: oklch(20% 0.02 240) !important; border: 1px solid oklch(30% 0.02 240) !important;}"
+    "[data-testid='stSidebar']{background:#111827 !important;border-right:1px solid #1f2937 !important;} "
+    "[data-testid='stSidebar'] .stButton button{"
+    "  border-radius:6px !important;font-size:13px !important;font-weight:500 !important;"
+    "  border:1px solid #1f2937 !important;background:#1f2937 !important;color:#9ca3af !important;"
+    "  text-align:left !important;padding:8px 12px !important;transition:background .15s;} "
+    "[data-testid='stSidebar'] .stButton button:hover{background:#374151 !important;color:#f9fafb !important;} "
+    "[data-testid='stSidebar'] .stButton button[kind='primary']{"
+    "  background:#78BE20 !important;color:#111827 !important;border-color:#78BE20 !important;font-weight:600 !important;} "
+    "[data-testid='stSidebar'] hr{border-color:#1f2937;} "
+    ".stAlert{background-color:oklch(25% 0.05 85) !important;border:1px solid oklch(40% 0.1 85) !important;color:oklch(95% 0.02 85) !important;}"
+    ".stExpander{background-color:oklch(20% 0.02 240) !important;border:1px solid oklch(30% 0.02 240) !important;}"
     "</style>",
     unsafe_allow_html=True,
 )
@@ -1021,46 +1027,75 @@ def load_data() -> dict:
 
 data = load_data()
 
-# Minimal top bar: errors + refresh
-all_errors = sum((v.get("errors",[]) for v in data.values() if isinstance(v,dict)),[])
-col_e, col_b = st.columns([11, 1])
-with col_e:
+def _render(html: str, height: int) -> None:
+    try:
+        st.iframe(srcdoc=html, height=height, scrolling=False)
+    except TypeError:
+        import streamlit.components.v1 as _cv1
+        _cv1.html(html, height=height, scrolling=False)
+
+# ─── Sidebar navigation ───────────────────────────────────────────────────────
+st.session_state.setdefault("view", "global")
+
+with st.sidebar:
+    st.markdown(
+        '<div style="padding:20px 4px 4px;font-size:15px;font-weight:700;'
+        'color:#78BE20;letter-spacing:-.01em">Feu Vert Annecy 203</div>'
+        '<div style="font-size:11px;color:#6b7280;margin-bottom:20px;'
+        'font-family:monospace">Tableau de bord</div>',
+        unsafe_allow_html=True,
+    )
+
+    hebdo_active = st.session_state.view in ("global", "ls", "atelier")
+    if st.button("📋 Rapports hebdomadaires", use_container_width=True,
+                 type="primary" if hebdo_active else "secondary", key="nav_hebdo"):
+        st.session_state.view = "global"
+        st.rerun()
+
+    if hebdo_active:
+        for label, view_id in [
+            ("  🌍 Global",        "global"),
+            ("  🛒 Libre Service", "ls"),
+            ("  🔧 Atelier",       "atelier"),
+        ]:
+            if st.button(label, use_container_width=True,
+                         type="primary" if st.session_state.view == view_id else "secondary",
+                         key=f"nav_{view_id}"):
+                st.session_state.view = view_id
+                st.rerun()
+
+    if st.button("📅 Rapports mensuels", use_container_width=True,
+                 type="primary" if st.session_state.view == "mensuel" else "secondary",
+                 key="nav_mensuel"):
+        st.session_state.view = "mensuel"
+        st.rerun()
+
+    if st.button("📊 Rapports trimestriels", use_container_width=True,
+                 type="primary" if st.session_state.view == "trimestriel" else "secondary",
+                 key="nav_trimestriel"):
+        st.session_state.view = "trimestriel"
+        st.rerun()
+
+    st.markdown("---")
+    if st.button("⟳ Rafraîchir", use_container_width=True):
+        st.cache_data.clear()
+        st.rerun()
+
+    all_errors = sum((v.get("errors", []) for v in data.values() if isinstance(v, dict)), [])
     if all_errors:
         with st.expander(f"⚠️ {len(all_errors)} avertissement(s)", expanded=False):
             for e in all_errors:
                 st.warning(e)
-with col_b:
-    if st.button("⟳", help="Rafraîchir"):
-        st.cache_data.clear()
-        st.rerun()
 
-tab1, tab2, tab3 = st.tabs([
-    "📋  Briefing Hebdomadaire",
-    "📅  Revue Mensuelle",
-    "📊  Analyse Trimestrielle",
-])
-
-def _render(html: str, height: int) -> None:
-    """Render an HTML string in an isolated iframe (Streamlit 1.35+)."""
-    try:
-        # st.iframe with srcdoc is the current API (replaces components.v1.html)
-        st.iframe(srcdoc=html, height=height, scrolling=False)
-    except TypeError:
-        # Fallback for older Streamlit builds that don't accept srcdoc
-        import streamlit.components.v1 as _cv1
-        _cv1.html(html, height=height, scrolling=False)
-
-with tab1:
-    sub_global, sub_ls, sub_atelier = st.tabs(["🌍 Global", "🛒 Libre Service", "🔧 Atelier"])
-    with sub_global:
-        _render(build_global_html(data), height=2400)
-    with sub_ls:
-        _render(build_ls_html(data), height=2400)
-    with sub_atelier:
-        _render(build_atelier_html(data), height=2400)
-
-with tab2:
+# ─── Main content ─────────────────────────────────────────────────────────────
+view = st.session_state.view
+if view == "global":
+    _render(build_global_html(data), height=2400)
+elif view == "ls":
+    _render(build_ls_html(data), height=2400)
+elif view == "atelier":
+    _render(build_atelier_html(data), height=2400)
+elif view == "mensuel":
     _render(build_monthly_html(data), height=1100)
-
-with tab3:
+elif view == "trimestriel":
     _render(build_quarterly_html(data), height=900)
