@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Feu Vert Annecy 203 — Global S19</title>
+  <title>Feu Vert Annecy 203 — Tableau de bord</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <style>
-/* ── Exact copy of _CSS from app.py ──────────────────────────────────────── */
+/* ── Design tokens — exact copy from app.py _CSS ───────────────────────── */
 :root {
   --bg:               oklch(15% 0.015 240);
   --surface:          oklch(20% 0.012 240);
@@ -26,14 +26,143 @@
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: var(--font-body); background: var(--bg); color: var(--fg);
-       line-height: 1.5; font-size: 14px; }
-.dashboard { display: grid; grid-template-columns: 1fr 320px;
-             grid-template-rows: auto auto 1fr; gap: 16px;
-             padding: 24px; max-width: 1600px; margin: 0 auto; }
-/* HEADER */
-.header { grid-column: 1 / -1; display: flex; align-items: center;
-          justify-content: space-between; padding-bottom: 16px;
-          border-bottom: 1px solid var(--border); }
+       line-height: 1.5; font-size: 14px; min-height: 100vh; }
+
+/* ── App shell ─────────────────────────────────────────────────────────── */
+.app {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  min-height: 100vh;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+/* ── Left nav panel ─────────────────────────────────────────────────────── */
+.nav-panel {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 20px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+.nav-title {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--fg);
+  padding: 0 8px 12px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
+}
+.nav-title span {
+  display: block;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--muted);
+  letter-spacing: 0;
+  margin-top: 2px;
+}
+.nav-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  color: var(--muted);
+  font-weight: 600;
+  padding: 2px 8px;
+  margin-top: 6px;
+}
+.nav-divider { height: 1px; background: var(--border); margin: 6px 0; }
+.main-tabs { display: flex; flex-direction: column; gap: 2px; }
+.main-tab {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 9px 10px;
+  text-align: left;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: var(--font-body);
+  font-weight: 500;
+  width: 100%;
+  transition: background 0.15s, color 0.15s;
+}
+.main-tab:hover { background: var(--surface-elevated); color: var(--fg); }
+.main-tab.active { background: var(--accent-dim); color: var(--accent); }
+.sub-tabs { display: flex; flex-direction: column; gap: 2px; }
+.sub-tab {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 7px 10px;
+  text-align: left;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: var(--font-body);
+  width: 100%;
+  transition: background 0.15s, color 0.15s;
+}
+.sub-tab:hover { background: var(--surface-elevated); color: var(--fg); }
+.sub-tab.active { background: var(--surface-elevated); color: var(--fg); font-weight: 600; }
+.period-selector {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 7px 10px;
+  background: var(--surface-elevated);
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+.period-btn {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 0 4px;
+  font-size: 14px;
+  flex-shrink: 0;
+  transition: color 0.15s;
+  line-height: 1;
+}
+.period-btn:hover { color: var(--fg); }
+.period-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--fg);
+  flex: 1;
+  text-align: center;
+}
+.controls { display: flex; flex-direction: column; gap: 6px; }
+.controls.hidden { display: none; }
+
+/* ── Content area ───────────────────────────────────────────────────────── */
+.content {
+  padding: 24px;
+  border-left: 1px solid var(--border);
+  overflow-y: auto;
+}
+.view { display: none; flex-direction: column; gap: 16px; }
+.view.active { display: flex; }
+
+/* ── Shared card styles — same as app.py _CSS ───────────────────────────── */
+.card { background: var(--surface); border: 1px solid var(--border);
+        border-radius: 6px; padding: 16px; }
+.card-header { display: flex; justify-content: space-between; align-items: center;
+               margin-bottom: 14px; }
+.card-title { font-size: 13px; font-weight: 600; text-transform: uppercase;
+              letter-spacing: .06em; color: var(--muted); }
+.card-meta { font-size: 11px; color: var(--muted); font-family: var(--font-mono); }
+
+/* ── HEADER — same as app.py ────────────────────────────────────────────── */
+.header { display: flex; align-items: center; justify-content: space-between;
+          padding-bottom: 16px; border-bottom: 1px solid var(--border); }
 .header-left { display: flex; align-items: center; gap: 16px; }
 .logo { width: 40px; height: 40px; background: var(--accent); border-radius: 6px;
         display: flex; align-items: center; justify-content: center;
@@ -42,9 +171,9 @@ body { font-family: var(--font-body); background: var(--bg); color: var(--fg);
 .header-subtitle { font-size: 13px; color: var(--muted); font-family: var(--font-mono); }
 .week-badge { background: var(--surface); padding: 8px 16px; border-radius: 6px;
               border: 1px solid var(--border); font-family: var(--font-mono); font-size: 13px; }
-/* KPI STRIP */
-.kpi-strip { grid-column: 1 / -1; display: grid;
-             grid-template-columns: repeat(6, 1fr); gap: 12px; }
+
+/* ── KPI STRIP — same as app.py ─────────────────────────────────────────── */
+.kpi-strip { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; }
 .kpi-card { background: var(--surface); border: 1px solid var(--border);
             border-radius: 6px; padding: 16px;
             display: flex; flex-direction: column; gap: 6px; }
@@ -55,31 +184,30 @@ body { font-family: var(--font-body); background: var(--bg); color: var(--fg);
 .kpi-value { font-family: var(--font-mono); font-size: 24px; font-weight: 600;
              font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
 .kpi-delta { font-family: var(--font-mono); font-size: 11px; font-variant-numeric: tabular-nums; }
-.kpi-delta.pos  { color: var(--positive); }
-.kpi-delta.neg  { color: var(--negative); }
-.kpi-delta.warn { color: var(--warning);  }
+.kpi-delta.pos { color: var(--positive); }
+.kpi-delta.neg { color: var(--negative); }
 .kpi-sparkline { height: 20px; display: flex; align-items: flex-end; gap: 2px; margin-top: 2px; }
 .spark-bar     { flex: 1; background: var(--accent-dim); border-radius: 1px; }
 .spark-bar.cur { background: var(--accent); }
-/* LAYOUT */
-.main-content { display: flex; flex-direction: column; gap: 16px; }
-.card { background: var(--surface); border: 1px solid var(--border);
-        border-radius: 6px; padding: 16px; }
-.card-header { display: flex; justify-content: space-between; align-items: center;
-               margin-bottom: 14px; }
-.card-title { font-size: 13px; font-weight: 600; text-transform: uppercase;
-              letter-spacing: .06em; color: var(--muted); }
-.card-meta { font-size: 11px; color: var(--muted); font-family: var(--font-mono); }
-/* RAF */
+
+/* ── BRIEF GLOBAL — same as app.py ─────────────────────────────────────── */
+.brief-card { background: var(--surface); border: 1px solid var(--border);
+              border-radius: 6px; padding: 14px 16px; }
+.brief-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.brief-title { font-size: 11px; font-weight: 600; text-transform: uppercase;
+               letter-spacing: .08em; color: var(--muted); }
+.brief-period { font-family: var(--font-mono); font-size: 10px; color: var(--muted);
+                background: var(--surface-elevated); padding: 2px 8px; border-radius: 3px; }
+.brief-text { font-size: 13px; line-height: 1.65; color: var(--fg); }
+
+/* ── RAF — same as app.py ───────────────────────────────────────────────── */
 .obj-list { display: flex; flex-direction: column; gap: 13px; }
 .obj-item { display: flex; flex-direction: column; gap: 5px; }
 .obj-row  { display: flex; justify-content: space-between; align-items: center; }
 .obj-lbl  { font-size: 13px; }
 .obj-vals { display: flex; align-items: baseline; gap: 8px; }
-.obj-cur  { font-family: var(--font-mono); font-size: 14px;
-            font-variant-numeric: tabular-nums; color: var(--accent); }
-.obj-tgt  { font-family: var(--font-mono); font-size: 12px;
-            font-variant-numeric: tabular-nums; color: var(--muted); }
+.obj-cur  { font-family: var(--font-mono); font-size: 14px; font-variant-numeric: tabular-nums; }
+.obj-tgt  { font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums; color: var(--muted); }
 .obj-bar  { height: 4px; background: var(--border); border-radius: 2px; }
 .obj-fill { height: 100%; border-radius: 2px; }
 .fill-ok   { background: var(--positive); }
@@ -87,227 +215,600 @@ body { font-family: var(--font-body); background: var(--bg); color: var(--fg);
 .fill-bad  { background: var(--negative); }
 .obj-foot  { display: flex; justify-content: space-between;
              font-size: 10px; color: var(--muted); font-family: var(--font-mono); }
-/* BRIEF GLOBAL */
-.brief-card { background: var(--surface); border: 1px solid var(--border);
-              border-radius: 6px; padding: 14px 16px; grid-column: 1 / -1; }
-.brief-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-.brief-title { font-size: 11px; font-weight: 600; text-transform: uppercase;
-               letter-spacing: .08em; color: var(--muted); }
-.brief-period { font-family: var(--font-mono); font-size: 10px; color: var(--muted);
-                background: var(--surface-elevated); padding: 2px 8px; border-radius: 3px; }
-.brief-text { font-size: 13px; line-height: 1.65; color: var(--fg); }
-/* UTIL */
+
+/* ── FAMILLES — same as app.py ──────────────────────────────────────────── */
+.famille-header-row { display: grid; grid-template-columns: 140px 1fr 80px 58px;
+                      gap: 10px; padding-bottom: 6px; margin-bottom: 2px;
+                      border-bottom: 1px solid var(--border); }
+.col-label { font-size: 10px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.famille-item { display: grid; grid-template-columns: 140px 1fr 80px 58px;
+                gap: 10px; align-items: center;
+                padding: 5px 0; border-bottom: 1px solid var(--border-subtle); }
+.famille-item:last-child { border-bottom: none; }
+.famille-name { font-size: 12px; font-weight: 500; white-space: nowrap;
+                overflow: hidden; text-overflow: ellipsis; }
+.bar-track { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+.bar-fill  { height: 100%; border-radius: 4px; }
+.bar-green  { background: var(--accent); }
+.bar-red    { background: var(--negative); }
+.evo-badge { font-family: var(--font-mono); font-size: 10px; font-variant-numeric: tabular-nums;
+             padding: 2px 5px; border-radius: 3px; text-align: center; white-space: nowrap; }
+.evo-up   { background: oklch(22% 0.08 130); color: var(--positive); }
+.evo-down { background: oklch(22% 0.08 25);  color: var(--negative); }
+.famille-ca { font-family: var(--font-mono); font-size: 12px;
+              font-variant-numeric: tabular-nums; text-align: right; }
+
+/* ── RATIOS — same as app.py ────────────────────────────────────────────── */
+.ratio-item { display: flex; flex-direction: column; gap: 4px;
+              padding: 8px 0; border-bottom: 1px solid var(--border-subtle); }
+.ratio-item:last-child { border-bottom: none; }
+.ratio-header { display: flex; justify-content: space-between; align-items: center; }
+.ratio-name   { font-size: 12px; font-weight: 500; }
+.ratio-vals   { display: flex; align-items: baseline; gap: 5px; }
+.ratio-cur    { font-family: var(--font-mono); font-size: 14px; font-weight: 600;
+                font-variant-numeric: tabular-nums; }
+.r-good { color: var(--positive); }
+.r-bad  { color: var(--negative); }
+.ratio-obj   { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+.ratio-ecart { font-family: var(--font-mono); font-size: 10px; }
+.ratio-track { height: 4px; background: var(--border); border-radius: 2px; }
+.ratio-fill  { height: 100%; border-radius: 2px; }
+.rf-good { background: var(--positive); }
+.rf-bad  { background: var(--negative); }
+
+/* ── STAFF TABLE — same as app.py ───────────────────────────────────────── */
+.staff-table { width: 100%; border-collapse: collapse; }
+.staff-table th { color: var(--muted); font-size: 10px; font-weight: 500;
+                  text-transform: uppercase; letter-spacing: .04em;
+                  padding: 4px; text-align: right;
+                  border-bottom: 1px solid var(--border); }
+.staff-table th:first-child { text-align: left; }
+.staff-table td { padding: 5px 4px; text-align: right; font-family: var(--font-mono);
+                  font-size: 10px; border-bottom: 1px solid var(--border-subtle); }
+.staff-table td:first-child { text-align: left; font-family: var(--font-body);
+                               font-size: 11px; font-weight: 500; }
+.staff-table tr:last-child td { border-bottom: none; }
+.t-good { color: var(--positive); }
+.t-bad  { color: var(--negative); }
+
+/* ── Layout helpers ─────────────────────────────────────────────────────── */
+.two-col { display: grid; grid-template-columns: 1fr 320px; gap: 16px; }
+.sidebar { display: flex; flex-direction: column; gap: 16px; }
+.view-placeholder { display: flex; align-items: center; justify-content: center;
+                    min-height: 240px; color: var(--muted); font-size: 13px;
+                    background: var(--surface); border: 1px dashed var(--border);
+                    border-radius: 6px; }
 .no-data { color: var(--muted); font-size: 13px; padding: 24px;
            text-align: center; font-style: italic; }
   </style>
 </head>
 <body>
+<div class="app">
 
-<!-- ═══════════════════════════════════════════════════════════════════════
-     Global view — matches build_global_html() output exactly
-     Sample data: Semaine 19 · 05/05/2025 – 11/05/2025
-     ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- ── Left navigation panel ──────────────────────────────────────────── -->
+  <nav class="nav-panel">
 
-<div class="dashboard">
-
-  <!-- HEADER — _header() -->
-  <header class="header">
-    <div class="header-left">
-      <div class="logo">FV</div>
-      <div>
-        <h1 class="header-title">Feu Vert Annecy 203</h1>
-        <p class="header-subtitle">Briefing Hebdomadaire</p>
-      </div>
+    <div class="nav-title">
+      Feu Vert Annecy 203
+      <span>Tableau de bord</span>
     </div>
-    <div class="week-badge">S19&nbsp;&nbsp;·&nbsp;&nbsp;05/05/2025 – 11/05/2025</div>
-  </header>
 
-  <!-- BRIEF GLOBAL — _brief_html() -->
-  <div class="brief-card">
-    <div class="brief-header">
-      <span class="brief-title">1. Brief global</span>
-      <span class="brief-period">S19 · 05/05/2025 – 11/05/2025</span>
+    <span class="nav-label">Rapports</span>
+
+    <div class="main-tabs">
+      <button class="main-tab active" data-view="hebdo">📋 Rapports hebdomadaires</button>
+      <button class="main-tab" data-view="mensuel">📅 Rapports mensuels</button>
+      <button class="main-tab" data-view="trimestriel">📊 Rapports trimestriels</button>
     </div>
-    <p class="brief-text">La semaine 19 affiche un CA TTC de 56 688 € en retrait de 9,0 % sur l'objectif et de 3,0 % vs N-1, mais ce déficit de volume est largement compensé par une marge brute de 52,5 %, soit +3,2 pts au-dessus de la cible — signe d'un mix produit maîtrisé. La fréquentation est en nette progression (+10,1 % vs N-1, 821 clients), tandis que le panier moyen recule à 69 € (-11,9 %), révélant un atelier concentré sur de petites interventions (187 OR, panier 185 € vs 224 € N-1). Côté LS, la dynamique est solide (+11,8 % CA, marge à 42,1 %). Point notable : l'avancement mensuel est à 27,8 % de l'objectif mai (252 219 €), avec un RAF de 182 069 € à réaliser sur les 21 jours restants — un rythme qui devra s'accélérer pour atteindre la cible mensuelle.</p>
-  </div>
 
-  <!-- KPI STRIP — _kpi_strip() · 6 cards · repeat(6,1fr) -->
-  <section class="kpi-strip">
+    <div class="nav-divider"></div>
 
-    <!-- CA TTC Total -->
-    <div class="kpi-card">
-      <span class="kpi-label">CA TTC Total</span>
-      <p class="kpi-sublabel">obj. 62 290 € · écart −9,0 %</p>
-      <div class="kpi-value-row">
-        <span class="kpi-value">56 688 €</span>
-        <span class="kpi-delta neg">↓ −3,0 % vs N-1</span>
+    <!-- Hebdo controls -->
+    <div id="controls-hebdo" class="controls">
+      <div class="period-selector">
+        <button class="period-btn">←</button>
+        <span class="period-label">S19 · 5–11 mai 2025</span>
+        <button class="period-btn">→</button>
       </div>
-      <div class="kpi-sparkline">
-        <div class="spark-bar" style="height:70%"></div>
-        <div class="spark-bar" style="height:75%"></div>
-        <div class="spark-bar" style="height:65%"></div>
-        <div class="spark-bar" style="height:80%"></div>
-        <div class="spark-bar" style="height:72%"></div>
-        <div class="spark-bar" style="height:68%"></div>
-        <div class="spark-bar cur" style="height:62%"></div>
+      <div class="nav-divider"></div>
+      <span class="nav-label" style="margin-top:0">Vue</span>
+      <div class="sub-tabs">
+        <button class="sub-tab active" data-subview="global">🌍 Global</button>
+        <button class="sub-tab" data-subview="ls">🛒 Libre Service</button>
+        <button class="sub-tab" data-subview="atelier">🔧 Atelier</button>
       </div>
     </div>
 
-    <!-- Marge Globale -->
-    <div class="kpi-card">
-      <span class="kpi-label">Marge Globale</span>
-      <p class="kpi-sublabel">obj. 49,3 % · +3,2 pts</p>
-      <div class="kpi-value-row">
-        <span class="kpi-value">52,5 %</span>
-        <span class="kpi-delta pos">↑ +3,2 pts vs N-1</span>
-      </div>
-      <div class="kpi-sparkline">
-        <div class="spark-bar" style="height:55%"></div>
-        <div class="spark-bar" style="height:60%"></div>
-        <div class="spark-bar" style="height:65%"></div>
-        <div class="spark-bar" style="height:70%"></div>
-        <div class="spark-bar" style="height:75%"></div>
-        <div class="spark-bar" style="height:78%"></div>
-        <div class="spark-bar cur" style="height:85%"></div>
+    <!-- Mensuel controls -->
+    <div id="controls-mensuel" class="controls hidden">
+      <div class="period-selector">
+        <button class="period-btn">←</button>
+        <span class="period-label">Mai 2025</span>
+        <button class="period-btn">→</button>
       </div>
     </div>
 
-    <!-- Fréquentation -->
-    <div class="kpi-card">
-      <span class="kpi-label">Fréquentation</span>
-      <p class="kpi-sublabel">N-1 : 745 clients</p>
-      <div class="kpi-value-row">
-        <span class="kpi-value">821</span>
-        <span class="kpi-delta pos">↑ +10,1 % vs N-1</span>
-      </div>
-      <div class="kpi-sparkline">
-        <div class="spark-bar" style="height:55%"></div>
-        <div class="spark-bar" style="height:60%"></div>
-        <div class="spark-bar" style="height:58%"></div>
-        <div class="spark-bar" style="height:65%"></div>
-        <div class="spark-bar" style="height:70%"></div>
-        <div class="spark-bar" style="height:75%"></div>
-        <div class="spark-bar cur" style="height:82%"></div>
+    <!-- Trimestriel controls -->
+    <div id="controls-trimestriel" class="controls hidden">
+      <div class="period-selector">
+        <button class="period-btn">←</button>
+        <span class="period-label">T2 · 2025</span>
+        <button class="period-btn">→</button>
       </div>
     </div>
 
-    <!-- Panier Moyen -->
-    <div class="kpi-card">
-      <span class="kpi-label">Panier Moyen</span>
-      <p class="kpi-sublabel">N-1 : 78 € · Atel. 185 €</p>
-      <div class="kpi-value-row">
-        <span class="kpi-value">69 €</span>
-        <span class="kpi-delta neg">↓ −11,9 % vs N-1</span>
-      </div>
-      <div class="kpi-sparkline">
-        <div class="spark-bar" style="height:85%"></div>
-        <div class="spark-bar" style="height:80%"></div>
-        <div class="spark-bar" style="height:78%"></div>
-        <div class="spark-bar" style="height:75%"></div>
-        <div class="spark-bar" style="height:72%"></div>
-        <div class="spark-bar" style="height:68%"></div>
-        <div class="spark-bar cur" style="height:60%"></div>
-      </div>
-    </div>
+  </nav>
 
-    <!-- CA Atelier -->
-    <div class="kpi-card">
-      <span class="kpi-label">CA Atelier</span>
-      <p class="kpi-sublabel">187 OR · Marge 63,7 %</p>
-      <div class="kpi-value-row">
-        <span class="kpi-value">34 554 €</span>
-        <span class="kpi-delta neg">↓ −12,4 % vs N-1</span>
-      </div>
-      <div class="kpi-sparkline">
-        <div class="spark-bar" style="height:80%"></div>
-        <div class="spark-bar" style="height:78%"></div>
-        <div class="spark-bar" style="height:75%"></div>
-        <div class="spark-bar" style="height:70%"></div>
-        <div class="spark-bar" style="height:68%"></div>
-        <div class="spark-bar" style="height:65%"></div>
-        <div class="spark-bar cur" style="height:58%"></div>
-      </div>
-    </div>
+  <!-- ── Right content area ─────────────────────────────────────────────── -->
+  <main class="content">
 
-    <!-- CA Libre Service -->
-    <div class="kpi-card">
-      <span class="kpi-label">CA Libre Service</span>
-      <p class="kpi-sublabel">Panier 30 € · Marge 42,1 %</p>
-      <div class="kpi-value-row">
-        <span class="kpi-value">22 134 €</span>
-        <span class="kpi-delta pos">↑ +11,8 % vs N-1</span>
-      </div>
-      <div class="kpi-sparkline">
-        <div class="spark-bar" style="height:50%"></div>
-        <div class="spark-bar" style="height:55%"></div>
-        <div class="spark-bar" style="height:60%"></div>
-        <div class="spark-bar" style="height:65%"></div>
-        <div class="spark-bar" style="height:70%"></div>
-        <div class="spark-bar" style="height:75%"></div>
-        <div class="spark-bar cur" style="height:82%"></div>
-      </div>
-    </div>
+    <!-- ══ Hebdo › Global — mirrors build_global_html() ══════════════════ -->
+    <div id="view-global" class="view active">
 
-  </section>
-
-  <!-- RESTE À FAIRE — _raf_html() -->
-  <main class="main-content" style="grid-column:1/-1">
-    <div class="card">
-      <div class="card-header">
-        <span class="card-title">Reste à Faire — Mois en cours</span>
-        <span class="card-meta">Cumul mensuel</span>
-      </div>
-      <div class="obj-list">
-
-        <div class="obj-item">
-          <div class="obj-row">
-            <span class="obj-lbl">Chiffre d'Affaires</span>
-            <div class="obj-vals">
-              <span class="obj-cur" style="color:var(--accent)">70 150 €</span>
-              <span class="obj-tgt">/ 252 219 €</span>
-            </div>
+      <header class="header">
+        <div class="header-left">
+          <div class="logo">FV</div>
+          <div>
+            <h1 class="header-title">Feu Vert Annecy 203</h1>
+            <p class="header-subtitle">Briefing Hebdomadaire</p>
           </div>
-          <div class="obj-bar"><div class="obj-fill fill-bad" style="width:27.8%"></div></div>
-          <div class="obj-foot">
-            <span>27,8 % réalisé</span>
-            <span style="color:var(--negative)">RAF : 182 069 €</span>
+        </div>
+        <div class="week-badge">S19&nbsp;&nbsp;·&nbsp;&nbsp;05/05/2025 – 11/05/2025</div>
+      </header>
+
+      <!-- Brief global — _brief_html() -->
+      <div class="brief-card">
+        <div class="brief-header">
+          <span class="brief-title">1. Brief global</span>
+          <span class="brief-period">S19 · 05/05/2025 – 11/05/2025</span>
+        </div>
+        <p class="brief-text">La semaine 19 affiche un CA TTC de 56 688 € en retrait de 9,0 % sur l'objectif et de 3,0 % vs N-1, mais ce déficit de volume est largement compensé par une marge brute de 52,5 %, soit +3,2 pts au-dessus de la cible — signe d'un mix produit maîtrisé. La fréquentation est en nette progression (+10,1 % vs N-1, 821 clients), tandis que le panier moyen recule à 69 € (−11,9 %), révélant un atelier concentré sur de petites interventions (187 OR, panier 185 € vs 224 € N-1). Côté LS, la dynamique est solide (+11,8 % CA, marge à 42,1 %). Point notable : l'avancement mensuel est à 27,8 % de l'objectif mai (252 219 €), avec un RAF de 182 069 € à réaliser sur les 21 jours restants.</p>
+      </div>
+
+      <!-- KPI strip — _kpi_strip() — repeat(6,1fr) -->
+      <section class="kpi-strip">
+
+        <div class="kpi-card">
+          <span class="kpi-label">CA TTC Total</span>
+          <p class="kpi-sublabel">obj. 62 290 € · écart −9,0 %</p>
+          <div class="kpi-value-row">
+            <span class="kpi-value">56 688 €</span>
+            <span class="kpi-delta neg">↓ −3,0 % vs N-1</span>
+          </div>
+          <div class="kpi-sparkline">
+            <div class="spark-bar" style="height:70%"></div><div class="spark-bar" style="height:75%"></div>
+            <div class="spark-bar" style="height:65%"></div><div class="spark-bar" style="height:80%"></div>
+            <div class="spark-bar" style="height:72%"></div><div class="spark-bar" style="height:68%"></div>
+            <div class="spark-bar cur" style="height:62%"></div>
           </div>
         </div>
 
-        <div class="obj-item">
-          <div class="obj-row">
-            <span class="obj-lbl">Marge</span>
-            <div class="obj-vals">
-              <span class="obj-cur" style="color:var(--accent)">36 829 €</span>
-              <span class="obj-tgt">/ 124 342 €</span>
-            </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Marge Globale</span>
+          <p class="kpi-sublabel">obj. 49,3 % · +3,2 pts</p>
+          <div class="kpi-value-row">
+            <span class="kpi-value">52,5 %</span>
+            <span class="kpi-delta pos">↑ +3,2 pts vs N-1</span>
           </div>
-          <div class="obj-bar"><div class="obj-fill fill-bad" style="width:29.6%"></div></div>
-          <div class="obj-foot">
-            <span>29,6 % réalisé</span>
-            <span style="color:var(--negative)">RAF : 87 513 €</span>
-          </div>
-        </div>
-
-        <div class="obj-item">
-          <div class="obj-row">
-            <span class="obj-lbl">Contrats</span>
-            <div class="obj-vals">
-              <span class="obj-cur" style="color:var(--accent)">—</span>
-              <span class="obj-tgt">/ —</span>
-            </div>
-          </div>
-          <div class="obj-bar"><div class="obj-fill fill-bad" style="width:0%"></div></div>
-          <div class="obj-foot">
-            <span>0,0 % réalisé</span>
-            <span style="color:var(--muted)">RAF : —</span>
+          <div class="kpi-sparkline">
+            <div class="spark-bar" style="height:55%"></div><div class="spark-bar" style="height:60%"></div>
+            <div class="spark-bar" style="height:65%"></div><div class="spark-bar" style="height:70%"></div>
+            <div class="spark-bar" style="height:75%"></div><div class="spark-bar" style="height:78%"></div>
+            <div class="spark-bar cur" style="height:85%"></div>
           </div>
         </div>
 
+        <div class="kpi-card">
+          <span class="kpi-label">Fréquentation</span>
+          <p class="kpi-sublabel">N-1 : 745 clients</p>
+          <div class="kpi-value-row">
+            <span class="kpi-value">821</span>
+            <span class="kpi-delta pos">↑ +10,1 % vs N-1</span>
+          </div>
+          <div class="kpi-sparkline">
+            <div class="spark-bar" style="height:55%"></div><div class="spark-bar" style="height:60%"></div>
+            <div class="spark-bar" style="height:58%"></div><div class="spark-bar" style="height:65%"></div>
+            <div class="spark-bar" style="height:70%"></div><div class="spark-bar" style="height:75%"></div>
+            <div class="spark-bar cur" style="height:82%"></div>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <span class="kpi-label">Panier Moyen</span>
+          <p class="kpi-sublabel">N-1 : 78 € · Atel. 185 €</p>
+          <div class="kpi-value-row">
+            <span class="kpi-value">69 €</span>
+            <span class="kpi-delta neg">↓ −11,9 % vs N-1</span>
+          </div>
+          <div class="kpi-sparkline">
+            <div class="spark-bar" style="height:85%"></div><div class="spark-bar" style="height:80%"></div>
+            <div class="spark-bar" style="height:78%"></div><div class="spark-bar" style="height:75%"></div>
+            <div class="spark-bar" style="height:72%"></div><div class="spark-bar" style="height:68%"></div>
+            <div class="spark-bar cur" style="height:60%"></div>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <span class="kpi-label">CA Atelier</span>
+          <p class="kpi-sublabel">187 OR · Marge 63,7 %</p>
+          <div class="kpi-value-row">
+            <span class="kpi-value">34 554 €</span>
+            <span class="kpi-delta neg">↓ −12,4 % vs N-1</span>
+          </div>
+          <div class="kpi-sparkline">
+            <div class="spark-bar" style="height:80%"></div><div class="spark-bar" style="height:78%"></div>
+            <div class="spark-bar" style="height:75%"></div><div class="spark-bar" style="height:70%"></div>
+            <div class="spark-bar" style="height:68%"></div><div class="spark-bar" style="height:65%"></div>
+            <div class="spark-bar cur" style="height:58%"></div>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <span class="kpi-label">CA Libre Service</span>
+          <p class="kpi-sublabel">Panier 30 € · Marge 42,1 %</p>
+          <div class="kpi-value-row">
+            <span class="kpi-value">22 134 €</span>
+            <span class="kpi-delta pos">↑ +11,8 % vs N-1</span>
+          </div>
+          <div class="kpi-sparkline">
+            <div class="spark-bar" style="height:50%"></div><div class="spark-bar" style="height:55%"></div>
+            <div class="spark-bar" style="height:60%"></div><div class="spark-bar" style="height:65%"></div>
+            <div class="spark-bar" style="height:70%"></div><div class="spark-bar" style="height:75%"></div>
+            <div class="spark-bar cur" style="height:82%"></div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- RAF — _raf_html() -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Reste à Faire — Mois en cours</span>
+          <span class="card-meta">Cumul mensuel</span>
+        </div>
+        <div class="obj-list">
+          <div class="obj-item">
+            <div class="obj-row">
+              <span class="obj-lbl">Chiffre d'Affaires</span>
+              <div class="obj-vals">
+                <span class="obj-cur" style="color:var(--accent)">70 150 €</span>
+                <span class="obj-tgt">/ 252 219 €</span>
+              </div>
+            </div>
+            <div class="obj-bar"><div class="obj-fill fill-bad" style="width:27.8%"></div></div>
+            <div class="obj-foot"><span>27,8 % réalisé</span><span style="color:var(--negative)">RAF : 182 069 €</span></div>
+          </div>
+          <div class="obj-item">
+            <div class="obj-row">
+              <span class="obj-lbl">Marge</span>
+              <div class="obj-vals">
+                <span class="obj-cur" style="color:var(--accent)">36 829 €</span>
+                <span class="obj-tgt">/ 124 342 €</span>
+              </div>
+            </div>
+            <div class="obj-bar"><div class="obj-fill fill-bad" style="width:29.6%"></div></div>
+            <div class="obj-foot"><span>29,6 % réalisé</span><span style="color:var(--negative)">RAF : 87 513 €</span></div>
+          </div>
+          <div class="obj-item">
+            <div class="obj-row">
+              <span class="obj-lbl">Contrats</span>
+              <div class="obj-vals">
+                <span class="obj-cur" style="color:var(--accent)">—</span>
+                <span class="obj-tgt">/ —</span>
+              </div>
+            </div>
+            <div class="obj-bar"><div class="obj-fill fill-bad" style="width:0%"></div></div>
+            <div class="obj-foot"><span>0,0 % réalisé</span><span style="color:var(--muted)">RAF : —</span></div>
+          </div>
+        </div>
       </div>
+
+    </div><!-- /view-global -->
+
+    <!-- ══ Hebdo › Libre Service — mirrors build_ls_html() ══════════════ -->
+    <div id="view-ls" class="view">
+
+      <header class="header">
+        <div class="header-left">
+          <div class="logo">FV</div>
+          <div>
+            <h1 class="header-title">Feu Vert Annecy 203</h1>
+            <p class="header-subtitle">Briefing Hebdomadaire</p>
+          </div>
+        </div>
+        <div class="week-badge">S19&nbsp;&nbsp;·&nbsp;&nbsp;05/05/2025 – 11/05/2025</div>
+      </header>
+
+      <!-- LS KPI strip — _ls_kpi_strip() — repeat(4,1fr) -->
+      <section class="kpi-strip" style="grid-template-columns:repeat(4,1fr)">
+        <div class="kpi-card">
+          <span class="kpi-label">CA Libre Service</span>
+          <p class="kpi-sublabel">obj. 19 800 €</p>
+          <div class="kpi-value-row">
+            <span class="kpi-value">22 134 €</span>
+            <span class="kpi-delta pos">↑ +11,8 % vs N-1</span>
+          </div>
+          <div class="kpi-sparkline">
+            <div class="spark-bar" style="height:50%"></div><div class="spark-bar" style="height:58%"></div>
+            <div class="spark-bar" style="height:62%"></div><div class="spark-bar" style="height:68%"></div>
+            <div class="spark-bar" style="height:74%"></div><div class="spark-bar" style="height:79%"></div>
+            <div class="spark-bar cur" style="height:85%"></div>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Marge LS</span>
+          <p class="kpi-sublabel">obj. —</p>
+          <div class="kpi-value-row">
+            <span class="kpi-value">42,1 %</span>
+            <span class="kpi-delta pos">↑ +1,4 pts vs N-1</span>
+          </div>
+          <div class="kpi-sparkline">
+            <div class="spark-bar" style="height:60%"></div><div class="spark-bar" style="height:63%"></div>
+            <div class="spark-bar" style="height:65%"></div><div class="spark-bar" style="height:68%"></div>
+            <div class="spark-bar" style="height:70%"></div><div class="spark-bar" style="height:72%"></div>
+            <div class="spark-bar cur" style="height:76%"></div>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Fréquentation LS</span>
+          <p class="kpi-sublabel">N-1 : — clients</p>
+          <div class="kpi-value-row">
+            <span class="kpi-value">—</span>
+            <span class="kpi-delta">→ —</span>
+          </div>
+          <div class="kpi-sparkline">
+            <div class="spark-bar" style="height:55%"></div><div class="spark-bar" style="height:55%"></div>
+            <div class="spark-bar" style="height:55%"></div><div class="spark-bar" style="height:55%"></div>
+            <div class="spark-bar" style="height:55%"></div><div class="spark-bar" style="height:55%"></div>
+            <div class="spark-bar cur" style="height:55%"></div>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Panier Moyen LS</span>
+          <p class="kpi-sublabel">N-1 : —</p>
+          <div class="kpi-value-row">
+            <span class="kpi-value">30 €</span>
+            <span class="kpi-delta">→ —</span>
+          </div>
+          <div class="kpi-sparkline">
+            <div class="spark-bar" style="height:60%"></div><div class="spark-bar" style="height:60%"></div>
+            <div class="spark-bar" style="height:60%"></div><div class="spark-bar" style="height:60%"></div>
+            <div class="spark-bar" style="height:60%"></div><div class="spark-bar" style="height:60%"></div>
+            <div class="spark-bar cur" style="height:60%"></div>
+          </div>
+        </div>
+      </section>
+
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Performance par Famille</span>
+            <span class="card-meta">CA TTC · évolution vs N-1</span>
+          </div>
+          <div class="famille-header-row">
+            <span class="col-label">Famille</span>
+            <span class="col-label">Proportion</span>
+            <span class="col-label" style="text-align:right">CA TTC</span>
+            <span class="col-label" style="text-align:center">Évo.</span>
+          </div>
+          <div class="famille-item"><span class="famille-name">I · Pneumatiques</span><div class="bar-track"><div class="bar-fill bar-green" style="width:100%"></div></div><span class="famille-ca">8 420 €</span><span class="evo-badge evo-up">+5,2 %</span></div>
+          <div class="famille-item"><span class="famille-name">A · Entretien</span><div class="bar-track"><div class="bar-fill bar-green" style="width:72%"></div></div><span class="famille-ca">6 060 €</span><span class="evo-badge evo-up">+3,1 %</span></div>
+          <div class="famille-item"><span class="famille-name">C · Pièces Techniques</span><div class="bar-track"><div class="bar-fill bar-red" style="width:55%"></div></div><span class="famille-ca">4 630 €</span><span class="evo-badge evo-down">−8,4 %</span></div>
+          <div class="famille-item"><span class="famille-name">E · Équip. Extérieur</span><div class="bar-track"><div class="bar-fill bar-green" style="width:30%"></div></div><span class="famille-ca">2 530 €</span><span class="evo-badge evo-up">+1,0 %</span></div>
+        </div>
+
+        <div class="sidebar">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Ratios LS — Vendeurs</span>
+              <span class="card-meta">S19</span>
+            </div>
+            <table class="staff-table">
+              <thead><tr><th>Vendeur</th><th title="Garantie Pneu">GP</th><th title="Géométrie">Géo</th><th title="VCR">VCR</th><th title="VCF">VCF</th><th title="Dépollution">Dép.</th></tr></thead>
+              <tbody>
+                <tr><td>Sandrine</td><td class="t-good">62,5 %</td><td class="t-good">24,1 %</td><td class="t-good">8,2 %</td><td class="t-bad">9,1 %</td><td class="t-good">38,0 %</td></tr>
+                <tr><td>Paul</td><td class="t-bad">41,2 %</td><td class="t-bad">15,3 %</td><td class="t-bad">5,4 %</td><td class="t-good">12,0 %</td><td class="t-bad">28,5 %</td></tr>
+                <tr><td>Kamilia</td><td class="t-good">71,4 %</td><td class="t-good">21,8 %</td><td class="t-good">9,0 %</td><td class="t-good">13,5 %</td><td class="t-good">40,2 %</td></tr>
+              </tbody>
+            </table>
+            <p style="margin-top:8px;font-size:10px;color:var(--muted)">GP = Garantie Pneu · Dép. = Dépollution · valeurs en %</p>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /view-ls -->
+
+    <!-- ══ Hebdo › Atelier — mirrors build_atelier_html() ══════════════ -->
+    <div id="view-atelier" class="view">
+
+      <header class="header">
+        <div class="header-left">
+          <div class="logo">FV</div>
+          <div>
+            <h1 class="header-title">Feu Vert Annecy 203</h1>
+            <p class="header-subtitle">Briefing Hebdomadaire</p>
+          </div>
+        </div>
+        <div class="week-badge">S19&nbsp;&nbsp;·&nbsp;&nbsp;05/05/2025 – 11/05/2025</div>
+      </header>
+
+      <!-- Atelier KPI strip — _at_kpi_strip() — repeat(4,1fr) -->
+      <section class="kpi-strip" style="grid-template-columns:repeat(4,1fr)">
+        <div class="kpi-card">
+          <span class="kpi-label">CA Atelier</span>
+          <p class="kpi-sublabel">obj. 42 490 €</p>
+          <div class="kpi-value-row">
+            <span class="kpi-value">34 554 €</span>
+            <span class="kpi-delta neg">↓ −12,4 % vs N-1</span>
+          </div>
+          <div class="kpi-sparkline">
+            <div class="spark-bar" style="height:80%"></div><div class="spark-bar" style="height:75%"></div>
+            <div class="spark-bar" style="height:72%"></div><div class="spark-bar" style="height:68%"></div>
+            <div class="spark-bar" style="height:64%"></div><div class="spark-bar" style="height:61%"></div>
+            <div class="spark-bar cur" style="height:57%"></div>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Marge Atelier</span>
+          <p class="kpi-sublabel">obj. —</p>
+          <div class="kpi-value-row">
+            <span class="kpi-value">63,7 %</span>
+            <span class="kpi-delta pos">↑ +2,8 pts vs N-1</span>
+          </div>
+          <div class="kpi-sparkline">
+            <div class="spark-bar" style="height:60%"></div><div class="spark-bar" style="height:63%"></div>
+            <div class="spark-bar" style="height:65%"></div><div class="spark-bar" style="height:68%"></div>
+            <div class="spark-bar" style="height:70%"></div><div class="spark-bar" style="height:73%"></div>
+            <div class="spark-bar cur" style="height:76%"></div>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Nombre d'OR</span>
+          <p class="kpi-sublabel">N-1 : 214</p>
+          <div class="kpi-value-row">
+            <span class="kpi-value">187</span>
+            <span class="kpi-delta neg">↓ −12,6 % vs N-1</span>
+          </div>
+          <div class="kpi-sparkline">
+            <div class="spark-bar" style="height:82%"></div><div class="spark-bar" style="height:78%"></div>
+            <div class="spark-bar" style="height:74%"></div><div class="spark-bar" style="height:70%"></div>
+            <div class="spark-bar" style="height:66%"></div><div class="spark-bar" style="height:62%"></div>
+            <div class="spark-bar cur" style="height:58%"></div>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Panier Moyen Atelier</span>
+          <p class="kpi-sublabel">N-1 : 224 €</p>
+          <div class="kpi-value-row">
+            <span class="kpi-value">185 €</span>
+            <span class="kpi-delta neg">↓ −17,4 % vs N-1</span>
+          </div>
+          <div class="kpi-sparkline">
+            <div class="spark-bar" style="height:88%"></div><div class="spark-bar" style="height:82%"></div>
+            <div class="spark-bar" style="height:78%"></div><div class="spark-bar" style="height:74%"></div>
+            <div class="spark-bar" style="height:70%"></div><div class="spark-bar" style="height:66%"></div>
+            <div class="spark-bar cur" style="height:60%"></div>
+          </div>
+        </div>
+      </section>
+
+      <div class="two-col">
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <!-- RAF -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Reste à Faire — Mois en cours</span>
+              <span class="card-meta">Cumul mensuel</span>
+            </div>
+            <div class="obj-list">
+              <div class="obj-item">
+                <div class="obj-row"><span class="obj-lbl">Chiffre d'Affaires</span><div class="obj-vals"><span class="obj-cur" style="color:var(--accent)">70 150 €</span><span class="obj-tgt">/ 252 219 €</span></div></div>
+                <div class="obj-bar"><div class="obj-fill fill-bad" style="width:27.8%"></div></div>
+                <div class="obj-foot"><span>27,8 % réalisé</span><span style="color:var(--negative)">RAF : 182 069 €</span></div>
+              </div>
+              <div class="obj-item">
+                <div class="obj-row"><span class="obj-lbl">Marge</span><div class="obj-vals"><span class="obj-cur" style="color:var(--accent)">36 829 €</span><span class="obj-tgt">/ 124 342 €</span></div></div>
+                <div class="obj-bar"><div class="obj-fill fill-bad" style="width:29.6%"></div></div>
+                <div class="obj-foot"><span>29,6 % réalisé</span><span style="color:var(--negative)">RAF : 87 513 €</span></div>
+              </div>
+            </div>
+          </div>
+          <!-- Ratios -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Ratios Prioritaires</span>
+              <span class="card-meta">Atelier · S19</span>
+            </div>
+            <div class="ratio-item"><div class="ratio-header"><span class="ratio-name">Garantie Pneu</span><div class="ratio-vals"><span class="ratio-cur r-good">58,3 %</span><span class="ratio-obj">/ obj. 50,0 %</span><span class="ratio-ecart" style="color:var(--positive)">+8 pts</span></div></div><div class="ratio-track"><div class="ratio-fill rf-good" style="width:100%"></div></div></div>
+            <div class="ratio-item"><div class="ratio-header"><span class="ratio-name">Géométrie</span><div class="ratio-vals"><span class="ratio-cur r-bad">12,4 %</span><span class="ratio-obj">/ obj. 19,0 %</span><span class="ratio-ecart" style="color:var(--negative)">−7 pts</span></div></div><div class="ratio-track"><div class="ratio-fill rf-bad" style="width:65%"></div></div></div>
+            <div class="ratio-item"><div class="ratio-header"><span class="ratio-name">VCR (Refroid)</span><div class="ratio-vals"><span class="ratio-cur r-good">8,1 %</span><span class="ratio-obj">/ obj. 7,0 %</span><span class="ratio-ecart" style="color:var(--positive)">+1 pt</span></div></div><div class="ratio-track"><div class="ratio-fill rf-good" style="width:100%"></div></div></div>
+            <div class="ratio-item"><div class="ratio-header"><span class="ratio-name">VCF (Frein)</span><div class="ratio-vals"><span class="ratio-cur r-bad">9,2 %</span><span class="ratio-obj">/ obj. 11,0 %</span><span class="ratio-ecart" style="color:var(--negative)">−2 pts</span></div></div><div class="ratio-track"><div class="ratio-fill rf-bad" style="width:84%"></div></div></div>
+            <div class="ratio-item"><div class="ratio-header"><span class="ratio-name">Dépollution</span><div class="ratio-vals"><span class="ratio-cur r-good">38,0 %</span><span class="ratio-obj">/ obj. 35,0 %</span><span class="ratio-ecart" style="color:var(--positive)">+3 pts</span></div></div><div class="ratio-track"><div class="ratio-fill rf-good" style="width:100%"></div></div></div>
+          </div>
+        </div>
+
+        <div class="sidebar">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Ratios LS — Vendeurs</span>
+              <span class="card-meta">S19</span>
+            </div>
+            <table class="staff-table">
+              <thead><tr><th>Vendeur</th><th>GP</th><th>Géo</th><th>VCR</th><th>VCF</th><th>Dép.</th></tr></thead>
+              <tbody>
+                <tr><td>Sandrine</td><td class="t-good">62,5 %</td><td class="t-good">24,1 %</td><td class="t-good">8,2 %</td><td class="t-bad">9,1 %</td><td class="t-good">38,0 %</td></tr>
+                <tr><td>Paul</td><td class="t-bad">41,2 %</td><td class="t-bad">15,3 %</td><td class="t-bad">5,4 %</td><td class="t-good">12,0 %</td><td class="t-bad">28,5 %</td></tr>
+                <tr><td>Kamilia</td><td class="t-good">71,4 %</td><td class="t-good">21,8 %</td><td class="t-good">9,0 %</td><td class="t-good">13,5 %</td><td class="t-good">40,2 %</td></tr>
+              </tbody>
+            </table>
+            <p style="margin-top:8px;font-size:10px;color:var(--muted)">GP = Garantie Pneu · Dép. = Dépollution · valeurs en %</p>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /view-atelier -->
+
+    <!-- ══ Mensuel ════════════════════════════════════════════════════════ -->
+    <div id="view-mensuel" class="view">
+      <header class="header">
+        <div class="header-left">
+          <div class="logo">FV</div>
+          <div>
+            <h1 class="header-title">Feu Vert Annecy 203</h1>
+            <p class="header-subtitle">Revue Mensuelle</p>
+          </div>
+        </div>
+        <div class="week-badge">Mai 2025</div>
+      </header>
+      <div class="view-placeholder">Rapports mensuels — données à venir</div>
     </div>
+
+    <!-- ══ Trimestriel ══════════════════════════════════════════════════ -->
+    <div id="view-trimestriel" class="view">
+      <header class="header">
+        <div class="header-left">
+          <div class="logo">FV</div>
+          <div>
+            <h1 class="header-title">Feu Vert Annecy 203</h1>
+            <p class="header-subtitle">Analyse Trimestrielle</p>
+          </div>
+        </div>
+        <div class="week-badge">T2 · 2025</div>
+      </header>
+      <div class="view-placeholder">Rapports trimestriels — données à venir</div>
+    </div>
+
   </main>
+</div><!-- /.app -->
 
-</div>
+<script>
+  let currentSubview = 'global';
+
+  function show(id) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('view-' + id).classList.add('active');
+  }
+
+  document.querySelectorAll('.main-tab').forEach(tab => {
+    tab.addEventListener('click', function () {
+      document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+      const view = this.dataset.view;
+      ['hebdo','mensuel','trimestriel'].forEach(v => {
+        document.getElementById('controls-' + v).classList.toggle('hidden', v !== view);
+      });
+      show(view === 'hebdo' ? currentSubview : view);
+    });
+  });
+
+  document.querySelectorAll('.sub-tab').forEach(tab => {
+    tab.addEventListener('click', function () {
+      document.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+      currentSubview = this.dataset.subview;
+      show(currentSubview);
+    });
+  });
+</script>
 </body>
 </html>
