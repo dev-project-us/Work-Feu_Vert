@@ -40,7 +40,11 @@
       "Bash(python3:*)",
       "Bash(python -c \":*)",
       "Bash(ls c:/Users/mendo/Documents/Work/*.skill)",
-      "Bash(git pull *)"
+      "Bash(git pull *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(docker compose *)"
     ]
   }
 }
