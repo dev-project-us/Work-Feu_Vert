@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Feu Vert Seynod — Rapports</title>
+  <title>Feu Vert Annecy 203 — Rapports</title>
   <style>
     :root {
       --bg: oklch(15% 0.015 240);
@@ -34,7 +34,7 @@
 
     .app {
       display: grid;
-      grid-template-columns: 1fr 260px;
+      grid-template-columns: 260px 1fr;
       max-width: 1600px;
       margin: 0 auto;
       min-height: 100vh;
@@ -43,7 +43,7 @@
     /* ── Content area ── */
     .content {
       padding: 24px;
-      border-right: 1px solid var(--border);
+      border-left: 1px solid var(--border);
       overflow-y: auto;
     }
 
@@ -202,10 +202,10 @@
       border-radius: 6px;
     }
 
-    /* ── Right nav panel ── */
+    /* ── Left nav panel ── */
     .nav-panel {
       background: var(--surface);
-      border-left: 1px solid var(--border);
+      border-right: 1px solid var(--border);
       padding: 20px 14px;
       display: flex;
       flex-direction: column;
@@ -317,6 +317,26 @@
       font-weight: 600;
     }
 
+    /* ── Nav title ── */
+    .nav-title {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--fg);
+      padding: 0 8px 4px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 6px;
+    }
+
+    .nav-title span {
+      display: block;
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--muted);
+      letter-spacing: 0;
+      margin-top: 1px;
+    }
+
     /* ── Controls sections ── */
     .controls { display: flex; flex-direction: column; gap: 6px; }
     .controls.hidden { display: none; }
@@ -325,7 +345,61 @@
 <body>
   <div class="app">
 
-    <!-- ── Left content area ── -->
+    <!-- ── Left navigation panel ── -->
+    <nav class="nav-panel">
+
+      <div class="nav-title">
+        Feu Vert Annecy 203
+        <span>Tableau de bord</span>
+      </div>
+
+      <span class="nav-label">Rapports</span>
+
+      <div class="main-tabs">
+        <button class="main-tab active" data-view="hebdo">Rapports hebdomadaires</button>
+        <button class="main-tab" data-view="mensuel">Rapports mensuels</button>
+        <button class="main-tab" data-view="trimestriel">Rapports trimestriels</button>
+      </div>
+
+      <div class="nav-divider"></div>
+
+      <!-- Hebdo controls -->
+      <div id="controls-hebdo" class="controls">
+        <div class="period-selector">
+          <button class="period-btn">←</button>
+          <span class="period-label">S19 · 5–11 mai 2025</span>
+          <button class="period-btn">→</button>
+        </div>
+        <div class="nav-divider"></div>
+        <span class="nav-label" style="margin-top:0">Vue</span>
+        <div class="sub-tabs">
+          <button class="sub-tab active" data-subview="global">Global</button>
+          <button class="sub-tab" data-subview="ls">Libre Service</button>
+          <button class="sub-tab" data-subview="atelier">Atelier</button>
+        </div>
+      </div>
+
+      <!-- Mensuel controls -->
+      <div id="controls-mensuel" class="controls hidden">
+        <div class="period-selector">
+          <button class="period-btn">←</button>
+          <span class="period-label">Avril 2025</span>
+          <button class="period-btn">→</button>
+        </div>
+      </div>
+
+      <!-- Trimestriel controls -->
+      <div id="controls-trimestriel" class="controls hidden">
+        <div class="period-selector">
+          <button class="period-btn">←</button>
+          <span class="period-label">T1 · 2025</span>
+          <button class="period-btn">→</button>
+        </div>
+      </div>
+
+    </nav>
+
+    <!-- ── Right content area ── -->
     <main class="content">
 
       <!-- Hebdo > Global -->
@@ -503,54 +577,6 @@
 
     </main>
 
-    <!-- ── Right navigation panel ── -->
-    <nav class="nav-panel">
-
-      <span class="nav-label">Rapports</span>
-
-      <div class="main-tabs">
-        <button class="main-tab active" data-view="hebdo">Rapports hebdomadaires</button>
-        <button class="main-tab" data-view="mensuel">Rapports mensuels</button>
-        <button class="main-tab" data-view="trimestriel">Rapports trimestriels</button>
-      </div>
-
-      <div class="nav-divider"></div>
-
-      <!-- Hebdo controls -->
-      <div id="controls-hebdo" class="controls">
-        <div class="period-selector">
-          <button class="period-btn">←</button>
-          <span class="period-label">S19 · 5–11 mai 2025</span>
-          <button class="period-btn">→</button>
-        </div>
-        <div class="nav-divider"></div>
-        <span class="nav-label" style="margin-top:0">Vue</span>
-        <div class="sub-tabs">
-          <button class="sub-tab active" data-subview="global">Global</button>
-          <button class="sub-tab" data-subview="ls">Libre Service</button>
-          <button class="sub-tab" data-subview="atelier">Atelier</button>
-        </div>
-      </div>
-
-      <!-- Mensuel controls -->
-      <div id="controls-mensuel" class="controls hidden">
-        <div class="period-selector">
-          <button class="period-btn">←</button>
-          <span class="period-label">Avril 2025</span>
-          <button class="period-btn">→</button>
-        </div>
-      </div>
-
-      <!-- Trimestriel controls -->
-      <div id="controls-trimestriel" class="controls hidden">
-        <div class="period-selector">
-          <button class="period-btn">←</button>
-          <span class="period-label">T1 · 2025</span>
-          <button class="period-btn">→</button>
-        </div>
-      </div>
-
-    </nav>
   </div>
 
   <script>
