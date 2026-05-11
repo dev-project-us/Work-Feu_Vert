@@ -192,9 +192,12 @@ _Objectif : Rigueur technique et capacité de détection des besoins de sécurit
 ## 8. RH
 
 ### 8.1 Alerte RH
-
-> _[Insérer ici toute situation RH sensible ou urgente à signaler : conflit, comportement, avertissement, etc.]_
+> Prolongation arrêt maladie Denis jusque Juillet
+> Arrêt maladie de Kamilia jusque 17/05/2026
 
 ### 8.2 Absence / Congé
+> Congé Paul jusque 17/05/2026
 
 ### 8.3 Recrutement / Départ
+> Départ Mohamad-Ali le 29/05/2026 (problème logement non résolu)
+> Attente retour d'un recrutement profil expert / leader atelier
