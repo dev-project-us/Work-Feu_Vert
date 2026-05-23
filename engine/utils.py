@@ -17,16 +17,17 @@ import glob
 import pathlib
 from typing import Optional
 
-# ── Data directory constants (Docker volume mount paths) ────────────────────
-BASE_DIR      = pathlib.Path("/app/resources")
+# ── Data directory constants ─────────────────────────────────────────────────
+_PROJECT_ROOT = pathlib.Path(__file__).parent.parent
+BASE_DIR      = _PROJECT_ROOT / "resources"
 SUC_DIR       = BASE_DIR / "SUC"
 FAMILLES_DIR  = BASE_DIR / "familles"
 PNEUS_DIR     = BASE_DIR / "Pneus"
 RATIOS_DIR    = BASE_DIR / "ratios prioritaires"
 SUIVI_DIR     = BASE_DIR / "suivi vendeur"
 DEFECT_DIR    = BASE_DIR / "defectuosite"
-MONTHLY_DIR   = pathlib.Path("/app/monthly_recap")
-QUARTERLY_DIR = pathlib.Path("/app/trimestres")
+MONTHLY_DIR   = BASE_DIR / "Resources mensuelles"
+QUARTERLY_DIR = BASE_DIR / "trimestres"
 
 
 # ── Value parsers ────────────────────────────────────────────────────────────

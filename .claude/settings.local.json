@@ -44,9 +44,11 @@
       "Bash(git add *)",
       "Bash(git commit -m ' *)",
       "Bash(git push *)",
-      "Bash(docker compose *)",
       "Bash(python -c \"from engine import markdown_parser; d = markdown_parser.parse_latest_report\\(\\); print\\('Keys:', list\\(d.keys\\(\\)\\)\\); print\\('RH available:', d['rh']['available']\\); print\\('RH alerte:', d['rh']['alerte']\\); print\\('notes_fam count:', len\\(d['notes_fam']\\)\\); print\\('notes_pneu count:', len\\(d['notes_pneu']\\)\\); print\\('plan_ls count:', len\\(d['plan_ls']\\)\\); print\\('plan_at count:', len\\(d['plan_at']\\)\\); print\\('tire_brands available:', d['tire_brands']['available']\\); print\\('defects df shape:', d['defects']['df'].shape\\)\")",
-      "Bash(docker exec fv_dashboard python3 -c ' *)"
+      "Bash(git -C /home/dev-project/Documents/Work/Work-Feu_Vert status)",
+      "Bash(git -C /home/dev-project/Documents/Work/Work-Feu_Vert log --oneline -5)",
+      "Bash(git -C /home/dev-project/Documents/Work/Work-Feu_Vert diff)",
+      "Bash(git *)"
     ]
   }
 }
