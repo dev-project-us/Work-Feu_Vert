@@ -1,5 +1,9 @@
 {
   "permissions": {
+    "allow": [
+      "Bash(find /home/dev-project -type d -name \"Rapport hebdomadaire\" 2>/dev/null)",
+      "Read(//home/dev-project/**)"
+    ],
     "additionalDirectories": [
       "/home/dev-project/Documents/Work/Work-Feu_Vert/.claude/commands"
     ]

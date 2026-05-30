@@ -1,0 +1,40 @@
+﻿nbContratEntretien_DECI,nbCE_G6K
+1,0
+
+textbox1,textbox72
+Du 18/05/2026,24/06/2026
+
+LIBELLEMAGASIN
+ANNECY SEYNOD
+
+textbox250,textbox256
+18/05/2026 - 24/06/2026,19/05/2025 - 25/06/2025
+
+caht_n,textbox4,textbox74,textbox84,cattc_n,textbox16,marge_n,textbox24,textbox78,textbox86,textbox11,nbPassage_n,textbox14,cattc_n_2,textbox17
+47 353,"-80,4 %",264 595,"17,9 %",56 821,"-80,4 %","51,8 %","-80,1 %",130 394,-105 858,Nb. client,709,"-82,7 %","80,1 €","13,9 %"
+
+textbox22,textbox25,textbox27,textbox29,textbox31,textbox33,textbox34,textbox35,textbox37,textbox39,textbox41
+16 628,"-81,4 %",19 952,"-81,4 %","35,8 %","-81,8 %",Nb. client,547,"-83,0 %","36,5 €","9,1 %"
+
+textbox43,textbox45,textbox47,textbox49,textbox51,textbox53,textbox54,textbox55,textbox57,textbox62,textbox64
+30 725,"-79,7 %",36 869,"-79,7 %","60,5 %","-79,4 %",Nb. client,173,"-81,9 %","213,1 €","12,4 %"
+
+textbox76,textbox19,codeFamille,libelleFamille,caht_n_1_1,textbox36,textbox77,textbox15,textbox71,textbox66
+Prog. %  CA n-n-1,Prog. %Marge  n-n-1,,,,-,-, - ,-,-
+Prog. %  CA n-n-1,Prog. %Marge  n-n-1,A,ENTRETIEN,"4 854,04","8,5 %","-82,4 %","19,0 %","43,5 %","-82,8 %"
+Prog. %  CA n-n-1,Prog. %Marge  n-n-1,B,ELECTRICITE,"3 312,14","5,8 %","-79,3 %","19,6 %","45,4 %","-79,6 %"
+Prog. %  CA n-n-1,Prog. %Marge  n-n-1,C,PIECES TECHNIQUES,"8 490,96","14,9 %","-76,5 %","21,6 %","43,1 %","-76,7 %"
+Prog. %  CA n-n-1,Prog. %Marge  n-n-1,D,OUTILLAGE,"1 332,44","2,3 %","-79,4 %","19,9 %","47,4 %","-74,6 %"
+Prog. %  CA n-n-1,Prog. %Marge  n-n-1,E,EQUIPEMENT EXTERIEUR,"6 667,31","11,7 %","-77,6 %","16,9 %","34,1 %","-81,4 %"
+Prog. %  CA n-n-1,Prog. %Marge  n-n-1,F,EQUIPEMENT INTERIEUR,"1 408,25","2,5 %","-83,7 %","17,1 %","32,3 %","-84,6 %"
+Prog. %  CA n-n-1,Prog. %Marge  n-n-1,G,AUTO SON,"1 169,62","2,1 %","-71,9 %","24,6 %","26,5 %","-70,4 %"
+Prog. %  CA n-n-1,Prog. %Marge  n-n-1,H,LUBRIFIANTS,"4 668,05","8,2 %","-81,5 %","19,6 %","43,1 %","-81,2 %"
+Prog. %  CA n-n-1,Prog. %Marge  n-n-1,I,PNEUMATIQUES,"7 911,31","13,9 %","-82,7 %","13,0 %","11,4 %","-77,0 %"
+Prog. %  CA n-n-1,Prog. %Marge  n-n-1,J,2 ROUES,"1 492,00","2,6 %","-85,4 %","20,2 %","-3,5 %","-110,9 %"
+Prog. %  CA n-n-1,Prog. %Marge  n-n-1,U,SERVICES,"-1 908,20","-3,4 %","-63,1 %","94,0 %","93,9 %","-68,7 %"
+Prog. %  CA n-n-1,Prog. %Marge  n-n-1,W,DIVERS,"824,34","1,5 %","-81,5 %", - ,"100,0 %","-80,8 %"
+Prog. %  CA n-n-1,Prog. %Marge  n-n-1,X,TARIF MAIN D'OEUVRE,"16 599,19","29,2 %","-79,5 %","20,2 %","100,0 %","-79,5 %"
+
+libelle,marge_n_2,marge_n_1_1,textbox92
+Marge Produit,10 704,55 730,-81 %
+

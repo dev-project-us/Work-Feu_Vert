@@ -38,23 +38,32 @@ assert fichier_def, "ERREUR : fichier défectuosité introuvable dans resources/
 
 # Line format: "ANNECY SEYNOD,16/03/2026,22/03/2026"
 lines = content.split('\n')
-semaine = None
+date_debut_str = None
+date_fin_str   = None
 for line in lines:
     if 'ANNECY' in line and '/' in line:
-        parts        = line.split(',')
-        date_fin_str = parts[2].strip()
-        date_fin     = datetime.strptime(date_fin_str, "%d/%m/%Y")
-        semaine      = date_fin.isocalendar()[1]
+        parts          = line.split(',')
+        date_debut_str = parts[1].strip()
+        date_fin_str   = parts[2].strip()
         break
 
-assert semaine, "ERREUR : date de fin introuvable dans le fichier défectuosité."
+assert date_fin_str, "ERREUR : date de fin introuvable dans le fichier défectuosité."
 
-
+# Find the matching report by scanning for the period dates (Feu Vert uses a
+# non-ISO week numbering, so we match by date content rather than week number).
 rapport_dir  = str(find_dir("Rapport hebdomadaire"))
-rapport_path = os.path.join(rapport_dir, f"rapport hebdomadaire semaine {semaine}.md")
+rapport_path = None
+for f in sorted(glob.glob(os.path.join(rapport_dir, "rapport hebdomadaire semaine *.md"))):
+    with open(f, 'r', encoding='utf-8') as fh:
+        rc = fh.read()
+    if date_debut_str in rc or date_fin_str in rc:
+        rapport_path = f
+        break
 
-assert os.path.exists(rapport_path), \
-    f"ERREUR : Rapport semaine {semaine} introuvable. Lance d'abord /chiffre."
+assert rapport_path, (
+    f"ERREUR : Aucun rapport contenant la période {date_debut_str}–{date_fin_str}. "
+    "Lance d'abord /chiffre."
+)
 
 # The synthesis block is the LAST block starting with "technicien3".
 # Split on double CRLF, keep the last matching block.

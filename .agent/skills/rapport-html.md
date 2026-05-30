@@ -33,7 +33,7 @@ Or uploads a `rapport_hebdomadaire_*.md` and asks to convert/send it.
 
 ## Step 1 — Find the source file
 
-1. Check if the user uploaded a file → look in `/mnt/user-data/uploads/`
+1. Check if the user referenced a specific `.md` file path
 2. Check if a `.md` report is referenced in the conversation
 3. If no file found, ask: *"Quel fichier rapport veux-tu convertir ?"*
 
@@ -91,7 +91,7 @@ Use the full CSS block below verbatim inside `<style>`. Do NOT modify the CSS.
 Replace only the data content.
 
 Output filename: `rapport_semaine_XX.html` (use the week number from the report).
-Save to: `/mnt/user-data/outputs/rapport_semaine_XX.html`
+Save to: `Rapport hebdomadaire/html/rapport_semaine_XX.html` (locate `Rapport hebdomadaire/` with `find_dir()` — walk up from the current file).
 
 ### Full CSS (copy verbatim)
 
@@ -313,8 +313,8 @@ section-sub: "Absences, congés, mouvements de personnel"
 
 ## Step 5 — Output
 
-1. Write the complete HTML to `/mnt/user-data/outputs/rapport_semaine_XX.html`
-2. Call `present_files` with that path
+1. Write the complete HTML to `Rapport hebdomadaire/html/rapport_semaine_XX.html`
+2. Confirm the file path to the user
 3. Say: *"Voici le rapport semaine XX en HTML — prêt à envoyer !"*
 
 ---
