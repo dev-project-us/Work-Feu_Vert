@@ -53,7 +53,7 @@ MOIS_FR = {
 
 # STEP 1 — LOCATE FILES
 
-pneus_folder = str(find_dir("Resources mensuelles") / "pneus")
+pneus_folder = str(find_dir("resources") / "Resources mensuelles" / "pneus")
 csv_files    = glob.glob(os.path.join(pneus_folder, "Pneus*.csv"))
 assert csv_files, "ERREUR : aucun fichier Pneus*.csv trouvé dans Resources mensuelles/pneus/"
 fichier_pneus = csv_files[0]

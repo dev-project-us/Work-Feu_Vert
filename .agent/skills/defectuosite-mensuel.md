@@ -27,7 +27,7 @@ MOIS_FR = {
 }
 
 
-folder    = str(find_dir("monthly_recap") / "defectuosite")
+folder    = str(find_dir("resources") / "Resources mensuelles" / "defectuosite")
 csv_files = glob.glob(os.path.join(folder, "*.csv"))
 
 fichier_def = None
@@ -38,19 +38,22 @@ for f in csv_files:
         fichier_def = f
         break
 
-assert fichier_def, "ERREUR : fichier défectuosité introuvable dans monthly_recap/defectuosite/"
+assert fichier_def, "ERREUR : fichier défectuosité introuvable dans resources/Resources mensuelles/defectuosite/"
 
+# Normalize line endings (file may use \n or \r\n)
+content_normalized = content.replace('\r\n', '\n')
 
 # Line format: "ANNECY SEYNOD,01/03/2026,31/03/2026"
-lines = content.split('\r\n')
+lines = content_normalized.split('\n')
 for line in lines:
     if 'ANNECY' in line and '/' in line:
         parts        = line.split(',')
-        date_fin_str = parts[2].strip()
-        date_fin     = datetime.strptime(date_fin_str, "%d/%m/%Y")
-        mois_str     = MOIS_FR[date_fin.month]
-        annee        = date_fin.year
-        break
+        if len(parts) >= 3:
+            date_fin_str = parts[2].strip()
+            date_fin     = datetime.strptime(date_fin_str, "%d/%m/%Y")
+            mois_str     = MOIS_FR[date_fin.month]
+            annee        = date_fin.year
+            break
 
 
 rapport_dir  = str(find_dir("Rapport mensuel"))
@@ -60,7 +63,7 @@ assert os.path.exists(rapport_path), \
     f"ERREUR : Rapport mensuel {mois_str} {annee} introuvable. Lance d'abord /chiffre-mensuel."
 
 
-blocks        = content.split('\r\n\r\n')
+blocks        = content_normalized.split('\n\n')
 synthese_block = None
 for block in blocks:
     if block.strip().startswith('technicien3'):

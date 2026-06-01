@@ -60,11 +60,55 @@
 
 ### Points clés de l'analyse par famille
 
-* [Point clé 1 — famille moteur du trimestre]
+* [Point clé 1 — famille moteur du mois]
 * [Point clé 2 — famille en déclin]
 * [Point clé 3 — alerte marge]
 * [Point clé 4 — anomalie ou fait notable]
-* [Synthèse trimestrielle globale]
+* [Synthèse mensuelle globale]
+
+### Analyse Pneus par Saison et Catégorie (mois)
+
+| Saison | Catégorie | Qté | PdM % | CA (€) | Évo CA % | Marge (€) | Marge % | Statut |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **ÉTÉ** | PREMIUM | | | | | | | |
+| **ÉTÉ** | MEDIUM | | | | | | | |
+| **ÉTÉ** | BUDGET | | | | | | | |
+| *Total ÉTÉ* | | | | | | | | |
+| **4 SAISONS** | PREMIUM | | | | | | | |
+| **4 SAISONS** | MEDIUM | | | | | | | |
+| **4 SAISONS** | BUDGET | | | | | | | |
+| *Total 4 SAISONS* | | | | | | | | |
+| **HIVER** | PREMIUM | | | | | | | |
+| **HIVER** | MEDIUM | | | | | | | |
+| **HIVER** | BUDGET | | | | | | | |
+| *Total HIVER* | | | | | | | | |
+| **TOTAL PNEUS** | | | | | | | | |
+
+### Détail par Marque — ÉTÉ (mois)
+
+| Catégorie | Marque | Qté | PdM % | CA (€) | Évo CA % | Marge (€) | Marge % | Statut |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **PREMIUM** | AUTRE | | | | | | | |
+| **PREMIUM** | CONTINENTAL | | | | | | | |
+| **PREMIUM** | GOODYEAR | | | | | | | |
+| **PREMIUM** | MICHELIN | | | | | | | |
+| **PREMIUM** | PIRELLI | | | | | | | |
+| **MEDIUM** | AUTRE | | | | | | | |
+| **MEDIUM** | FEU VERT | | | | | | | |
+| **MEDIUM** | HANKOOK | | | | | | | |
+| **MEDIUM** | KUMHO | | | | | | | |
+| **MEDIUM** | NEXEN | | | | | | | |
+| **MEDIUM** | NOKIAN | | | | | | | |
+| **BUDGET** | AUTRE | | | | | | | |
+| **BUDGET** | ROVELO | | | | | | | |
+| **BUDGET** | TRACMAX | | | | | | | |
+
+### Points clés de l'analyse pneus
+
+* [Point clé 1 — saison dominante du mois]
+* [Point clé 2 — marque en progression]
+* [Point clé 3 — alerte marge]
+* [Point clé 4 — fait notable]
 
 ---
 

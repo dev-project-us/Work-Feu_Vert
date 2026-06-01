@@ -50,7 +50,7 @@ def marge_delta(marge_n_str, marge_n1_str):
     return f'{sign}{delta:.1f} pts'.replace('.', ',')
 
 
-familles_folder = str(find_dir("Resources mensuelles") / "Familles")
+familles_folder = str(find_dir("resources") / "Resources mensuelles" / "familles")
 csv_files       = glob.glob(os.path.join(familles_folder, "comparatifCAv2_Famille*.csv"))
 
 assert csv_files, "ERREUR : aucun fichier comparatifCAv2_Famille*.csv trouvé dans Resources mensuelles/Familles/"
