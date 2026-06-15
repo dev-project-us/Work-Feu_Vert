@@ -65,10 +65,9 @@ for row in reader:
     nom = row['technicien3'].strip()
     techniciens[nom] = row
 
-# 4 techniciens dans le template trimestriel (pas de Victor B.)
+# 3 techniciens dans le template trimestriel (pas de Victor B.)
 NOM_MAP = {
     'Chandrack K.':    'CHANDRACK K.',
-    'Mohammed Ali M.': 'MOHAMMED ALI M.',
     'Gael R.':         'GAEL R.',
     'Denis D.':        'DENIS D.',
 }

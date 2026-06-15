@@ -56,7 +56,6 @@ NOM_MAP = {
     'Paul':     'PAUL P.',
     'Kamilia':  'KAMILIA A.',
     'Chouaib':  'CHOUAIB G.',
-    'Pauline':  'PAULINE R.',
     'Ridvan':   'RIDVAN K.',
     'Valentin': 'VALENTIN C.',
 }

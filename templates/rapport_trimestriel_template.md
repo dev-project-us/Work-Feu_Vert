@@ -86,14 +86,12 @@ Période : [T1/T2/T3/T4] [AAAA] | Centre : Annecy Seynod
 | **Paul** | % | % | % | % | % | % |
 | **Kamilia** | % | % | % | % | % | % |
 | **Chouaib** | % | % | % | % | % | % |
-| **Pauline** | % | % | % | % | % | % |
 | **Valentin** | % | % | % | % | % | % |
 
 ### Staff Atelier : Taux de Défectuosité
 | Technicien | Nb OR | Déf. Bat. | Disq. AV | Disq. AR | Plaq. AV | Plaq. AR | Déf. VCF | Déf. VCR |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Chandrack K.** | | % | % | % | % | % | % | % |
-| **Mohammed Ali M.** | | % | % | % | % | % | % | % |
 | **Gael R.** | | % | % | % | % | % | % | % |
 | **Denis D.** | | % | % | % | % | % | % | % |
 

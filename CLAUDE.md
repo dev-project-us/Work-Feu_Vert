@@ -166,7 +166,6 @@ File identified by presence of `textbox390` in content. Parsed raw with `open(..
 | **Paul** | `PAUL P.` |
 | **Kamilia** | `KAMILIA A.` |
 | **Chouaib** | `CHOUAIB G.` |
-| **Pauline** | `PAULINE R.` |
 | **Ridvan** | `RIDVAN K.` |
 | **Valentin** | `VALENTIN C.` |
 
@@ -206,7 +205,6 @@ Ratios are already formatted as `"24,2 %"` in the CSV — preserve as-is. Output
 |------------------|---------------|
 | `VICTOR B.` | **Victor B.** |
 | `CHANDRACK K.` | **Chandrack K.** |
-| `MOHAMMED ALI M.` | **Mohammed Ali M.** |
 | `GAEL R.` | **Gael R.** |
 | `DENIS D.` | **Denis D.** |
 
