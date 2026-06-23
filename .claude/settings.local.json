@@ -51,7 +51,9 @@
       "Bash(git *)",
       "Bash(del \"c:\\\\Users\\\\mendo\\\\Documents\\\\Work-Feu_Vert\\\\_chiffre_run.py\")",
       "Bash(del \"c:\\\\Users\\\\mendo\\\\Documents\\\\Work-Feu_Vert\\\\run_pneus.py\")",
-      "Bash(python -c ':*)"
+      "Bash(python -c ':*)",
+      "Bash(echo \"=== exit: $? ===\")",
+      "Bash(awk -F/ '{print $1}')"
     ]
   }
 }

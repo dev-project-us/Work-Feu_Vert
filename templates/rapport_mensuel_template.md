@@ -137,7 +137,6 @@ _Objectif : Régularité mensuelle de la transformation en prestations prioritai
 |**Paul**|%|%|%|%|%|%|
 |**Kamilia**|%|%|%|%|%|%|
 |**Chouaib**|%|%|%|%|%|%|
-|**Pauline**|%|%|%|%|%|%|
 |**Valentin**|%|%|%|%|%|%|
 
 ### Staff Atelier : Taux de Défectuosité (cumul mois)
@@ -147,7 +146,6 @@ _Objectif : Rigueur technique sur la durée — détecter les écarts structurel
 |Technicien|Nb OR|Déf. Batterie|Disq AV|Disq AR|Plaq Av|Plaq Ar|Def BEG|Déf. VCF (Frein)|Déf. VCR|Déf. Amort|Déf. Pare-brise|
 |:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|
 |**Chandrack K.**||%|%|%|%|%|%|%|%|%|%|
-|**Mohammed Ali M.**||%|%|%|%|%|%|%|%|%|%|
 |**Victor B.**||%|%|%|%|%|%|%|%|%|%|
 |**Gael R.**||%|%|%|%|%|%|%|%|%|%|
 |**Denis D.**||%|%|%|%|%|%|%|%|%|%|

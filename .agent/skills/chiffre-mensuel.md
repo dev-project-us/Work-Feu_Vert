@@ -262,7 +262,7 @@ rapport = rapport.replace(
 )
 rapport = rapport.replace(
     "| **Marge Brute**     | %           | %        | pts         | %   | pts             |",
-    f"| **Marge Brute**     | {fmt_pct(marge_n, sign=False)} | {fmt_pct(marge_obj, sign=False)} | {fmt_pts(marge_ecart)} | {fmt_pct(marge_n1, sign=False)} | {fmt_pts(marge_evo)} |"
+    f"| **Marge Brute**     | {fmt_pct(marge_n, sign=False)} | {fmt_pct(marge_obj, sign=False)} | {fmt_pts(marge_ecart)} | {fmt_pct(marge_n1, sign=False)} | {fmt_pts(round(marge_n - marge_n1, 1))} |"
 )
 rapport = rapport.replace(
     "| **Marge Brute (€)** | €           | €        | %           | €   | %               |",

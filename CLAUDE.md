@@ -205,7 +205,6 @@ Ratios are already formatted as `"24,2 %"` in the CSV — preserve as-is. Output
 |------------------|---------------|
 | `VICTOR B.` | **Victor B.** |
 | `CHANDRACK K.` | **Chandrack K.** |
-| `MOHAMMED ALI M.` | **Mohammed Ali M.** |
 | `GAEL R.` | **Gael R.** |
 | `DENIS D.` | **Denis D.** |
 

@@ -138,7 +138,6 @@ _Objectif : Capacité des conseillers à transformer l'accueil en prestations pr
 |**Paul**|%|%|%|%|%|%|
 |**Kamilia**|%|%|%|%|%|%|
 |**Chouaib**|%|%|%|%|%|%|
-|**Pauline**|%|%|%|%|%|%|
 |**Ridvan**|%|%|%|%|%|%|
 |**Valentin**|%|%|%|%|%|%|
 
@@ -149,7 +148,6 @@ _Objectif : Rigueur technique et capacité de détection des besoins de sécurit
 |Technicien|Nb OR|Déf. Batterie|Disq AV|Disq AR|Plaq Av|Plaq Ar|Def BEG|Déf. VCF (Frein)|Déf. VCR|Déf. Amort|Déf. Pare-brise|
 |:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|
 |**Chandrack K.**||%|%|%|%|%|%|%|%|%|%|
-|**Mohammed Ali M.**||%|%|%|%|%|%|%|%|%|%|
 |**Victor B.**||%|%|%|%|%|%|%|%|%|%|
 |**Gael R.**||%|%|%|%|%|%|%|%|%|%|
 |**Denis D.**||%|%|%|%|%|%|%|%|%|%|

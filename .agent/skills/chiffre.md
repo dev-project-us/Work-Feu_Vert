@@ -232,7 +232,7 @@ for line in obj_lines:
 # — Derived N-1 values for Section 2 —
 ca_n1      = round(cattc_n / (1 + caht_evo / 100))
 ca_ecart   = round((cattc_n / ca_obj_ttc - 1) * 100, 1) if ca_obj_ttc else 0
-marge_n1   = round(marge_n - marge_evo, 1)
+marge_n1   = round(marge_n / (1 + marge_evo / 100), 1) if marge_evo != -100 else 0
 marge_ecart = round(marge_n - marge_obj, 1)
 freq_n1    = round(freq_n / (1 + freq_evo / 100)) if freq_evo != -100 else 0
 panier_evo = clean_num(g.get('textbox17', '0'))   # reused field — check mapping
@@ -255,7 +255,7 @@ if n1_content:
     ls_panier_n1 = clean_num(ls_n1.get('textbox39', '0'))
 else:
     ls_ca_n1    = round(ls_ca / (1 + ls_evo / 100)) if ls_evo != -100 else 0
-    ls_marge_n1 = round(ls_marge - ls_marge_evo, 1)
+    ls_marge_n1 = round(ls_marge / (1 + ls_marge_evo / 100), 1) if ls_marge_evo != -100 else 0
     ls_panier_n1 = round(ls_panier / (1 + ls_panier_evo / 100), 1) if ls_panier_evo != -100 else 0
 
 # — Atelier block —
@@ -278,7 +278,7 @@ if n1_content:
     at_panier_n1 = clean_num(at_n1.get('textbox62', '0'))
 else:
     at_ca_n1     = round(at_ca / (1 + at_evo / 100)) if at_evo != -100 else 0
-    at_marge_n1  = round(at_marge - at_marge_evo, 1)
+    at_marge_n1  = round(at_marge / (1 + at_marge_evo / 100), 1) if at_marge_evo != -100 else 0
     at_nb_or_n1  = round(at_nb_or / (1 + at_nb_or_evo / 100)) if at_nb_or_evo != -100 else 0
     at_panier_n1 = round(at_panier / (1 + at_panier_evo / 100), 1) if at_panier_evo != -100 else 0
 
@@ -329,7 +329,7 @@ S2_OLD = (
 )
 S2_NEW = (
     f"|**CA TTC Total**|{fmt_eur(cattc_n)}|{fmt_eur(ca_obj_ttc)}|{fmt_pct(ca_ecart)}|{fmt_eur(ca_n1)}|{fmt_pct(caht_evo)}|\n"
-    f"|**Marge Brute**|{fmt_pct(marge_n, sign=False)}|{fmt_pct(marge_obj, sign=False)}|{fmt_pts(marge_ecart)}|{fmt_pct(marge_n1, sign=False)}|{fmt_pts(marge_evo)}|\n"
+    f"|**Marge Brute**|{fmt_pct(marge_n, sign=False)}|{fmt_pct(marge_obj, sign=False)}|{fmt_pts(marge_ecart)}|{fmt_pct(marge_n1, sign=False)}|{fmt_pts(round(marge_n - marge_n1, 1))}|\n"
     f"|**Fréquentation**|{freq_n} clts|-|-|{freq_n1} clts|{fmt_pct(freq_evo)}|\n"
     f"|**Panier Moyen**|{fmt_eur(panier_n)}|-|-|{fmt_eur(panier_n1)}|{fmt_pct(panier_evo)}|"
 )
@@ -343,7 +343,7 @@ S3LS_OLD = (
 )
 S3LS_NEW = (
     f"|**CA TTC Magasin**|{fmt_eur(ls_ca)}|{fmt_eur(ls_obj)}|{fmt_eur(ls_ca_n1)}|{fmt_pct(ls_evo)}|{statut_n1(ls_evo)}|\n"
-    f"|**Marge Magasin**|{fmt_pct(ls_marge, sign=False)}|-|{fmt_pct(ls_marge_n1, sign=False)}|{fmt_pts(ls_marge_evo)}|{statut_n1(ls_marge_evo)}|\n"
+    f"|**Marge Magasin**|{fmt_pct(ls_marge, sign=False)}|-|{fmt_pct(ls_marge_n1, sign=False)}|{fmt_pts(round(ls_marge - ls_marge_n1, 1))}|{statut_n1(ls_marge_evo)}|\n"
     f"|**Panier Moyen LS**|{fmt_eur(ls_panier)}|-|{fmt_eur(ls_panier_n1)}|{fmt_pct(ls_panier_evo)}|{statut_n1(ls_panier_evo)}|"
 )
 rapport = rapport.replace(S3LS_OLD, S3LS_NEW)
@@ -357,7 +357,7 @@ S3AT_OLD = (
 )
 S3AT_NEW = (
     f"|**CA TTC Atelier**|{fmt_eur(at_ca)}|{fmt_eur(at_obj)}|{fmt_eur(at_ca_n1)}|{fmt_pct(at_evo)}|{statut_n1(at_evo)}|\n"
-    f"|**Marge Atelier**|{fmt_pct(at_marge, sign=False)}|-|{fmt_pct(at_marge_n1, sign=False)}|{fmt_pts(at_marge_evo)}|{statut_n1(at_marge_evo)}|\n"
+    f"|**Marge Atelier**|{fmt_pct(at_marge, sign=False)}|-|{fmt_pct(at_marge_n1, sign=False)}|{fmt_pts(round(at_marge - at_marge_n1, 1))}|{statut_n1(at_marge_evo)}|\n"
     f"|**Nombre d'OR**|{at_nb_or}|-|{at_nb_or_n1}|{fmt_pct(at_nb_or_evo)}|{statut_n1(at_nb_or_evo)}|\n"
     f"|**Panier Moyen Atel.**|{fmt_eur(at_panier)}|-|{fmt_eur(at_panier_n1)}|{fmt_pct(at_panier_evo)}|{statut_n1(at_panier_evo)}|"
 )

@@ -47,9 +47,10 @@ def fmt_eur(val):
     return f"{val} €" if val != 'N/A' else 'N/A'
 
 
-pneus_folder = str(find_dir("resources") / "Pneus")
-csv_files    = glob.glob(os.path.join(pneus_folder, "Pneus*.csv"))
-assert csv_files, "ERREUR : aucun fichier Pneus*.csv trouvé dans resources/Pneus/"
+res = find_dir("resources")
+pneus_folder = next((str(res / c) for c in ("Pneus", "pneus") if (res / c).is_dir()), None)
+csv_files    = glob.glob(os.path.join(pneus_folder, "Pneus*.csv")) if pneus_folder else []
+assert csv_files, "ERREUR : aucun fichier Pneus*.csv trouvé dans resources/Pneus/ ou resources/pneus/"
 fichier_pneus = csv_files[0]
 
 rapport_dir = str(find_dir("Rapport hebdomadaire"))

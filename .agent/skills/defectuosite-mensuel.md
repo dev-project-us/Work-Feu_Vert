@@ -86,7 +86,6 @@ for row in reader:
 #
 NOM_MAP = {
     'Chandrack K.':    'CHANDRACK K.',
-    'Mohammed Ali M.': 'MOHAMMED ALI M.',
     'Victor B.':       'VICTOR B.',
     'Gael R.':         'GAEL R.',
     'Denis D.':        'DENIS D.',
