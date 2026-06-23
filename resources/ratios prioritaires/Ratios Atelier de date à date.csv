@@ -1,0 +1,57 @@
+﻿libelleAbrege,textbox38
+ANNECY 2,15/06/2026-21/06/2026
+
+libelleGroupe,qteN,qteN_1,textbox20,textbox50
+Nb OR,191,168,23,14 %
+Forfaits Vidange,36,32,4,13 %
+Pose Pneu,58,68,-10,-15 %
+
+dateDebut_N_1
+16/06/2025-22/06/2025
+
+libelleUnivers,textbox1,objectif,numN,denomN,ratioN,textbox113,textbox114,ratioN_1,textbox130,prixNum,Potentiel,textbox91
+Ratios sur Pose Pneu,Garantie Pneu / Pneus vendus,50 %,34,67,51 %,28,78,36 %,1,5,3,6
+Ratios sur Pose Pneu,Permutation / Pose Pneu,10 %,,58, - ,,68, - ,-6,7,-40,0
+Ratios sur Pose Pneu,Géométrie / Pose Pneu,19 %,17,58,29 %,10,68,15 %,6,66,394,7
+Ratios sur Pose Pneu,Rotule / Pose Pneu,3 %,8,58,14 %,,68, - ,6,45,282,8
+Ratios sur Pose Pneu,Amortisseur / Pose Pneu,5 %,4,58,7 %,4,68,6 %,1,79,87,0
+Ratios sur Nb OR,MultiDiag / Nb OR,30 %,39,191,20 %,35,168,21 %,-18,30,-549,4
+Ratios sur Nb OR,Climatisation / Nb OR,3 %,73,191,38 %,56,168,33 %,67,49,3 296,17
+Ratios sur Nb OR,Courroie Distribution / Nb OR,3 %,,191, - ,1,168,1 %,-5,196,-936,-1
+Ratios sur Nb OR,Liquide de refroidissement / Nb OR,7 %,12,191,6 %,4,168,2 %,-1,70,-96,8
+Ratios sur Nb OR,Plaquette / Nb OR,11 %,17,191,9 %,10,168,6 %,-4,34,-136,7
+Ratios sur Nb OR,Liquide de frein / Nb OR,11 %,25,191,13 %,9,168,5 %,4,59,235,16
+Ratios sur Nb OR,Disque / Plaquette,60 %,7,17,41 %,7,10,70 %,-3,68,-218,0
+Ratios sur Nb OR,Montage ampoules / Nb OR,10 %,10,191,5 %,7,168,4 %,-9,10,-91,3
+Ratios sur Nb OR,Réglage phare / Nb OR,4 %,3,191,2 %,1,168,1 %,-5,32,-148,2
+Ratios sur Nb OR,Rénovation phare / Nb OR,1 %,1,191,1 %,,168, - ,-1,84,-76,1
+Ratios sur Nb OR,Attelage / Nb OR,2 %,3,191,2 %,1,168,1 %,-1,122,-100,2
+Ratios sur vidange,Filtre habitacle / Vidange,65 %,21,36,58 %,25,32,78 %,-2,22,-53,-4
+Ratios sur vidange,Filtre à air / Vidange,50 %,10,36,28 %,10,32,31 %,-8,16,-128,0
+Ratios sur vidange,Filtre à carburant / Vidange,30 %,2,36,6 %,9,32,28 %,-9,23,-202,-7
+Ratios sur vidange,Vidange simple / Vidange,0 %,9,36,25 %,5,32,16 %,9,,0,4
+Ratios sur vidange,Révision 1F / Vidange,30 %,7,36,19 %,8,32,25 %,-4,,0,-1
+Ratios sur vidange,Révision 2F / Vidange,35 %,13,36,36 %,7,32,22 %,0,,0,6
+Ratios sur vidange,Révision 3F / Vidange,17 %,5,36,14 %,6,32,19 %,-1,,0,-1
+Ratios sur vidange,Révision 4F / Vidange,18 %,2,36,6 %,6,32,19 %,-4,,0,-4
+Ratios sur vidange,Nb remplacement bougies / Véhicules essence,15 %,1,1,100 %,2,, - ,1,,0,-1
+Relais de croissance,Obus / Climatisation,70 %,53,73,73 %,45,56,80 %,2,10,19,8
+Relais de croissance,Recherche de fuite / Climatisation,40 %,33,73,45 %,33,56,59 %,4,,0,0
+Relais de croissance,CT / Nb OR,3 %,,191, - ,2,168,1 %,-6,0,0,-2
+Relais de croissance,Nbre montage batteries / Nb batterie,30 %,2,11,18 %,1,16,6 %,-1,20,-26,1
+Relais de croissance,Diag pollution diesel/Nb Révision,0 %,,36, - ,,32, - ,0,29,0,0
+Relais de croissance,Traitements dépollution moteurs / Nb Vidange,35 %,28,36,78 %,9,32,28 %,15,69,1 063,19
+Relais de croissance,Nb Pose Batterie/Nb OR,7 %,2,191,1 %,1,168,1 %,-11,,0,1
+Relais de croissance,NB distribution Puretech / Distribution,12 %,,, - ,,, - ,0,,0,0
+Relais de croissance,Colmatage / Climatisation,35 %,28,73,38 %,20,56,36 %,2,,0,8
+
+textbox141
+5 378
+
+textbox103
+-2 800
+
+textbox65,textbox57,textbox59,textbox60,textbox61,textbox33
+Suivi ventes,Filtre à particules,,,0, - 
+Suivi ventes,Embrayage,,,0, - 
+

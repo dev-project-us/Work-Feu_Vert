@@ -166,7 +166,6 @@ File identified by presence of `textbox390` in content. Parsed raw with `open(..
 | **Paul** | `PAUL P.` |
 | **Kamilia** | `KAMILIA A.` |
 | **Chouaib** | `CHOUAIB G.` |
-| **Pauline** | `PAULINE R.` |
 | **Ridvan** | `RIDVAN K.` |
 | **Valentin** | `VALENTIN C.` |
 
