@@ -53,7 +53,14 @@
       "Bash(del \"c:\\\\Users\\\\mendo\\\\Documents\\\\Work-Feu_Vert\\\\run_pneus.py\")",
       "Bash(python -c ':*)",
       "Bash(echo \"=== exit: $? ===\")",
-      "Bash(awk -F/ '{print $1}')"
+      "Bash(awk -F/ '{print $1}')",
+      "Bash(python _run_defectuosite.py)",
+      "Bash(cd \"/c/Users/mendo/Documents/Work-Feu_Vert\" && rm _run_defectuosite.py)",
+      "Bash(python -X utf8 _tmp_pneus.py)",
+      "Bash(python .tmp_familles.py)"
+    ],
+    "additionalDirectories": [
+      "c:\\c\\Users\\mendo\\Documents\\Work-Feu_Vert"
     ]
   }
 }
